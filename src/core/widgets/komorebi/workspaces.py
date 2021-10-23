@@ -34,7 +34,7 @@ class WorkspaceWidget(BaseWidget):
 
     def __init__(
             self,
-            timer_interval: int = 2000,
+            timer_interval: int = 250,
             class_name: str = "komorebi-workspaces"
     ):
         super().__init__(timer_interval, class_name)
