@@ -1,5 +1,5 @@
 # Yasb: Yet Another Status Bar
-**Yasb** is a highly configurable and hackable taskbar written with python and Qt6. This project is still in (very) early development, and the number of available widgets are currently very limited.
+**Yasb** is a highly configurable and hackable taskbar written in python with Qt6. This project is still in (very) early development, and the number of available widgets are currently very limited.
 
 The feature set stands as follows:
 - Multiple taskbars for each screen
