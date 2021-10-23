@@ -1,0 +1,26 @@
+{
+  "bars": [
+    {
+      "screen": "all",
+      "class_name": "my-top-bar",
+      "position": "top",
+      "always_on_top": false,
+      "centered": false,
+      "width": "100%",
+      "height": 30,
+      "offset": { "x": 0, "y": 0 }
+    }
+    /**
+    {
+      "screen": "DISPLAY1",
+      "class_name": "my-bottom-bar",
+      "position": "bottom",
+      "always_on_top": true,
+      "centered": true,
+      "width": "50%",
+      "height": 30,
+      "offset": { "x": 0, "y": 0 }
+    }
+    **/
+  ]
+}

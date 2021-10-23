@@ -1,0 +1,5 @@
+PyQt6==6.2.0
+pytz==2021.3
+tzlocal==4.0
+pywin32==302
+jstyleson==0.0.2

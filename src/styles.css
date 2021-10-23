@@ -1,0 +1,65 @@
+* {
+    font-family: 'Calibri';
+    font-size: 18px;
+    color: white;
+}
+
+.custom-widget {
+    background: black;
+    color: white;
+}
+
+.bar {
+    background: #121212;
+    border-bottom: 1px solid #59788E;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+/*
+.container,
+.container-left,
+.container-center,
+.container-right
+*/
+.container-left {
+    padding-left: 5px;
+}
+.container-right {
+    padding-right: 5px;
+}
+
+.ws-btn {
+    padding: 5px;
+    margin-right: 1px;
+    border: 2px solid black;
+    background: #3d3d3d;
+    border: 1px solid #e3e3e3;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    font-size: 12px;
+}
+
+.ws-btn:hover {
+    background: #59788E;
+}
+
+.ws-btn.populated {
+    background: darkgreen;
+}
+
+.ws-btn.active {
+    background: blue;
+}
+
+.custom-widget {
+    padding: 0 3px;
+}
+
+.custom-widget.hostname-widget {
+    color: yellow;
+}
+
+.custom-widget.whoami-widget {
+    color: orange;
+}
