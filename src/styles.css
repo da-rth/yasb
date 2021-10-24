@@ -1,13 +1,24 @@
 * {
     font-family: 'Calibri', 'Font Awesome 5 Free';
     font-size: 16px;
-    color: white;
+    color: #f2e5bc;
 }
 
 .bar {
-    background: #121212;
-    border-bottom: 1px solid #59788E;
+    background: #1d2021;
+    border-bottom: 1px solid #928374;
     padding: 0 8px;
+}
+
+.widget * {
+  margin: 2px 2px;
+  padding: 0 10px;
+}
+
+.container-right * .widget * {
+  border-radius: 5px;
+  background: #bdae93;
+  color: #242424;
 }
 
 /*
@@ -45,36 +56,38 @@
 }
 
 .custom-widget.hostname-widget {
-    color: yellow;
+    background: #83a598;
 }
 
-.custom-widget.whoami-widget {
-    color: orange;
+.custom-widget.explorer-widget {
+    cursor: pointer;
 }
+
+.custom-widget.explorer-widget:hover {
+    background: #fbf1c7;
+}
+
 .battery-widget .battery-label {
   padding-top: 2px;
   font-size: 14px;
-  font-weight: bold;
+  color: #242424;
+  border-radius: 5px;
 }
-
 .battery-widget .battery-label.status-critical {
-  color: #fb4934;
+  background: #fb4934;
 }
 .battery-widget .battery-label.status-low {
-  color: #fe8019;
+  background: #fe8019;
 }
 .battery-widget .battery-label.status-medium {
-  color: #fabd2f;
+  background: #fabd2f;
 }
 .battery-widget .battery-label.status-high {
-  color: #b8bb26;
+  background: #b8bb26;
 }
 .battery-widget .battery-label.status-full {
-  color: #8ec07c;
+  background: #8ec07c;
 }
 .battery-widget .battery-label.status-charging {
-  color: #8ec07c;
-}
-.battery-widget {
-  padding-right: 90px;
+  background: #8ec07c;
 }

@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QHBoxLayout
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QFrame
 from PyQt6.QtGui import QMouseEvent
 from PyQt6.QtCore import QTimer, Qt
 from typing import Union
@@ -13,16 +13,28 @@ class BaseWidget(QWidget):
             class_name: str = ""
     ):
         super().__init__()
+        self._widget_frame = QFrame()
+        self._widget_frame_layout = QHBoxLayout()
+        self.widget_layout = QHBoxLayout()
         self.timer_interval = timer_interval
-        self.className = class_name
-        self.setProperty("class", f"widget {class_name}")
+
+        if class_name:
+            self._widget_frame.setProperty("class", f"widget {class_name}")
+        else:
+            self._widget_frame.setProperty("class", "widget")
+
         self.timer = QTimer(self)
         self.mousePressEvent = self._handle_mouse_events
 
-        self.layout = QHBoxLayout()
-        self.layout.setSpacing(0)
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(self.layout)
+        self.widget_layout.setSpacing(0)
+        self.widget_layout.setContentsMargins(0, 0, 0, 0)
+        self._widget_frame_layout.setSpacing(0)
+        self._widget_frame_layout.setContentsMargins(0, 0, 0, 0)
+
+        # Wrap widgets in a widget frame with class name 'widget'
+        self._widget_frame.setLayout(self.widget_layout)
+        self._widget_frame_layout.addWidget(self._widget_frame)
+        self.setLayout(self._widget_frame_layout)
 
         self.callbacks = dict()
         self.register_callback("default", self._cb_do_nothing)

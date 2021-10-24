@@ -12,7 +12,6 @@ class ClockWidget(BaseWidget):
     def __init__(
             self,
             interval: int = 1000,
-            class_name: str = "",
             label: str = "{datetime}",
             label_alt: str = "{datetime}",
             clock_fmt: str = "%H:%M:%S",
@@ -22,7 +21,7 @@ class ClockWidget(BaseWidget):
             on_right: Union[str, list[str]] = "next_timezone",
             timezones=None,
     ):
-        super().__init__(interval, class_name)
+        super().__init__(interval, class_name="clock-widget")
         self._show_alt = False
         self._label = label
         self._label_alt = label_alt
@@ -32,10 +31,8 @@ class ClockWidget(BaseWidget):
         self._active_label = label
         self._active_clock_fmt = clock_fmt
         self._timezones = cycle(timezones if timezones else [get_localzone_name()])
-
         self._clock_text = QLabel()
-        self._clock_text.setProperty("class", f"clock-widget {class_name}")
-        self.layout.addWidget(self._clock_text)
+        self.widget_layout.addWidget(self._clock_text)
 
         self.register_callback("toggle_clock_text", self.toggle_clock_text)
         self.register_callback("update_clock_text", self.update_clock_text)

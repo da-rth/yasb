@@ -1,9 +1,9 @@
 import os
 import sys
 import jstyleson
+import cssutils
 from pathlib import Path
-from .alert_dialog import raise_error_alert
-
+from .alert_dialog import raise_error_alert, raise_info_alert
 
 CONFIG_DIR_NAME = ".yabar"
 STYLES_FILENAME = "styles.css"
@@ -20,9 +20,22 @@ def load_config(config_path) -> dict:
         return jstyleson.load(json_file)
 
 
-def load_stylesheet(stylesheet_path) -> str:
-    with open(stylesheet_path, "r") as css_file:
-        return css_file.read()
+def load_stylesheet(stylesheet_path) -> cssutils.css.CSSStyleSheet:
+    parsesr = cssutils.CSSParser(raiseExceptions=True)
+    try:
+        return parsesr.parseFile(stylesheet_path)
+    except Exception as e:
+        raise_info_alert(
+            title=f"Invalid CSS detected in {STYLES_FILENAME}",
+            msg=(
+                f"The some of the changes made in {STYLES_FILENAME} are invalid"
+                " and may result in your styles being incorrectly applied. "
+            ),
+            informative_msg="Please click 'Show Details' for more information.",
+            additional_details=e.__str__()
+        )
+    finally:
+        return cssutils.parseFile(stylesheet_path)
 
 
 def get_config():
@@ -46,7 +59,7 @@ def get_config():
         raise_error_alert(title, message, informative_message)
 
 
-def get_stylesheet() -> str:
+def get_stylesheet() -> cssutils.css.CSSStyleSheet:
     try:
         if os.path.isdir(HOME_CONFIGURATION_DIR) and os.path.isfile(HOME_STYLES_PATH):
             return load_stylesheet(HOME_STYLES_PATH)

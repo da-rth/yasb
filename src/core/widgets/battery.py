@@ -39,7 +39,7 @@ class BatteryWidget(BaseWidget):
             on_middle: Union[str, list[str]] = "toggle_label",
             on_right: Union[str, list[str]] = "toggle_label",
     ):
-        super().__init__(interval, "battery-widget")
+        super().__init__(interval, class_name="battery-widget")
         self._battery_state = None
         self._blink = False
         self._show_alt = False
@@ -76,7 +76,7 @@ class BatteryWidget(BaseWidget):
 
         self._battery_label = QLabel()
         self._battery_label.setProperty("class", "battery-label")
-        self.layout.addWidget(self._battery_label)
+        self.widget_layout.addWidget(self._battery_label)
         self.start_timer()
 
     def update_battery_info(self):

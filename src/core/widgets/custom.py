@@ -20,9 +20,9 @@ class CustomWidget(BaseWidget):
             on_middle: Union[str, list[str]] = "toggle",
             on_right: Union[str, list[str]] = "toggle",
             mex_length: int = None,
-            class_name: str = ""
+            class_name: str = None
     ):
-        super().__init__(exec_interval, class_name)
+        super().__init__(exec_interval, class_name="custom-widget")
         self._show_alt = False
         self._label = label
         self._label_alt = label_alt if label_alt else label
@@ -42,12 +42,13 @@ class CustomWidget(BaseWidget):
         self.callback_timer = "exec_custom"
 
         self._custom_text = QLabel()
-        self._custom_text.setProperty("class", f"custom-widget {class_name}")
+        if class_name:
+            self._custom_text.setProperty("class", f"custom-widget {class_name}")
 
         if not self._exec_cmd:
             self._custom_text.setText(label)
 
-        self.layout.addWidget(self._custom_text)
+        self.widget_layout.addWidget(self._custom_text)
 
         if self._exec_run_once:
             self._exec_callback()

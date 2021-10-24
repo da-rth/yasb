@@ -57,8 +57,8 @@ class WorkspaceWidget(BaseWidget):
         self._workspace_container.setLayout(self._workspace_container_layout)
         self._workspace_container.setProperty("class", f"komorebi-workspaces {class_name}")
 
-        self.layout.addWidget(self._offline_text)
-        self.layout.addWidget(self._workspace_container)
+        self.widget_layout.addWidget(self._offline_text)
+        self.widget_layout.addWidget(self._workspace_container)
 
         # NOTE: Currently every N seconds we call update_workspaces via a QTimer
         # This method will hopefully be replaced by an event listener which listens to komorebi's public socket

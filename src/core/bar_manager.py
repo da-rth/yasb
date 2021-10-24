@@ -6,6 +6,7 @@ from core.widgets.custom import CustomWidget
 from core.widgets.battery import BatteryWidget
 from core.widgets.komorebi.workspaces import WorkspaceWidget
 from .bar import BAR_POSITION_TOP, BAR_POSITION_BOTTOM
+from cssutils.css import CSSStyleSheet
 
 
 class BarManager(QWidget):
@@ -16,7 +17,7 @@ class BarManager(QWidget):
         self.setWindowFlags(Qt.WindowType.Tool)
         self.hide()
 
-    def add_bar(self, screen, bar_config: dict, stylesheet: str):
+    def add_bar(self, screen, bar_config: dict, stylesheet: CSSStyleSheet):
         bar_position = BAR_POSITION_TOP if bar_config.get('position', "top") == "top" else BAR_POSITION_BOTTOM
         offset = bar_config.get('offset', {})
 
@@ -53,23 +54,18 @@ class BarManager(QWidget):
             'left': [WorkspaceWidget()],
             'center': [ClockWidget()],
             'right': [
-                BatteryWidget(),
                 CustomWidget(
-                    class_name="notepad-widget",
-                    label="notepad",
-                    on_left=["exec", "notepad.exe"]
+                    class_name="explorer-widget",
+                    label="\uf07c",
+                    label_alt="Open Explorer",
+                    on_left=["exec", "explorer.exe"]
                 ),
+                BatteryWidget(),
                 CustomWidget(
                     class_name="hostname-widget",
                     label="{data}",
-                    exec_interval=1000,
+                    exec_run_once=True,
                     exec_cmd=["hostname"]
-                ),
-                CustomWidget(
-                    class_name="whoami-widget",
-                    label="{data}",
-                    exec_interval=1000,
-                    exec_cmd=["whoami"]
                 )
             ]
         }

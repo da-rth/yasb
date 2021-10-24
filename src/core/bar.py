@@ -2,6 +2,7 @@ from typing import Union, NewType, TypedDict, Literal
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QGridLayout, QFrame
 from PyQt6.QtGui import QScreen
 from PyQt6.QtCore import Qt
+from cssutils.css import CSSStyleSheet
 
 BarWidth = NewType('BarWidth', Union[str, int])
 BarOffset = TypedDict('BarOffset', {'x': int, 'y': int})
@@ -23,7 +24,7 @@ class Bar(QWidget):
             width: BarWidth = "100%",
             height: int = 30,
             centered: bool = False,
-            stylesheet: str = None,
+            stylesheet: CSSStyleSheet = None,
             hide_empty_module_containers: bool = False,
             always_on_top: bool = False,
             class_name=""
@@ -41,7 +42,7 @@ class Bar(QWidget):
         self.bar.className = class_name
         self.bar.setProperty("class", f"bar {class_name}")
 
-        self.setStyleSheet(stylesheet)
+        self.setStyleSheet(stylesheet.cssText.decode("utf-8"))
 
         self._set_window_attributes(always_on_top)
         self._set_geometry(x_offset, y_offset, width, height)
