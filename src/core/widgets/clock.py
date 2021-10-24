@@ -5,7 +5,6 @@ from tzlocal import get_localzone_name
 from itertools import cycle
 from typing import Union
 import pytz
-# TODO: Add args on_left, on_middle, on_right
 
 
 class ClockWidget(BaseWidget):
@@ -13,7 +12,7 @@ class ClockWidget(BaseWidget):
     def __init__(
             self,
             interval: int = 1000,
-            class_name: str = "clock",
+            class_name: str = "",
             label: str = "{datetime}",
             label_alt: str = "{datetime}",
             clock_fmt: str = "%H:%M:%S",
@@ -35,7 +34,7 @@ class ClockWidget(BaseWidget):
         self._timezones = cycle(timezones if timezones else [get_localzone_name()])
 
         self._clock_text = QLabel()
-        self._clock_text.setProperty("class", class_name)
+        self._clock_text.setProperty("class", f"clock-widget {class_name}")
         self.layout.addWidget(self._clock_text)
 
         self.register_callback("toggle_clock_text", self.toggle_clock_text)

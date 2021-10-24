@@ -3,3 +3,5 @@ pytz==2021.3
 tzlocal==4.0
 pywin32==302
 jstyleson==0.0.2
+psutil==5.8.0
+humanize==3.12.0

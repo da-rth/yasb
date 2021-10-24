@@ -1,6 +1,6 @@
 * {
-    font-family: 'Calibri';
-    font-size: 18px;
+    font-family: 'Calibri', 'Font Awesome 5 Free';
+    font-size: 16px;
     color: white;
 }
 
@@ -50,4 +50,31 @@
 
 .custom-widget.whoami-widget {
     color: orange;
+}
+.battery-widget .battery-label {
+  padding-top: 2px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.battery-widget .battery-label.status-critical {
+  color: #fb4934;
+}
+.battery-widget .battery-label.status-low {
+  color: #fe8019;
+}
+.battery-widget .battery-label.status-medium {
+  color: #fabd2f;
+}
+.battery-widget .battery-label.status-high {
+  color: #b8bb26;
+}
+.battery-widget .battery-label.status-full {
+  color: #8ec07c;
+}
+.battery-widget .battery-label.status-charging {
+  color: #8ec07c;
+}
+.battery-widget {
+  padding-right: 90px;
 }

@@ -4,7 +4,7 @@
       "screen": "all",
       "class_name": "my-top-bar",
       "position": "top",
-      "always_on_top": false,
+      "always_on_top": true,
       "centered": false,
       "width": "100%",
       "height": 30,

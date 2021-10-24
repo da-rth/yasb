@@ -35,7 +35,7 @@ class WorkspaceWidget(BaseWidget):
     def __init__(
             self,
             timer_interval: int = 250,
-            class_name: str = "komorebi-workspaces"
+            class_name: str = ""
     ):
         super().__init__(timer_interval, class_name)
         self._screen_idx = 0
@@ -48,14 +48,14 @@ class WorkspaceWidget(BaseWidget):
 
         self._offline_text = QLabel()
         self._offline_text.setText("komorebi offline")
-        self._offline_text.setProperty("class", "komorebi-offline")
+        self._offline_text.setProperty("class", "offline-status")
         self._offline_text.hide()
 
         self._workspace_container_layout: QHBoxLayout = QHBoxLayout()
         self._workspace_container_layout.setSpacing(0)
         self._workspace_container_layout.setContentsMargins(0, 0, 0, 0)
         self._workspace_container.setLayout(self._workspace_container_layout)
-        self._workspace_container.setProperty("class", "komorebi-workspaces")
+        self._workspace_container.setProperty("class", f"komorebi-workspaces {class_name}")
 
         self.layout.addWidget(self._offline_text)
         self.layout.addWidget(self._workspace_container)

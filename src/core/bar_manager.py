@@ -3,6 +3,7 @@ from PyQt6.QtCore import Qt
 from core.bar import Bar
 from core.widgets.clock import ClockWidget
 from core.widgets.custom import CustomWidget
+from core.widgets.battery import BatteryWidget
 from core.widgets.komorebi.workspaces import WorkspaceWidget
 from .bar import BAR_POSITION_TOP, BAR_POSITION_BOTTOM
 
@@ -52,6 +53,7 @@ class BarManager(QWidget):
             'left': [WorkspaceWidget()],
             'center': [ClockWidget()],
             'right': [
+                BatteryWidget(),
                 CustomWidget(
                     class_name="notepad-widget",
                     label="notepad",

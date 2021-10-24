@@ -4,6 +4,7 @@ from core.bar_manager import BarManager
 from core.config_parser import get_config, get_stylesheet
 from core.alert_dialog import raise_error_alert, raise_info_alert
 
+DEBUG = True
 ISSUES_URL = "https://github.com/denBot/yasb/issues"
 
 app = QApplication(sys.argv)
@@ -44,6 +45,9 @@ if __name__ == "__main__":
         sys.exit(app.exec())
 
     except Exception:
+        if DEBUG:
+            raise Exception
+
         raise_error_alert(
             title="Program Error",
             msg="This application has encountered a critical error. Sorry about that.",
