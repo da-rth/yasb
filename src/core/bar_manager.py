@@ -55,6 +55,12 @@ class BarManager(QWidget):
             'center': [ClockWidget()],
             'right': [
                 CustomWidget(
+                    class_name="terminal-widget",
+                    label="\uf120",
+                    label_alt="Open Windows Terminal",
+                    on_left=["exec", "wt.exe"]
+                ),
+                CustomWidget(
                     class_name="explorer-widget",
                     label="\uf07c",
                     label_alt="Open Explorer",
