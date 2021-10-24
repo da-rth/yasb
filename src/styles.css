@@ -4,16 +4,10 @@
     color: white;
 }
 
-.custom-widget {
-    background: black;
-    color: white;
-}
-
 .bar {
     background: #121212;
     border-bottom: 1px solid #59788E;
-    padding-left: 5px;
-    padding-right: 5px;
+    padding: 0 8px;
 }
 
 /*
@@ -22,12 +16,6 @@
 .container-center,
 .container-right
 */
-.container-left {
-    padding-left: 5px;
-}
-.container-right {
-    padding-right: 5px;
-}
 
 .ws-btn {
     padding: 5px;
