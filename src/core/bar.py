@@ -122,10 +122,10 @@ class Bar(QWidget):
         else:
             print("Failed to calculate bar width. Defaulting to full width.")
 
-        return bar_width
+        return int(bar_width)
 
     def _calc_bar_height(self, height: int) -> int:
-        return abs(height)
+        return int(abs(height))
 
     def _calc_adjusted_bar_offset(
             self,
