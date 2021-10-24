@@ -52,7 +52,10 @@ class BarManager(QWidget):
     def build_bar_modules(self):
         return {
             'left': [WorkspaceWidget()],
-            'center': [ClockWidget()],
+            'center': [ClockWidget(
+                # Open Clock App on right click
+                on_right=["exec", "explorer.exe", "shell:Appsfolder\\Microsoft.WindowsAlarms_8wekyb3d8bbwe!App"]
+            )],
             'right': [
                 CustomWidget(
                     class_name="terminal-widget",
