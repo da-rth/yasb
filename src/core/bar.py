@@ -1,27 +1,28 @@
-from typing import Union, NewType, TypedDict, Literal
+from typing import Union
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QGridLayout, QFrame
 from PyQt6.QtGui import QScreen
 from PyQt6.QtCore import Qt
 from cssutils.css import CSSStyleSheet
+from enum import Enum
+from core.utils.general import is_valid_percentage_str, percent_to_float
 
-BarWidth = NewType('BarWidth', Union[str, int])
-BarOffset = TypedDict('BarOffset', {'x': int, 'y': int})
-BarPosition = Literal["TOP", "BOTTOM"]
 
-BAR_POSITION_TOP: BarPosition = "TOP"
-BAR_POSITION_BOTTOM: BarPosition = "BOTTOM"
+class Position(Enum):
+    top = "top"
+    bottom = "bottom"
 
 
 class Bar(QWidget):
 
     def __init__(
             self,
+            bar_index: int,
             modules: dict[str, list] = None,
             screen: QScreen = None,
-            position: BarPosition = "TOP",
+            position: Position = None,
             x_offset: int = 0,
             y_offset: int = 0,
-            width: BarWidth = "100%",
+            width: Union[str, int] = "100%",
             height: int = 30,
             centered: bool = False,
             stylesheet: CSSStyleSheet = None,
@@ -34,7 +35,7 @@ class Bar(QWidget):
 
         if screen:
             self.setScreen(screen)
-
+        self.bar_index = bar_index
         self.bar_is_centered = centered
         self.bar_position = position
         self.hide_empty_module_containers = hide_empty_module_containers
@@ -47,6 +48,48 @@ class Bar(QWidget):
         self._set_window_attributes(always_on_top)
         self._set_geometry(x_offset, y_offset, width, height)
         self._add_modules(modules)
+
+    def _set_window_attributes(self, always_on_top: bool):
+        self.setWindowFlag(Qt.WindowType.Tool)
+        self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+
+        if always_on_top:
+            self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint)
+
+    def _set_geometry(
+            self,
+            x_offset: int,
+            y_offset: int,
+            width: Union[int, str],
+            height: int
+    ):
+        width = self._calc_bar_width(width)
+        x, y = self._calc_adjusted_bar_offset(x_offset, y_offset, width, height)
+        self.setGeometry(x, y, width, height)
+        self.bar.setGeometry(0, 0, width, height)
+
+    def _calc_bar_width(self, width: Union[str, int]) -> int:
+        if isinstance(width, str) and is_valid_percentage_str(width):
+            return int(self.screen().geometry().width() * percent_to_float(width))
+        else:
+            return width
+
+    def _calc_adjusted_bar_offset(self, x_offset: int, y_offset: int, bar_w: int, bar_h: int) -> tuple[int, int]:
+        geo = self.screen().geometry()
+
+        if self.bar_is_centered:
+            x = int(geo.x() + (geo.width() / 2) - int(bar_w / 2))
+        else:
+            x = geo.x() + x_offset
+
+        if self.bar_position == Position.bottom:
+            y = geo.height() - y_offset - bar_h
+        else:
+            print("failed to match position bottom")
+            y = geo.y() + y_offset
+
+        return x, y
 
     def _add_modules(self, modules: dict[str, list] = None):
         bar_layout = QGridLayout()
@@ -68,6 +111,7 @@ class Bar(QWidget):
             for widget in modules[layout_type]:
                 widget.setFixedHeight(self.bar.geometry().height() - 2)
                 widget.parent_layout_type = layout_type
+                widget.bar_index = self.bar_index
                 layout.addWidget(widget, 0)
 
             if layout_type in ["left", "center"]:
@@ -78,76 +122,3 @@ class Bar(QWidget):
             bar_layout.addWidget(layout_container, 0, column_num)
 
         self.bar.setLayout(bar_layout)
-
-    def _set_geometry(
-            self,
-            x_offset: int,
-            y_offset: int,
-            width: Union[int, str],
-            height: int
-    ):
-        native_res_width = self._calc_bar_width(width)
-        native_res_height = self._calc_bar_height(height)
-
-        x, y = self._calc_adjusted_bar_offset(x_offset, y_offset, native_res_width, native_res_height)
-        width = self._adjust_pixels_to_ratio(native_res_width)
-        height = self._adjust_pixels_to_ratio(native_res_height)
-
-        self.setGeometry(x, y, width, height)
-        self.bar.setGeometry(0, 0, width, height)
-
-    def _set_window_attributes(self, always_on_top: bool):
-        self.setWindowFlag(Qt.WindowType.Tool)
-        self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-
-        if always_on_top:
-            self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint)
-
-    def _calc_bar_width(self, width: BarWidth) -> int:
-
-        def percent_to_float(percent: str) -> float:
-            return float(percent.strip('%')) / 100.0
-
-        def is_valid_percentage_str(s: str) -> bool:
-            return s.endswith("%") and len(s) <= 4 and s[:-1].isdigit()
-
-        bar_width = self.screen().geometry().width()
-
-        if width:
-            if isinstance(width, str) and is_valid_percentage_str(width):
-                bar_width = self.screen().geometry().width() * percent_to_float(width)
-            else:
-                bar_width = abs(width)
-        else:
-            print("Failed to calculate bar width. Defaulting to full width.")
-
-        return int(bar_width)
-
-    def _calc_bar_height(self, height: int) -> int:
-        return int(abs(height))
-
-    def _calc_adjusted_bar_offset(
-            self,
-            x_offset: int,
-            y_offset: int,
-            bar_width: int,
-            bar_height: int
-    ) -> tuple[int, int]:
-        geo = self.screen().geometry()
-
-        if self.bar_is_centered:
-            center = (self.screen().geometry().width()) / 2
-            x = geo.x() + self._adjust_pixels_to_ratio(center - int(bar_width / 2))
-        else:
-            x = self._adjust_pixels_to_ratio(geo.x() + x_offset)
-
-        if self.bar_position == BAR_POSITION_TOP:
-            y = self._adjust_pixels_to_ratio(geo.y() + y_offset)
-        else:
-            y = self._adjust_pixels_to_ratio(geo.height() - y_offset - bar_height)
-
-        return x, y
-
-    def _adjust_pixels_to_ratio(self, pixels: int) -> int:
-        return pixels  # / self.screen().devicePixelRatio()

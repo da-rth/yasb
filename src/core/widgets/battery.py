@@ -1,9 +1,9 @@
-from datetime import timedelta
-from .base import BaseWidget
-from PyQt6.QtWidgets import QLabel
-from typing import Union, Literal
 import psutil
 import humanize
+from datetime import timedelta
+from core.widgets.base import BaseWidget
+from PyQt6.QtWidgets import QLabel
+from typing import Union, Literal
 
 
 BatteryIconPosition = Literal["left", "right"]

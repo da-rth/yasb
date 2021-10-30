@@ -1,7 +1,7 @@
 import subprocess
 import json
 from PyQt6.QtWidgets import QLabel
-from .base import BaseWidget
+from core.widgets.base import BaseWidget
 from typing import Union
 
 

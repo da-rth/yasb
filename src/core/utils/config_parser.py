@@ -1,9 +1,9 @@
 import os
 import sys
 import jstyleson
-import cssutils
 from pathlib import Path
-from .alert_dialog import raise_error_alert, raise_info_alert
+from core.utils.alert_dialog import raise_error_alert, raise_info_alert
+from cssutils import css, CSSParser, parseFile
 
 CONFIG_DIR_NAME = ".yabar"
 STYLES_FILENAME = "styles.css"
@@ -13,6 +13,7 @@ HOME_STYLES_PATH = os.path.normpath(os.path.join(HOME_CONFIGURATION_DIR, STYLES_
 HOME_CONFIG_PATH = os.path.normpath(os.path.join(HOME_CONFIGURATION_DIR, CONFIG_FILENAME))
 DEFAULT_STYLES_PATH = os.path.normpath(os.path.join(os.path.dirname(sys.argv[0]), STYLES_FILENAME))
 DEFAULT_CONFIG_PATH = os.path.normpath(os.path.join(os.path.dirname(sys.argv[0]), CONFIG_FILENAME))
+GITHUB_ISSUES_URL = "https://github.com/denBot/yasb/issues"
 
 
 def load_config(config_path) -> dict:
@@ -20,10 +21,10 @@ def load_config(config_path) -> dict:
         return jstyleson.load(json_file)
 
 
-def load_stylesheet(stylesheet_path) -> cssutils.css.CSSStyleSheet:
-    parsesr = cssutils.CSSParser(raiseExceptions=True)
+def load_stylesheet(stylesheet_path) -> css.CSSStyleSheet:
+    parser = CSSParser(raiseExceptions=True)
     try:
-        return parsesr.parseFile(stylesheet_path)
+        return parser.parseFile(stylesheet_path)
     except Exception as e:
         raise_info_alert(
             title=f"Invalid CSS detected in {STYLES_FILENAME}",
@@ -35,10 +36,10 @@ def load_stylesheet(stylesheet_path) -> cssutils.css.CSSStyleSheet:
             additional_details=e.__str__()
         )
     finally:
-        return cssutils.parseFile(stylesheet_path)
+        return parseFile(stylesheet_path)
 
 
-def get_config():
+def get_config() -> dict:
     try:
         if os.path.isdir(HOME_CONFIGURATION_DIR) and os.path.isfile(HOME_CONFIG_PATH):
             return load_config(HOME_CONFIG_PATH)
@@ -59,7 +60,7 @@ def get_config():
         raise_error_alert(title, message, informative_message)
 
 
-def get_stylesheet() -> cssutils.css.CSSStyleSheet:
+def get_stylesheet() -> css.CSSStyleSheet:
     try:
         if os.path.isdir(HOME_CONFIGURATION_DIR) and os.path.isfile(HOME_STYLES_PATH):
             return load_stylesheet(HOME_STYLES_PATH)
@@ -78,3 +79,24 @@ def get_stylesheet() -> cssutils.css.CSSStyleSheet:
             "\n\n"
             "Please click 'Show Details' for more information.")
         raise_error_alert(title, message, informative_message)
+
+
+def get_config_and_stylesheet(debug_mode: bool = False) -> tuple[dict, css.CSSStyleSheet]:
+    try:
+        config = get_config()
+        stylesheet = get_stylesheet()
+        return config, stylesheet
+    except Exception:
+        if not debug_mode:
+            raise_error_alert(
+                title="Program Error",
+                msg="This application has encountered a critical error. Sorry about that.",
+                informative_msg=(
+                    f"You can <strong>submit a bug report</strong> at:"
+                    f"<br/><br/><a href='{GITHUB_ISSUES_URL}'>{GITHUB_ISSUES_URL}</a><br/><br/>"
+                    "Please click 'Show Details' for more information."
+                ),
+                rich_text=True
+            )
+        else:
+            raise Exception

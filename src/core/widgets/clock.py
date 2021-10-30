@@ -1,10 +1,10 @@
+import pytz
 from datetime import datetime
-from .base import BaseWidget
+from core.widgets.base import BaseWidget
 from PyQt6.QtWidgets import QLabel
 from tzlocal import get_localzone_name
 from itertools import cycle
 from typing import Union
-import pytz
 
 
 class ClockWidget(BaseWidget):

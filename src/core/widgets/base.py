@@ -1,8 +1,8 @@
+import subprocess
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QFrame
 from PyQt6.QtGui import QMouseEvent
 from PyQt6.QtCore import QTimer, Qt
 from typing import Union
-import subprocess
 
 
 class BaseWidget(QWidget):
@@ -17,6 +17,7 @@ class BaseWidget(QWidget):
         self._widget_frame_layout = QHBoxLayout()
         self.widget_layout = QHBoxLayout()
         self.timer_interval = timer_interval
+        self.bar_index = None
 
         if class_name:
             self._widget_frame.setProperty("class", f"widget {class_name}")
