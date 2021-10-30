@@ -6,7 +6,8 @@ from core.bar import Bar, Position
 from core.widgets.clock import ClockWidget
 from core.widgets.custom import CustomWidget
 from core.widgets.battery import BatteryWidget
-from core.widgets.windows.komorebi.workspaces import WorkspaceWidget
+from core.widgets.komorebi.workspaces import WorkspaceWidget
+from core.widgets.active_window import ActiveWindowWidget
 from core.event_service import EventService
 from core.event_enums import BarEvent
 
@@ -114,7 +115,8 @@ class BarManager(QObject):
     def _build_bar_modules(self):
         return {
             'left': [
-                WorkspaceWidget()
+                WorkspaceWidget(),
+                ActiveWindowWidget()
             ],
             'center': [
                 ClockWidget(

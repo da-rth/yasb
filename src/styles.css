@@ -95,3 +95,9 @@
 .battery-widget .battery-label.status-charging {
   background: #8ec07c;
 }
+
+.active-window-widget .active-window-label {
+  color: #242424;
+  background: #83a598;
+  margin-bottom: -1px;
+}

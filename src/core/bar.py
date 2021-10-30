@@ -6,6 +6,8 @@ from cssutils.css import CSSStyleSheet
 from enum import Enum
 from core.utils.utilities import is_valid_percentage_str, percent_to_float
 
+BAR_WM_TITLE = "YasbBar"
+
 
 class Position(Enum):
     top = "top"
@@ -35,6 +37,8 @@ class Bar(QWidget):
 
         if screen:
             self.setScreen(screen)
+
+        self.setWindowTitle(BAR_WM_TITLE)
         self.bar_index = bar_index
         self.bar_is_centered = centered
         self.bar_position = position

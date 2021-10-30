@@ -32,6 +32,7 @@ class ClockWidget(BaseWidget):
         self._active_clock_fmt = clock_fmt
         self._timezones = cycle(timezones if timezones else [get_localzone_name()])
         self._clock_text = QLabel()
+        self._clock_text.setProperty("class", "clock-label")
         self.widget_layout.addWidget(self._clock_text)
 
         self.register_callback("toggle_clock_text", self.toggle_clock_text)
