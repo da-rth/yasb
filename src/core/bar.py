@@ -4,7 +4,7 @@ from PyQt6.QtGui import QScreen
 from PyQt6.QtCore import Qt
 from cssutils.css import CSSStyleSheet
 from enum import Enum
-from core.utils.general import is_valid_percentage_str, percent_to_float
+from core.utils.utilities import is_valid_percentage_str, percent_to_float
 
 
 class Position(Enum):

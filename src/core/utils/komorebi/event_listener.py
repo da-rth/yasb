@@ -5,7 +5,7 @@ import json
 from PyQt6.QtCore import QObject, QTimer
 from core.event_enums import KomorebiEvent
 from core.event_service import EventService
-from core.widgets.windows.komorebi.helpers.client import KomorebiClient
+from core.utils.komorebi.client import KomorebiClient
 
 KOMOREBI_PIPE_BUFF_SIZE = 64 * 1024
 KOMOREBI_PIPE_NAME = "yasb"

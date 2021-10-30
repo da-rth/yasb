@@ -2,11 +2,11 @@ import traceback
 from PyQt6.QtWidgets import QPushButton, QWidget, QHBoxLayout, QLabel
 from PyQt6.QtCore import pyqtSignal
 from typing import Literal
-from core.utils.windows import get_monitor_hwnd
+from core.utils.win32.utilities import get_monitor_hwnd
 from core.event_service import EventService
 from core.event_enums import BarEvent, KomorebiEvent
 from core.widgets.base import BaseWidget
-from core.widgets.windows.komorebi.helpers.client import KomorebiClient
+from core.utils.komorebi.client import KomorebiClient
 
 
 WorkspaceState = Literal["EMPTY", "POPULATED", "ACTIVE"]

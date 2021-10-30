@@ -3,14 +3,13 @@ from PyQt6.QtWidgets import QApplication
 from core.bar_manager import BarManager
 from core.utils.config_parser import get_config_and_stylesheet
 from core.utils.alert_dialog import raise_info_alert
-from core.widgets.windows.komorebi.helpers.listener import KomorebiEventListener
-# from core.widgets.windows.komorebi.helpers.komorebi_background_updater import KomorebiBackgroundUpdater
+from core.utils.komorebi.event_listener import KomorebiEventListener
+
 DEBUG_MODE = True
 
-app = QApplication(sys.argv)
-app.setQuitOnLastWindowClosed(False)
-
 if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    app.setQuitOnLastWindowClosed(False)
     config, stylesheet = get_config_and_stylesheet(DEBUG_MODE)
     manager = BarManager(app, config, stylesheet)
     manager.initialize_bars()
@@ -28,7 +27,6 @@ if __name__ == "__main__":
         )
 
     komorebi_event_listener = KomorebiEventListener()
-    # komorebi_background_updater = KomorebiBackgroundUpdater()
     manager.add_background_task(komorebi_event_listener.listen_for_events)
     manager.show_bars()
     manager.run_background_tasks()
