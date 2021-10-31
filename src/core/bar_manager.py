@@ -46,6 +46,7 @@ class BarManager(QObject):
         bar = Bar(
             bar_index,
             screen=screen,
+            enable_win32_appbar=True,
             width=bar_config.get('width', '100%'),
             centered=bar_config.get('centered', False),
             position=bar_position,
@@ -58,6 +59,7 @@ class BarManager(QObject):
             modules=self._build_bar_modules(),
             always_on_top=bar_config.get('always_on_top', False)
         )
+
         self._bars.append(bar)
 
     def num_bars(self):
@@ -81,6 +83,14 @@ class BarManager(QObject):
         for bar in self._bars:
             bar.hide()
 
+    def close_bars(self):
+        for bar in self._bars:
+
+            if bar.win32_app_bar:
+                bar.win32_app_bar.remove_appbar()
+
+            bar.close()
+
     def initialize_bars(self):
         self._bars = []
 
@@ -99,14 +109,16 @@ class BarManager(QObject):
 
     def _on_reload_bars_event(self):
         print("Reloading all bars")
-        for bar in self._bars:
-            bar.close()
-
+        self.close_bars()
         self.initialize_bars()
 
     def _on_close_bar_event(self, bar_index: int):
         try:
             bar = self._bars[bar_index]
+
+            if bar.win32_app_bar:
+                bar.win32_app_bar.remove_appbar()
+
             bar.close()
             print("Closed bar", bar_index, "on screen", bar.scree.name())
         except IndexError:

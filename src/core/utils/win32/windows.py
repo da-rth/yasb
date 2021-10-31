@@ -23,8 +23,9 @@ WinEventProcType = ctypes.WINFUNCTYPE(
 
 class WinEvent(Event):
     """
-      Win32 Event Constants
-      - More Info: https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants
+    Win32 Event Constants
+
+    More information: https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants
     """
     EventMin = 0x00000001
     EventMax = 0x7FFFFFFF
@@ -50,10 +51,3 @@ class WinEvent(Event):
     EventSystemMinimizeEnd = 0x0017
     EventSystemMoveSizeStart = 0x000A
     EventSystemMoveSizeEnd = 0x000B
-
-
-
-
-
-
-

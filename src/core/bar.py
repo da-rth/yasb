@@ -6,6 +6,13 @@ from cssutils.css import CSSStyleSheet
 from enum import Enum
 from core.utils.utilities import is_valid_percentage_str, percent_to_float
 
+
+try:
+    from core.utils.win32.app_bar import Win32AppBar, AppBarEdge
+    IMPORT_APP_BAR_MANAGER_SUCCESSFUL = True
+except ImportError:
+    IMPORT_APP_BAR_MANAGER_SUCCESSFUL = False
+
 BAR_WM_TITLE = "YasbBar"
 
 
@@ -20,6 +27,7 @@ class Bar(QWidget):
             self,
             bar_index: int,
             modules: dict[str, list] = None,
+            enable_win32_appbar: bool = True,
             screen: QScreen = None,
             position: Position = None,
             x_offset: int = 0,
@@ -52,6 +60,14 @@ class Bar(QWidget):
         self._set_window_attributes(always_on_top)
         self._set_geometry(x_offset, y_offset, width, height)
         self._add_modules(modules)
+
+        if enable_win32_appbar and IMPORT_APP_BAR_MANAGER_SUCCESSFUL:
+            self.appbar_edge = AppBarEdge.Top if position == Position.top else AppBarEdge.Bottom
+            self.app_bar_manager = Win32AppBar(self, self.appbar_edge)
+            self.app_bar_manager.create_appbar()
+        else:
+            self.appbar_edge = None
+            self.app_bar_manager = None
 
     def _set_window_attributes(self, always_on_top: bool):
         self.setWindowFlag(Qt.WindowType.Tool)

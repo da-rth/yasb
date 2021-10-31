@@ -1,4 +1,3 @@
-
 import sys
 from PyQt6.QtWidgets import QApplication
 from core.bar_manager import BarManager
