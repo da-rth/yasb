@@ -148,4 +148,4 @@ class BatteryWidget(BaseWidget):
 
         self._battery_label.setText(battery_status)
         self._battery_label.setProperty("class", f"battery-label status-{threshold}")
-        self._battery_label.setStyleSheet(self.styleSheet())
+        self._battery_label.setStyleSheet('')

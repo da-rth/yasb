@@ -5,6 +5,7 @@ from cssutils.css import CSSStyleSheet
 from core.bar import Bar, Position
 from core.widgets.clock import ClockWidget
 from core.widgets.custom import CustomWidget
+from core.widgets.memory import MemoryWidget
 from core.widgets.battery import BatteryWidget
 from core.widgets.komorebi.workspaces import WorkspaceWidget
 from core.widgets.active_window import ActiveWindowWidget
@@ -149,6 +150,7 @@ class BarManager(QObject):
                     label_alt="Open Explorer",
                     on_left=["exec", "explorer.exe"]
                 ),
+                MemoryWidget(),
                 BatteryWidget(),
                 CustomWidget(
                     class_name="hostname-widget",
