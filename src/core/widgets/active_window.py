@@ -8,20 +8,12 @@ from PyQt6.QtWidgets import QLabel
 from typing import Union
 from core.bar import BAR_WM_TITLE
 
-IGNORED_TITLES = [
-    '',
-]
-IGNORED_CLASSES = [
-    'WorkerW'
-]
-IGNORED_PROCESSES = [
-    'SearchHost.exe'
-]
-IGNORED_YASB_TITLES = [
-    BAR_WM_TITLE
-]
+IGNORED_TITLES = ['']
+IGNORED_CLASSES = ['WorkerW']
+IGNORED_PROCESSES = ['SearchHost.exe']
+IGNORED_YASB_TITLES = [BAR_WM_TITLE]
 
-DEFAULT_ALT_LABEL = "[class_name='{win[class_name]}' exe='{win[process]}' " \
+DEFAULT_ALT_LABEL = "[class_name='{win[class_name]}' exe='{win[process][name]}' " \
                     "hwnd={win[hwnd]} monitor='{win[monitor_info][device]}']"
 
 
@@ -65,6 +57,7 @@ class ActiveWindowWidget(BaseWidget):
 
         self._event_service.register_event(WinEvent.EventSystemForeground, self.foreground_change)
         self._event_service.register_event(WinEvent.EventSystemMoveSizeEnd, self.foreground_change)
+        self._event_service.register_event(WinEvent.EventObjectNameChange, self.foreground_change)
 
     def _toggle_title_text(self) -> None:
         self._show_alt = not self._show_alt
@@ -74,12 +67,18 @@ class ActiveWindowWidget(BaseWidget):
     def _on_focus_change_event(self, win_info: dict) -> None:
         try:
             if win_info['title'] not in IGNORED_YASB_TITLES:
-                self._win_info = win_info
-                self._update_window_title()
+                # This event is triggered when web browser tab changes occur
+                if win_info['event'] == WinEvent.EventObjectNameChange and win_info['title']:
+                    self._win_info['title'] = win_info['title']
+                    self._window_title_text.setText(win_info['title'])
+                    self._window_title_text.show()
+                else:
+                    self._win_info = win_info
+                    self._update_window_title()
         except Exception:
             print(traceback.format_exc())
 
-    def _update_window_title(self,) -> None:
+    def _update_window_title(self) -> None:
         try:
             title = self._win_info['title']
             process = self._win_info['process']

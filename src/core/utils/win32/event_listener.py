@@ -15,15 +15,15 @@ class Win32EventListener(QObject):
 
     def _event_handler(self, win_event_hook, event, hwnd, id_object, id_child, event_thread, event_time) -> None:
         if event in WinEvent:
-            hwnd_info = get_hwnd_info(hwnd)
             event_type = WinEvent._value2member_map_[event]
-            self._event_service.emit_event(event_type, hwnd_info)
+            event_info = get_hwnd_info(hwnd, event_type)
+            self._event_service.emit_event(event_type, event_info)
 
     def _build_event_hook(self) -> int:
         # Hooks onto System events only
         return user32.SetWinEventHook(
             WinEvent.EventMin.value,
-            WinEvent.EventSystemEnd.value,
+            WinEvent.EventObjectEnd.value,
             0,
             self._win_event_process,
             0,
@@ -32,9 +32,10 @@ class Win32EventListener(QObject):
         )
 
     def _emit_foreground_window_event(self):
+        foreground_event = WinEvent.EventSystemForeground
         foreground_window_hwnd = GetForegroundWindow()
-        foreground_window_info = get_hwnd_info(foreground_window_hwnd)
-        self._event_service.emit_event(WinEvent.EventSystemForeground, foreground_window_info)
+        foreground_window_info = get_hwnd_info(foreground_window_hwnd, foreground_event)
+        self._event_service.emit_event(foreground_event, foreground_window_info)
 
     def listen_for_events(self):
         hook = self._build_event_hook()
