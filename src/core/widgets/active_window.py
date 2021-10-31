@@ -62,46 +62,43 @@ class ActiveWindowWidget(BaseWidget):
     def _toggle_title_text(self) -> None:
         self._show_alt = not self._show_alt
         self._active_label = self._label_alt if self._show_alt else self._label
+        print("before", self._win_info)
         self._update_text()
 
     def _on_focus_change_event(self, win_info: dict) -> None:
         try:
             if win_info['title'] not in IGNORED_YASB_TITLES:
-                # This event is triggered when web browser tab changes occur
-                if win_info['event'] == WinEvent.EventObjectNameChange and win_info['title']:
-                    self._win_info['title'] = win_info['title']
-                    self._window_title_text.setText(win_info['title'])
-                    self._window_title_text.show()
-                else:
-                    self._win_info = win_info
-                    self._update_window_title()
+                self._update_window_title(win_info)
         except Exception:
             print(traceback.format_exc())
 
-    def _update_window_title(self) -> None:
+    def _update_window_title(self, win_info: dict) -> None:
         try:
-            title = self._win_info['title']
-            process = self._win_info['process']
-            class_name = self._win_info['class_name']
-            monitor_name = self._win_info['monitor_info'].get('device', None)
+            hwnd = win_info['hwnd']
+            event = win_info['event']
+            title = win_info['title']
+            process = win_info['process']
+            class_name = win_info['class_name']
+            monitor_name = win_info['monitor_info'].get('device', None)
 
-            if self._max_title_length and len(self._win_info['title']) > self._max_title_length:
-                truncated_title = f"{self._win_info['title'][:self._max_title_length]}{self.max_title_ellipsis_fmt}"
-                self._win_info['title'] = truncated_title
-
-            if self._monitor_exclusive_label and self.screen().name() != monitor_name:
+            if not hwnd or (event == WinEvent.EventObjectNameChange and not title):
+                return
+            elif self._monitor_exclusive_label and self.screen().name() != monitor_name:
                 return self._window_title_text.hide()
-
-            if (title in IGNORED_TITLES) or (class_name in IGNORED_CLASSES) or (process in IGNORED_PROCESSES):
+            elif (title in IGNORED_TITLES) or (class_name in IGNORED_CLASSES) or (process in IGNORED_PROCESSES):
                 if not self._no_window_text:
                     return self._window_title_text.hide()
-
-                self._window_title_text.setText(self._no_window_text)
             else:
+                if self._max_title_length and len(win_info['title']) > self._max_title_length:
+                    truncated_title = f"{win_info['title'][:self._max_title_length]}{self.max_title_ellipsis_fmt}"
+                    win_info['title'] = truncated_title
+                    self._window_title_text.setText(self._no_window_text)
+
+                self._win_info = win_info
                 self._update_text()
 
-            if self._window_title_text.isHidden():
-                self._window_title_text.show()
+                if self._window_title_text.isHidden():
+                    self._window_title_text.show()
         except Exception:
             print(traceback.format_exc())
 
