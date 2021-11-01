@@ -1,8 +1,8 @@
-import os
 import traceback
 import psutil
 from humanize import naturalsize
 from core.widgets.base import BaseWidget
+from core.utils.win32.utilities import open_task_manager
 from PyQt6.QtWidgets import QLabel
 from typing import Union
 
@@ -32,7 +32,7 @@ class MemoryWidget(BaseWidget):
 
         self.register_callback("toggle_memory_info", self._toggle_memory_info)
         self.register_callback("update_memory_info", self._update_memory_info)
-        self.register_callback("open_task_manager", self._open_task_manager)
+        self.register_callback("open_task_manager", open_task_manager)
 
         self.callback_left = on_left
         self.callback_right = on_right
@@ -46,9 +46,6 @@ class MemoryWidget(BaseWidget):
         }
 
         self.start_timer()
-
-    def _open_task_manager(self):
-        os.system("cmd /c Taskmgr")
 
     def _toggle_memory_info(self):
         self._show_alt = not self._show_alt

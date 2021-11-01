@@ -5,13 +5,14 @@ from core.utils.win32.windows import WinEvent
 from win32process import GetWindowThreadProcessId
 from win32gui import GetWindowText, GetClassName, GetWindowRect
 from win32api import MonitorFromWindow, GetMonitorInfo
+from subprocess import Popen
 
 
 def get_monitor_hwnd(window_hwnd: int) -> int:
     return int(MonitorFromWindow(window_hwnd))
 
 
-def get_monitor_info(monitor_hwnd: int):
+def get_monitor_info(monitor_hwnd: int) -> dict:
     monitor_info = GetMonitorInfo(monitor_hwnd)
     return {
         'rect': {
@@ -112,3 +113,7 @@ def get_hwnd_info(hwnd: int, event: WinEvent) -> dict:
         }
     except Exception:
         print(traceback.format_exc())
+
+
+def open_task_manager() -> None:
+    Popen(["cmd", "/c", "Taskmgr"])
