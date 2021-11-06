@@ -2,15 +2,11 @@ import traceback
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import QThreadPool, QObject, pyqtSignal
 from cssutils.css import CSSStyleSheet
-from core.bar import Bar, Position
-from core.widgets.clock import ClockWidget
-from core.widgets.custom import CustomWidget
-from core.widgets.memory import MemoryWidget
-from core.widgets.battery import BatteryWidget
-from core.widgets.komorebi.workspaces import WorkspaceWidget
-from core.widgets.active_window import ActiveWindowWidget
+from core.bar import Bar
+from core.utils.widget_builder import WidgetBuilder
 from core.event_service import EventService
 from core.event_enums import BarEvent
+from copy import deepcopy
 
 
 class BarManager(QObject):
@@ -35,32 +31,8 @@ class BarManager(QObject):
         self._event_service.register_event(BarEvent.CloseBar, self.close_bar_signal)
         self._event_service.register_event(BarEvent.ReloadBars, self.reload_bars_signal)
 
-    def add_bar(self, screen, bar_config: dict, stylesheet: CSSStyleSheet):
-        offset = bar_config.get('offset', {})
-        bar_index = len(self._bars)
-
-        try:
-            bar_position = Position[bar_config.get('position', "bottom")]
-        except KeyError:
-            bar_position = Position.top
-
-        bar = Bar(
-            bar_index,
-            screen=screen,
-            enable_win32_appbar=True,
-            width=bar_config.get('width', '100%'),
-            centered=bar_config.get('centered', False),
-            position=bar_position,
-            height=bar_config.get('height', 30),
-            hide_empty_module_containers=True,
-            x_offset=offset.get('x', 0),
-            y_offset=offset.get('y', 0),
-            class_name=bar_config.get('class_name', ''),
-            stylesheet=stylesheet,
-            modules=self._build_bar_modules(),
-            always_on_top=bar_config.get('always_on_top', False)
-        )
-
+    def add_bar(self, bar_options: dict):
+        bar = Bar(**bar_options)
         self._bars.append(bar)
 
     def num_bars(self):
@@ -92,21 +64,37 @@ class BarManager(QObject):
 
             bar.close()
 
-    def initialize_bars(self):
-        self._bars = []
+    def initialize_bars(self) -> None:
+        widget_builder = WidgetBuilder(self._config['widgets'])
 
-        for bar_config in self._config['bars']:
-            if bar_config['screen'] == "all":
+        for bar_index, (bar_name, bar_config) in enumerate(self._config['bars'].items()):
+
+            if not bar_config['enabled']:
+                continue
+
+            bar_options = deepcopy(bar_config)
+            bar_options['bar_index'] = bar_index
+            bar_options['bar_name'] = bar_name
+            bar_options['stylesheet'] = self._stylesheet.cssText.decode('utf-8')
+            bar_options['widgets'] = widget_builder.build_widgets(bar_options.get('widgets', {}))
+            del bar_options['enabled']
+            del bar_options['screens']
+
+            if '*' in bar_config['screens']:
                 for screen in self._app.screens():
-                    print("Adding bar to", screen.name())
-                    self.add_bar(screen, bar_config, self._stylesheet)
+                    bar = Bar(**bar_options, bar_screen=screen)
+                    self._bars.append(bar)
             else:
-                screen_name = bar_config['screen']
-                matched_screen = next(filter(lambda scr: screen_name in scr.name(), self._app.screens()), None)
+                for screen_name in bar_config['screens']:
+                    screen = self._get_screen_by_name(screen_name)
+                    if screen:
+                        bar = Bar(**bar_options, bar_screen=screen)
+                        self._bars.append(bar)
 
-                if matched_screen:
-                    print("Adding bar to", matched_screen.name())
-                    self.add_bar(matched_screen, bar_config, self._stylesheet)
+        widget_builder.raise_alerts_if_errors_present()
+
+    def _get_screen_by_name(self, screen_name: str):
+        return next(filter(lambda scr: screen_name in scr.name(), self._app.screens()), None)
 
     def _on_reload_bars_event(self):
         print("Reloading all bars")
@@ -124,39 +112,3 @@ class BarManager(QObject):
             print("Closed bar", bar_index, "on screen", bar.scree.name())
         except IndexError:
             print("Failed to close bar with index", bar_index, "due to IndexError")
-
-    def _build_bar_modules(self):
-        return {
-            'left': [
-                WorkspaceWidget(),
-                ActiveWindowWidget()
-            ],
-            'center': [
-                ClockWidget(
-                    # Open Clock App on right click
-                    on_right=["exec", "explorer.exe", "shell:Appsfolder\\Microsoft.WindowsAlarms_8wekyb3d8bbwe!App"]
-                )
-            ],
-            'right': [
-                CustomWidget(
-                    class_name="terminal-widget",
-                    label="\uf120",
-                    label_alt="Open Windows Terminal",
-                    on_left=["exec", "wt.exe"]
-                ),
-                CustomWidget(
-                    class_name="explorer-widget",
-                    label="\uf07c",
-                    label_alt="Open Explorer",
-                    on_left=["exec", "explorer.exe"]
-                ),
-                MemoryWidget(),
-                BatteryWidget(),
-                CustomWidget(
-                    class_name="hostname-widget",
-                    label="{data}",
-                    exec_run_once=True,
-                    exec_cmd=["hostname"]
-                )
-            ]
-        }

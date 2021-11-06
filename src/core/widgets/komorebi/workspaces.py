@@ -7,7 +7,7 @@ from core.event_service import EventService
 from core.event_enums import BarEvent, KomorebiEvent
 from core.widgets.base import BaseWidget
 from core.utils.komorebi.client import KomorebiClient
-
+from core.validation.widgets.komorebi.workspaces import VALIDATION_SCHEMA
 
 WorkspaceState = Literal["EMPTY", "POPULATED", "ACTIVE"]
 WORKSPACE_STATE_EMPTY: WorkspaceState = "EMPTY"
@@ -43,10 +43,12 @@ class WorkspaceWidget(BaseWidget):
     k_signal_disconnect = pyqtSignal()
     k_signal_focus_change = pyqtSignal(dict)
     k_signal_workspace_focus = pyqtSignal(dict)
+    validation_schema = VALIDATION_SCHEMA
 
     def __init__(
             self,
-            offline_status_label: str = "komorebi offline"
+            label_offline: str,
+            hide_empty_workspaces: bool
     ):
         super().__init__(class_name="komorebi-workspaces")
         self._event_service = EventService()
@@ -56,13 +58,14 @@ class WorkspaceWidget(BaseWidget):
         self._prev_workspace_index = None
         self._curr_workspace_index = None
         self._workspace_buttons: list[QPushButton] = []
+        self._hide_empty_workspaces = hide_empty_workspaces
 
         # Disable default mouse event handling inherited from BaseWidget
         self.mousePressEvent = None
 
         # Status text shown when komorebi state can't be retrieved
         self._offline_text = QLabel()
-        self._offline_text.setText(offline_status_label)
+        self._offline_text.setText(label_offline)
         self._offline_text.setProperty("class", "offline-status")
 
         # Construct container which holds workspace buttons

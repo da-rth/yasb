@@ -1,0 +1,117 @@
+bars:
+  yasb-bar:
+    enabled: true
+    screens: ['*']
+    class_name: "yasb-bar"
+    #alignment:
+      #position: "top"
+      #center: false
+    window_flags:
+      #always_on_top: false
+      windows_app_bar: false
+    #dimensions:
+      #width: "100%"
+      #height: 30
+    #offset:
+      #x: 0
+      #y: 0
+    widgets:
+      left:   ["komorebi_workspaces", "active_window"]
+      center: ["clock"]
+      right:  ["explorer_btn", "memory", "battery"]
+
+widgets:
+  clock:
+    type: "yasb.clock.ClockWidget"
+    options:
+        label: "{%H:%M:%S %Z}"
+        label_alt: "{%d-%m-%y %H:%M:%S %Z}"
+        #update_interval: 1000
+        # List of timezones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+        timezones: ["Europe/London", "America/New_York"]
+        callbacks:
+          #on_left: "toggle_label"
+          on_middle: "exec explorer.exe shell:Appsfolder\\Microsoft.WindowsAlarms_8wekyb3d8bbwe!App"
+          on_right: "next_timezone"
+
+  explorer_btn:
+    type: "yasb.custom.CustomWidget"
+    options:
+        label: "\uf07c"
+        label_alt: "Open Explorer"
+        label_max_length: 90
+        class_name: "explorer-widget"
+        exec_options:
+          run_cmd: null
+          run_once: falseW
+          run_interval: 0
+          return_format: "json"
+          return_encoding: "utf-8"
+        callbacks:
+          on_left: "exec explorer.exe"
+          on_middle: "do_nothing" # TODO: fix callbacks when null
+          on_right: "do_nothing"
+
+  memory:
+    type: "yasb.memory.MemoryWidget"
+    options:
+        label: "\uf538  {virtual_mem_free}"
+        label_alt: "\uf538  {virtual_mem_percent}%"
+        update_interval: 5000
+        callbacks:
+          #on_left: "toggle_label"
+          #on_middle: "do_nothing"
+          on_right: "exec cmd /c Taskmgr"
+        #memory_thresholds:
+          #low: 25
+          #medium: 50
+          #high: 90
+
+  battery:
+    type: "yasb.battery.BatteryWidget"
+    options:
+        # Label options: icon, percent, time_remaining, is_charging
+        label: "{icon}"
+        label_alt: "{percent}% | time remaining: {time_remaining}"
+        update_interval: 1000
+        time_remaining_natural: true
+        charging_options:
+          icon_format: "{charging_icon}  {icon}"
+          blink_charging_icon: true
+        status_thresholds:
+          critical: 10
+          low: 25
+          medium: 75
+          high: 95
+          full: 100
+        status_icons:
+          icon_charging: "\uf0e7"
+          icon_critical: "\uf244"
+          icon_low: "\uf243"
+          icon_medium: "\uf242"
+          icon_high: "\uf241"
+          icon_full: "\uf240"
+        callbacks:
+          on_left: "toggle_label"
+          on_middle: "do_nothing"
+          on_right: "do_nothing"
+
+  active_window:
+    type: "yasb.active_window.ActiveWindowWidget"
+    options:
+      label: "[ {win[title]} ]"
+      label_alt: "[class_name='{win[class_name]}' exe='{win[process][name]}' hwnd={win[hwnd]}]"
+      label_no_window: ""
+      max_length: 32
+      max_length_ellipsis: "..."
+      monitor_exclusive: true
+      callbacks:
+        on_left: "toggle_label"
+        on_middle: "do_nothing"
+        on_right: "do_nothing"
+
+  komorebi_workspaces:
+    type: "komorebi.workspaces.WorkspaceWidget"
+    #options:
+        #label_offline: "Komorebi Offline"
+        #hide_empty_workspaces: false # <- Work in Progress

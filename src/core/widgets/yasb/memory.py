@@ -2,26 +2,22 @@ import traceback
 import psutil
 from humanize import naturalsize
 from core.widgets.base import BaseWidget
-from core.utils.win32.utilities import open_task_manager
+from core.validation.widgets.yasb.memory import VALIDATION_SCHEMA
 from PyQt6.QtWidgets import QLabel
-from typing import Union
 
 
 class MemoryWidget(BaseWidget):
+    validation_schema = VALIDATION_SCHEMA
 
     def __init__(
             self,
-            interval: int = 500,
-            label: str = "\uf538  {virtual_mem_free}/{virtual_mem_total}",
-            label_alt: str = "\uf538  VIRT: {virtual_mem_percent}% SWAP: {swap_mem_percent}%",
-            on_left: Union[str, list[str]] = "toggle_memory_info",
-            on_middle: Union[str, list[str]] = "toggle_memory_info",
-            on_right: Union[str, list[str]] = "open_task_manager",
-            percent_threshold_low: int = 25,
-            percent_threshold_medium: int = 50,
-            percent_threshold_high: int = 90
+            label: str,
+            label_alt: str,
+            update_interval: int,
+            callbacks: dict[str, str],
+            memory_thresholds: dict[str, int]
     ):
-        super().__init__(interval, class_name="memory-widget")
+        super().__init__(update_interval, class_name="memory-widget")
         self._show_alt = False
         self._label = label
         self._label_alt = label_alt
@@ -30,20 +26,15 @@ class MemoryWidget(BaseWidget):
         self._mem_text.setProperty("class", "memory-label")
         self.widget_layout.addWidget(self._mem_text)
 
-        self.register_callback("toggle_memory_info", self._toggle_memory_info)
+        self.register_callback("toggle_label", self._toggle_memory_info)
         self.register_callback("update_memory_info", self._update_memory_info)
-        self.register_callback("open_task_manager", open_task_manager)
 
-        self.callback_left = on_left
-        self.callback_right = on_right
-        self.callback_middle = on_middle
+        self.callback_left = callbacks['on_left']
+        self.callback_right = callbacks['on_right']
+        self.callback_middle = callbacks['on_middle']
         self.callback_timer = "update_memory_info"
 
-        self._percent_thresholds = {
-            'low': percent_threshold_low,
-            'medium': percent_threshold_medium,
-            'high': percent_threshold_high
-        }
+        self._percent_thresholds = memory_thresholds
 
         self.start_timer()
 
@@ -72,7 +63,7 @@ class MemoryWidget(BaseWidget):
                 mem_text = mem_text.replace(fmt_str, str(value))
 
             self._mem_text.setText(mem_text)
-            self._mem_text.setProperty("class", f"battery-label status-{threshold}")
+            self._mem_text.setProperty("class", f"memory-label status-{threshold}")
             self._mem_text.setStyleSheet('')
         except Exception:
             print(traceback.format_exc())

@@ -1,13 +1,16 @@
 import os
 import sys
-import jstyleson
+import yaml
 from pathlib import Path
 from core.utils.alert_dialog import raise_error_alert, raise_info_alert
+from core.validation.config import CONFIG_SCHEMA
 from cssutils import css, CSSParser, parseFile
+from cerberus import Validator, schema
+from pprint import pprint
 
 CONFIG_DIR_NAME = ".yabar"
 STYLES_FILENAME = "styles.css"
-CONFIG_FILENAME = "config.json"
+CONFIG_FILENAME = "config.yaml"
 HOME_CONFIGURATION_DIR = os.path.join(Path.home(), CONFIG_DIR_NAME)
 HOME_STYLES_PATH = os.path.normpath(os.path.join(HOME_CONFIGURATION_DIR, STYLES_FILENAME))
 HOME_CONFIG_PATH = os.path.normpath(os.path.join(HOME_CONFIGURATION_DIR, CONFIG_FILENAME))
@@ -15,10 +18,16 @@ DEFAULT_STYLES_PATH = os.path.normpath(os.path.join(os.path.dirname(sys.argv[0])
 DEFAULT_CONFIG_PATH = os.path.normpath(os.path.join(os.path.dirname(sys.argv[0]), CONFIG_FILENAME))
 GITHUB_ISSUES_URL = "https://github.com/denBot/yasb/issues"
 
+try:
+    yaml_validator = Validator(CONFIG_SCHEMA)
+except schema.SchemaError as e:
+    pprint(e)
+    raise Exception
+
 
 def load_config(config_path) -> dict:
-    with open(config_path) as json_file:
-        return jstyleson.load(json_file)
+    with open(config_path) as yaml_stream:
+        return yaml.safe_load(yaml_stream)
 
 
 def load_stylesheet(stylesheet_path) -> css.CSSStyleSheet:
@@ -42,9 +51,23 @@ def load_stylesheet(stylesheet_path) -> css.CSSStyleSheet:
 def get_config() -> dict:
     try:
         if os.path.isdir(HOME_CONFIGURATION_DIR) and os.path.isfile(HOME_CONFIG_PATH):
-            return load_config(HOME_CONFIG_PATH)
+            config_path = HOME_CONFIG_PATH
+            config = load_config(HOME_CONFIG_PATH)
         else:
-            return load_config(DEFAULT_CONFIG_PATH)
+            config_path = DEFAULT_CONFIG_PATH
+            config = load_config(DEFAULT_CONFIG_PATH)
+
+        if not yaml_validator.validate(config, CONFIG_SCHEMA):
+            pretty_errors = yaml.dump(yaml_validator.errors)
+            raise_error_alert(
+                title=f"Failed to validate {CONFIG_FILENAME}",
+                msg=f"There are validation errors present in your {CONFIG_FILENAME} which need to be fixed."
+                    f"\n\n{config_path}",
+                informative_msg="Please click 'Show Details' to view the config fields which failed validation.",
+                additional_details=pretty_errors
+            )
+        else:
+            return yaml_validator.normalized(config)
     except Exception:
         title = f"Failed to load {CONFIG_FILENAME}"
         message = (

@@ -1,7 +1,7 @@
 import sys
 from PyQt6.QtWidgets import QApplication
 from core.bar_manager import BarManager
-from core.utils.config_parser import get_config_and_stylesheet
+from core.utils.config_loader import get_config_and_stylesheet
 from core.utils.alert_dialog import raise_info_alert
 from core.utils.komorebi.event_listener import KomorebiEventListener
 from core.utils.win32.event_listener import Win32EventListener
@@ -36,4 +36,5 @@ if __name__ == "__main__":
 
     manager.show_bars()
     manager.run_background_tasks()
+
     sys.exit(app.exec())

@@ -1,4 +1,6 @@
 import subprocess
+import traceback
+
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QFrame
 from PyQt6.QtGui import QMouseEvent
 from PyQt6.QtCore import QTimer, Qt
@@ -65,23 +67,29 @@ class BaseWidget(QWidget):
         elif event.button() == Qt.MouseButton.RightButton:
             self._run_callback(self.callback_right)
 
-    def _run_callback(self, cb: Union[str, list]):
-        is_cb_list = isinstance(cb, list)
-        cb_name = cb[0] if is_cb_list else cb
-        cb_args = cb[1:] if is_cb_list else []
-        is_valid_callback = cb_name in self.callbacks.keys()
-        self.callback = self.callbacks[cb_name if is_valid_callback else 'default']
+    def _run_callback(self, callback_str: Union[str, list]):
+        if " " in callback_str:
+            callback_args = callback_str.split(" ")
+            callback_type = callback_args[0]
+            callback_args = callback_args[1:]
+        else:
+            callback_type = callback_str
+            callback_args = []
+
+        is_valid_callback = callback_type in self.callbacks.keys()
+        self.callback = self.callbacks[callback_type if is_valid_callback else 'default']
 
         try:
-            self.callbacks[cb_name](*cb_args)
+            self.callbacks[callback_type](*callback_args)
         except Exception as e:
-            print(f"Failed to execute callback {cb_name} with args {cb_args}", e)
+            print(traceback.format_exc())
+            print(f"Failed to execute callback {callback_type} with args {callback_args}", e)
 
     def _timer_callback(self):
         self._run_callback(self.callback_timer)
 
-    def _cb_execute_subprocess(self, cmd: str, cmd_args: str = None):
-        subprocess.Popen([cmd, cmd_args] if cmd_args else [cmd])
+    def _cb_execute_subprocess(self, cmd: str, *cmd_args: list[str]):
+        subprocess.Popen([cmd, *cmd_args] if cmd_args else [cmd])
 
     def _cb_do_nothing(self):
         pass

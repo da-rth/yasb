@@ -5,7 +5,6 @@ from core.utils.win32.windows import WinEvent
 from win32process import GetWindowThreadProcessId
 from win32gui import GetWindowText, GetClassName, GetWindowRect
 from win32api import MonitorFromWindow, GetMonitorInfo
-from subprocess import Popen
 
 
 def get_monitor_hwnd(window_hwnd: int) -> int:
@@ -113,7 +112,3 @@ def get_hwnd_info(hwnd: int, event: WinEvent) -> dict:
         }
     except Exception:
         print(traceback.format_exc())
-
-
-def open_task_manager() -> None:
-    Popen(["cmd", "/c", "Taskmgr"])

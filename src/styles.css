@@ -96,6 +96,17 @@
   background: #8ec07c;
 }
 
+
+.memory-widget .memory-label.status-low {
+  background: #689d6a;
+}
+.memory-widget .memory-label.status-medium {
+  background: #fe8019;
+}
+.memory-widget .memory-label.status-high {
+  background: #cc241d;
+}
+
 .active-window-widget .active-window-label {
   color: #242424;
   background: #83a598;
