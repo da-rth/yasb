@@ -76,13 +76,16 @@ class Win32AppBar:
         screen_geometry = self.window.screen().geometry()
         win32api.RegisterWindowMessage("AppBarMessage")
         shell32.SHAppBarMessage(AppBarMessage.New, AppBarDataPointer(self.app_bar_data))
-
+        pixel_ratio = self.window.screen().devicePixelRatio()
         self.app_bar_data.rc.left = screen_geometry.x()
         self.app_bar_data.rc.right = screen_geometry.height()
 
+        print("screen_geo", screen_geometry)
+        """
+        # Vertical Bar Alignment
         if self.app_bar_data.uEdge in [AppBarEdge.Left, AppBarEdge.Right]:
             self.app_bar_data.rc.top = screen_geometry.y()
-            self.app_bar_data.rc.bottom = screen_geometry.height()
+            self.app_bar_data.rc.bottom = int(screen_geometry.height() * pixel_ratio)
 
             if self.app_bar_data.uEdge == AppBarEdge.Left:
                 self.app_bar_data.rc.left = screen_geometry.x()
@@ -90,13 +93,13 @@ class Win32AppBar:
             else:
                 self.app_bar_data.rc.right = screen_geometry.width()
                 self.app_bar_data.rc.left = screen_geometry.width() - self.window.width()
+        """
+        if self.app_bar_data.uEdge == AppBarEdge.Top:
+            self.app_bar_data.rc.top = int(screen_geometry.y() * pixel_ratio)
+            self.app_bar_data.rc.bottom = int(self.window.height() * pixel_ratio)
         else:
-            if self.app_bar_data.uEdge == AppBarEdge.Top:
-                self.app_bar_data.rc.top = screen_geometry.y()
-                self.app_bar_data.rc.bottom = self.window.height()
-            else:
-                self.app_bar_data.rc.bottom = screen_geometry.height()
-                self.app_bar_data.rc.top = screen_geometry.height() - self.window.height()
+            self.app_bar_data.rc.bottom = int(screen_geometry.height() * pixel_ratio)
+            self.app_bar_data.rc.top = int((screen_geometry.height() - self.window.height()) * pixel_ratio)
 
         pos_str = "{rc.top} {rc.left} {rc.bottom} {rc.right}".format(rc=self.app_bar_data.rc)
         print("Setting appbar on screen", self.window.screen().name(), "at position", pos_str)
