@@ -9,9 +9,9 @@ The feature set stands as follows:
 - Custom widgets capable of parsing/displaying content from command-line applications and on-click events
 
 ## Configuration
-All taskbars can be configured in a user-defined JSON config file `config.json` located in either of the following directories:
-- `C:/Users/{username}/.yasb/config.json`
-- `/path/to/yasb/src/config.json`
+All taskbars can be configured in a user-defined YAML config file `config.yaml` located in either of the following directories:
+- `C:/Users/{username}/.yasb/config.yaml`
+- `/path/to/yasb/src/config.yaml`
 
 All taskbars can also be styled using a configurable stylesheet `styles.css`:
 - `C:/Users/{username}/.yasb/styles.css`
@@ -26,7 +26,7 @@ NOTE: If either of these configuration files are not present in the user's `$HOM
 ### Local setup
 - Create a virtual python environment
 - Enter the venv and `pip install -r requirements.txt`
-- Configure `styles.css` and `config.json` accordingly
+- Configure `styles.css` and `config.yaml` accordingly
 - Run `main.py`
 
 ### Linting
