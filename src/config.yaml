@@ -216,6 +216,13 @@ bars:
         # ^ The ellipsis string used when truncating the window label if it exceeds the max length. Accepts: string
       # monitor_exclusive: true
         # ^ Specifies if the active window title should be shown on all bars, or exclusively for the bars on the active window screen
+      # ignore_window:
+        # class: []
+          # ^ A list of class_names the widget should ignore. Accepts: list of strings
+        # process: []
+          # ^ A list of process names the widget should ignore. Accepts: list of strings
+        # title:
+          # ^ A list of titles the widget should ignore. Accepts: list of strings
       # callbacks:
         # on_left: "toggle_label" - toggles between the clock and alternate clock labels
         # on_middle: "do_nothing"

@@ -23,6 +23,7 @@ class ActiveWindowWidget(BaseWidget):
             label_alt: str,
             callbacks: dict[str, str],
             label_no_window: str,
+            ignore_window: dict[str, list[str]],
             monitor_exclusive: bool,
             max_length: int,
             max_length_ellipsis: str
@@ -41,6 +42,11 @@ class ActiveWindowWidget(BaseWidget):
         self._window_title_text = QLabel()
         self._window_title_text.setProperty("class", "label")
         self._window_title_text.setText(self._label_no_window)
+
+        self._ignore_window = ignore_window
+        self._ignore_window['classes'] += IGNORED_CLASSES
+        self._ignore_window['processes'] += IGNORED_PROCESSES
+        self._ignore_window['titles'] += IGNORED_TITLES
 
         self.widget_layout.addWidget(self._window_title_text)
         self.foreground_change.connect(self._on_focus_change_event)
@@ -87,7 +93,9 @@ class ActiveWindowWidget(BaseWidget):
                 return
             elif self._monitor_exclusive and self.screen().name() != monitor_name:
                 return self._window_title_text.hide()
-            elif (title in IGNORED_TITLES) or (class_name in IGNORED_CLASSES) or (process in IGNORED_PROCESSES):
+            elif (title in self._ignore_window['titles']) or \
+                 (class_name in self._ignore_window['classes']) or \
+                 (process in self._ignore_window['processes']):
                 if not self._label_no_window:
                     return self._window_title_text.hide()
             else:

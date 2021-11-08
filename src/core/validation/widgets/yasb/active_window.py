@@ -5,6 +5,11 @@ DEFAULTS = {
     'max_length': None,
     'max_length_ellipsis': '...',
     'monitor_exclusive': True,
+    'ignore_windows': {
+        'classes': [],
+        'processes': [],
+        'titles': []
+    },
     'callbacks': {
         'on_left': 'toggle_label',
         'on_middle': 'do_nothing',
@@ -40,6 +45,33 @@ VALIDATION_SCHEMA = {
         'type': 'boolean',
         'required': False,
         'default': DEFAULTS['monitor_exclusive']
+    },
+    'ignore_window': {
+        'type': 'dict',
+        'schema': {
+            'classes': {
+                'type': 'list',
+                'schema': {
+                    'type': 'string'
+                },
+                'default': DEFAULTS['ignore_windows']['classes']
+            },
+            'processes': {
+                'type': 'list',
+                'schema': {
+                    'type': 'string'
+                },
+                'default': DEFAULTS['ignore_windows']['processes']
+            },
+            'titles': {
+                'type': 'list',
+                'schema': {
+                    'type': 'string'
+                },
+                'default': DEFAULTS['ignore_windows']['titles']
+            }
+        },
+        'default': DEFAULTS['ignore_windows']
     },
     'callbacks': {
         'type': 'dict',
