@@ -47,7 +47,7 @@ class BatteryWidget(BaseWidget):
         self.callback_timer = "update_battery_info"
 
         self._battery_label = QLabel()
-        self._battery_label.setProperty("class", "battery-label")
+        self._battery_label.setProperty("class", "label")
         self.widget_layout.addWidget(self._battery_label)
         self.start_timer()
 
@@ -119,5 +119,5 @@ class BatteryWidget(BaseWidget):
             threshold = "charging"
 
         self._battery_label.setText(battery_status)
-        self._battery_label.setProperty("class", f"battery-label status-{threshold}")
+        self._battery_label.setProperty("class", f"label status-{threshold}")
         self._battery_label.setStyleSheet('')

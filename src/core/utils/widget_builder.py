@@ -54,10 +54,10 @@ class WidgetBuilder(QObject):
                     normalized_options = widget_options_validator.normalized(widget_options)
                     return widget_cls(**normalized_options)
             except (AttributeError, ValueError, ModuleNotFoundError):
-                print("Failed to import widget with type", widget_config['type'])
+                print("Failed to import widget with type", widget_config['type'], traceback.format_exc())
                 self._invalid_widget_types[widget_name] = widget_config['type']
             except KeyError:
-                print("No type specified for widget", widget_name)
+                print("No type specified for widget", widget_name, traceback.format_exc())
                 self._missing_widget_types.add(widget_name)
             except Exception:
                 print(f"Failed to import widget '{widget_name}':", traceback.format_exc())

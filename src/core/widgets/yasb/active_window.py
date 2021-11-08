@@ -39,7 +39,7 @@ class ActiveWindowWidget(BaseWidget):
         self._max_length_ellipsis = max_length_ellipsis
         self._event_service = EventService()
         self._window_title_text = QLabel()
-        self._window_title_text.setProperty("class", "active-window-label")
+        self._window_title_text.setProperty("class", "label")
         self._window_title_text.setText(self._label_no_window)
 
         self.widget_layout.addWidget(self._window_title_text)

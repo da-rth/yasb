@@ -7,30 +7,21 @@
 .bar {
     background: #1d2021;
     border-bottom: 1px solid #928374;
-    padding: 0 8px;
+    padding: 0 4px;
 }
 
-.widget * {
-  margin: 2px 2px;
-  padding: 0 10px;
+.container-left .widget {
+  margin: 0 10px;
 }
 
-.container-right * .widget * {
+.container-right .widget {
+  margin: 2px;
   border-radius: 5px;
-  background: #bdae93;
+}
+
+.container-right .widget * {
   color: #242424;
 }
-
-.container-right * .custom-widget *:hover {
-  background: #fbf1c7;
-}
-
-/*
-.container,
-.container-left,
-.container-center,
-.container-right
-*/
 
 .ws-btn {
     padding: 5px;
@@ -56,9 +47,22 @@
 }
 
 .custom-widget {
-    padding: 0 3px;
+    padding: 2px 6px;
+    font-size: 14px;
+    background: #bdae93;
 }
-
+.custom-widget .icon {
+  font-size: 13px;
+}
+.custom-widget:hover {
+  background: #fbf1c7;
+}
+.custom-widget .icon.icon-left {
+    margin-right: 5px;
+}
+.custom-widget .icon.icon-right {
+    margin-left: 5px;
+}
 .custom-widget.hostname-widget {
     background: #83a598;
 }
@@ -71,43 +75,49 @@
     cursor: pointer;
 }
 
-.battery-widget .battery-label {
-  padding-top: 2px;
+
+.memory-widget .label,
+.battery-widget .label {
+  padding: 2px 5px;
   font-size: 14px;
-  color: #242424;
   border-radius: 5px;
 }
-.battery-widget .battery-label.status-critical {
+
+.battery-widget .label.status-critical {
   background: #fb4934;
 }
-.battery-widget .battery-label.status-low {
+.battery-widget .label.status-low {
   background: #fe8019;
 }
-.battery-widget .battery-label.status-medium {
+.battery-widget .label.status-medium {
   background: #fabd2f;
 }
-.battery-widget .battery-label.status-high {
+.battery-widget .label.status-high {
   background: #b8bb26;
 }
-.battery-widget .battery-label.status-full {
+.battery-widget .label.status-full {
   background: #8ec07c;
 }
-.battery-widget .battery-label.status-charging {
+.battery-widget .label.status-charging {
   background: #8ec07c;
 }
+.battery-widget,
+.memory-widget {
+  margin: 0;
+}
 
-
-.memory-widget .memory-label.status-low {
+.memory-widget .label.status-low {
   background: #689d6a;
 }
-.memory-widget .memory-label.status-medium {
+.memory-widget .label.status-medium {
   background: #fe8019;
 }
-.memory-widget .memory-label.status-high {
+.memory-widget .label.status-high {
   background: #cc241d;
 }
 
-.active-window-widget .active-window-label {
+.active-window-widget .label {
+  padding: 0 10px;
   color: #242424;
   background: #83a598;
   margin-bottom: -1px;

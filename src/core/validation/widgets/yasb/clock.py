@@ -2,7 +2,7 @@ DEFAULTS = {
     'label': '\uf017  {%H:%M:%S}',
     'label_alt': '\uf017  {%d-%m-%y %H:%M:%S}',
     'update_interval': 1000,
-    'timezones': ['Europe/London', 'America/New_York'],
+    'timezones': [],
     'callbacks': {
         'on_left': 'toggle_label',
         'on_middle': 'do_nothing',

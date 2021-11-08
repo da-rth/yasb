@@ -23,7 +23,7 @@ class MemoryWidget(BaseWidget):
         self._label_alt = label_alt
         self._active_label = label
         self._mem_text = QLabel()
-        self._mem_text.setProperty("class", "memory-label")
+        self._mem_text.setProperty("class", "label")
         self.widget_layout.addWidget(self._mem_text)
 
         self.register_callback("toggle_label", self._toggle_memory_info)
@@ -63,7 +63,7 @@ class MemoryWidget(BaseWidget):
                 mem_text = mem_text.replace(fmt_str, str(value))
 
             self._mem_text.setText(mem_text)
-            self._mem_text.setProperty("class", f"memory-label status-{threshold}")
+            self._mem_text.setProperty("class", f"label status-{threshold}")
             self._mem_text.setStyleSheet('')
         except Exception:
             print(traceback.format_exc())

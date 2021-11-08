@@ -13,25 +13,26 @@ class CustomWidget(BaseWidget):
             label: str,
             label_alt: str,
             label_max_length: int,
+            icon: dict,
             exec_options: dict,
             callbacks: dict,
             class_name: str
     ):
-        super().__init__(exec_options.get('run_interval', 0), class_name="custom-widget")
+        super().__init__(exec_options['run_interval'], class_name=f"custom-widget {class_name}")
         self._show_alt = False
         self._label = label
         self._label_alt = label_alt if label_alt else label
         self._label_max_length = label_max_length
 
-        self.register_callback("toggle", self.toggle)
+        self.register_callback("toggle_label", self.toggle)
         self.register_callback("exec_custom", self._exec_callback)
-        self._custom_text = QLabel()
-
         self._exec_data = None
         self._exec_cmd = exec_options['run_cmd']
+
+        if self._exec_cmd:
+            self._exec_cmd = self._exec_cmd.split(" ")
+
         self._exec_return_type = exec_options['return_format']
-        self._exec_return_encoding = exec_options['return_encoding']
-        self._exec_run_once = exec_options['run_once']
 
         self.callback_left = callbacks['on_left']
         self.callback_right = callbacks['on_right']
@@ -39,14 +40,27 @@ class CustomWidget(BaseWidget):
         self.callback_timer = "exec_custom"
 
         if class_name:
-            self._custom_text.setProperty("class", f"custom-widget {class_name}")
+            self.widget_layout.setProperty("class", class_name)
 
-        if not self._exec_cmd:
-            self._custom_text.setText(label)
+        self._custom_text = QLabel()
+        self._custom_text.setProperty("class",  "label")
+        self._custom_text.setText(label)
 
-        self.widget_layout.addWidget(self._custom_text)
+        if icon and icon['label']:
+            self._icon_text = QLabel()
+            self._icon_text.setText(icon['label'])
+            self._icon_text.setProperty("class", f"icon icon-{icon['position']}")
 
-        if self._exec_run_once:
+            if icon['position'] == 'left':
+                self.widget_layout.addWidget(self._icon_text)
+                self.widget_layout.addWidget(self._custom_text)
+            else:
+                self.widget_layout.addWidget(self._custom_text)
+                self.widget_layout.addWidget(self._icon_text)
+        else:
+            self.widget_layout.addWidget(self._custom_text)
+
+        if exec_options['run_once']:
             self._exec_callback()
         else:
             self.start_timer()
@@ -59,13 +73,14 @@ class CustomWidget(BaseWidget):
         self._exec_data = None
 
         if self._exec_cmd:
+            # TODO: Log stderr if present
             proc = subprocess.Popen(self._exec_cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
             output = proc.stdout.read()
 
             if self._exec_return_type == "json":
                 self._exec_data = json.loads(output)
             else:
-                self._exec_data = output.decode(self._exec_return_encoding).strip()
+                self._exec_data = output.decode('utf-8').strip()
 
             self._update_label()
 
@@ -84,3 +99,15 @@ class CustomWidget(BaseWidget):
             label = active_label
 
         self._custom_text.setText(self._truncate_label(label))
+
+    def _cb_execute_subprocess(self, cmd: str, *cmd_args: list[str]):
+        # Overrides 'exec' callback to allow for data formatting
+        if self._exec_data:
+            formatted_cmd_args = []
+            for cmd_arg in cmd_args:
+                try:
+                    formatted_cmd_args.append(cmd_arg.format(data=self._exec_data))
+                except KeyError:
+                    formatted_cmd_args.append(cmd_args)
+            cmd_args = formatted_cmd_args
+        subprocess.Popen([cmd, *cmd_args] if cmd_args else [cmd])

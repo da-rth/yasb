@@ -1,17 +1,17 @@
 DEFAULTS = {
-    'label': "Empty Custom Widget",
-    'label_alt': "[Empty Custom Widget]",
     'label_max_length': None,
-    'class_name': "custom-widget",
+    'icon': {
+        'position': 'left',
+        'label': None
+    },
     'exec_options': {
         'run_cmd': None,
         'run_once': False,
         'run_interval': 0,
-        'return_format': "json",
-        'return_encoding': "utf-8"
+        'return_format': "json"
     },
     'callbacks': {
-        'on_left': "exec explorer.exe",
+        'on_left': "toggle_label",
         'on_middle': "do_nothing",
         'on_right': "do_nothing",
     }
@@ -31,15 +31,52 @@ VALIDATION_SCHEMA = {
         'type': 'string',
         'required': True,
     },
+    'icon': {
+        'type': 'dict',
+        'schema': {
+            'position': {
+                'type': 'string',
+                'allowed': ['left', 'right'],
+                'default': DEFAULTS['icon']['position']
+            },
+            'label': {
+                'type': 'string',
+                'nullable': True,
+                'default': DEFAULTS['icon']['label']
+            }
+        },
+        'default': DEFAULTS['icon']
+    },
     'label_max_length': {
         'type': 'integer',
         'nullable': True,
         'default': DEFAULTS['label_max_length'],
-        'min': 1,
+        'min': 1
     },
     'exec_options': {
         'type': 'dict',
-        'required': False,
+        'schema': {
+            'run_cmd': {
+                'type': 'string',
+                'nullable': True,
+                'default': DEFAULTS['exec_options']['run_cmd']
+            },
+            'run_once': {
+                'type': 'boolean',
+                'default': DEFAULTS['exec_options']['run_once']
+            },
+            'run_interval': {
+                'type': 'integer',
+                'default': DEFAULTS['exec_options']['run_interval'],
+                'min': 0
+            },
+            'return_format': {
+                'type': 'string',
+                'allowed': ['string', 'json'],
+                'default': DEFAULTS['exec_options']['return_format']
+            }
+        },
+        'default': DEFAULTS['exec_options']
     },
     'callbacks': {
         'type': 'dict',

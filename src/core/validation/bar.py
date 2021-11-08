@@ -81,12 +81,10 @@ BAR_SCHEMA = {
             'schema': {
                 'x': {
                     'type': 'integer',
-                    'min': 0,
                     'default': BAR_DEFAULTS['offset']['x']
                 },
                 'y': {
                     'type': 'integer',
-                    'min': 0,
                     'default': BAR_DEFAULTS['offset']['y']
                 }
             },
