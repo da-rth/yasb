@@ -9,6 +9,8 @@ from core.event_enums import BarEvent
 from copy import deepcopy
 
 
+# TODO - Finish 'event_listener' widget class field loading after widgets are constructed
+
 class BarManager(QObject):
     close_bar_signal = pyqtSignal(int)
     reload_bars_signal = pyqtSignal()
@@ -19,7 +21,7 @@ class BarManager(QObject):
         self._config = config
         self._stylesheet = stylesheet
         self._bars: list[Bar] = []
-        self._event_service = EventService()
+        self.event_service = EventService()
         self._thread_pool = QThreadPool.globalInstance()
         self._thread_tasks = []
         self._register_signals_and_events()
@@ -28,8 +30,8 @@ class BarManager(QObject):
         self.close_bar_signal.connect(self._on_close_bar_event)
         self.reload_bars_signal.connect(self._on_reload_bars_event)
 
-        self._event_service.register_event(BarEvent.CloseBar, self.close_bar_signal)
-        self._event_service.register_event(BarEvent.ReloadBars, self.reload_bars_signal)
+        self.event_service.register_event(BarEvent.CloseBar, self.close_bar_signal)
+        self.event_service.register_event(BarEvent.ReloadBars, self.reload_bars_signal)
 
     def add_bar(self, bar_options: dict):
         bar = Bar(**bar_options)
@@ -48,6 +50,10 @@ class BarManager(QObject):
             except Exception:
                 print(traceback.format_exc())
 
+    def clear_threadpool(self):
+        self._thread_pool.clear()
+        print("thread-pool cleared")
+
     def show_bars(self):
         for bar in self._bars:
             bar.show()
@@ -58,13 +64,12 @@ class BarManager(QObject):
 
     def close_bars(self):
         for bar in self._bars:
-
-            if bar.win32_app_bar:
-                bar.win32_app_bar.remove_appbar()
-
+            if bar.app_bar_manager:
+                bar.app_bar_manager.remove_appbar()
             bar.close()
 
     def initialize_bars(self) -> None:
+        widget_event_listeners = set()
         widget_builder = WidgetBuilder(self._config['widgets'])
 
         for bar_index, (bar_name, bar_config) in enumerate(self._config['bars'].items()):
@@ -76,7 +81,10 @@ class BarManager(QObject):
             bar_options['bar_index'] = bar_index
             bar_options['bar_name'] = bar_name
             bar_options['stylesheet'] = self._stylesheet.cssText.decode('utf-8')
-            bar_options['widgets'] = widget_builder.build_widgets(bar_options.get('widgets', {}))
+            bar_options['widgets'], event_listeners = widget_builder.build_widgets(bar_options.get('widgets', {}))
+
+            widget_event_listeners = widget_event_listeners.union(event_listeners)
+
             del bar_options['enabled']
             del bar_options['screens']
 
@@ -92,6 +100,10 @@ class BarManager(QObject):
                         self._bars.append(bar)
 
         widget_builder.raise_alerts_if_errors_present()
+
+        for listener in widget_event_listeners:
+            ext_event_listener = listener()
+            ext_event_listener.start()
 
     def _get_screen_by_name(self, screen_name: str):
         return next(filter(lambda scr: screen_name in scr.name(), self._app.screens()), None)

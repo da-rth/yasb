@@ -73,7 +73,7 @@ bars:
     screens: ['*']
     class_name: "yasb-bar"
     alignment:
-      position: "top"
+      position: "bottom"
       center: false
     window_flags:
       always_on_top: false
@@ -85,7 +85,7 @@ bars:
       x: 0
       y: 0
     widgets:
-      left:   ["komorebi_workspaces", "active_window"]
+      left:   ["active_window"]
       center: ["clock"]
       right:  ["explorer_button", "ip_info", "memory", "battery"]
 

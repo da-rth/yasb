@@ -25,3 +25,4 @@ class KomorebiEvent(Event):
 class BarEvent(Event):
     CloseBar = "CloseBar"
     ReloadBars = "ReloadBars"
+    ExitApp = "ExitApp"

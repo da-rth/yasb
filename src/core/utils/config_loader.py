@@ -2,21 +2,19 @@ import os
 import sys
 import yaml
 from pathlib import Path
+from core import settings
 from core.utils.alert_dialog import raise_error_alert, raise_info_alert
 from core.validation.config import CONFIG_SCHEMA
 from cssutils import css, CSSParser, parseFile
 from cerberus import Validator, schema
 from pprint import pprint
 
-CONFIG_DIR_NAME = ".yabar"
-STYLES_FILENAME = "styles.css"
-CONFIG_FILENAME = "config.yaml"
-HOME_CONFIGURATION_DIR = os.path.join(Path.home(), CONFIG_DIR_NAME)
-HOME_STYLES_PATH = os.path.normpath(os.path.join(HOME_CONFIGURATION_DIR, STYLES_FILENAME))
-HOME_CONFIG_PATH = os.path.normpath(os.path.join(HOME_CONFIGURATION_DIR, CONFIG_FILENAME))
-DEFAULT_STYLES_PATH = os.path.normpath(os.path.join(os.path.dirname(sys.argv[0]), STYLES_FILENAME))
-DEFAULT_CONFIG_PATH = os.path.normpath(os.path.join(os.path.dirname(sys.argv[0]), CONFIG_FILENAME))
-GITHUB_ISSUES_URL = "https://github.com/denBot/yasb/issues"
+HOME_CONFIGURATION_DIR = os.path.join(Path.home(), settings.DEFAULT_CONFIG_DIRECTORY)
+HOME_STYLES_PATH = os.path.normpath(os.path.join(HOME_CONFIGURATION_DIR, settings.DEFAULT_STYLES_FILENAME))
+HOME_CONFIG_PATH = os.path.normpath(os.path.join(HOME_CONFIGURATION_DIR, settings.DEFAULT_CONFIG_FILENAME))
+DEFAULT_STYLES_PATH = os.path.normpath(os.path.join(os.path.dirname(sys.argv[0]), settings.DEFAULT_STYLES_FILENAME))
+DEFAULT_CONFIG_PATH = os.path.normpath(os.path.join(os.path.dirname(sys.argv[0]), settings.DEFAULT_CONFIG_FILENAME))
+GITHUB_ISSUES_URL = f"{settings.GITHUB_URL}/issues"
 
 try:
     yaml_validator = Validator(CONFIG_SCHEMA)
@@ -36,9 +34,9 @@ def load_stylesheet(stylesheet_path) -> css.CSSStyleSheet:
         return parser.parseFile(stylesheet_path)
     except Exception as e:
         raise_info_alert(
-            title=f"Invalid CSS detected in {STYLES_FILENAME}",
+            title=f"Invalid CSS detected in {settings.DEFAULT_STYLES_FILENAME}",
             msg=(
-                f"The some of the changes made in {STYLES_FILENAME} are invalid"
+                f"The some of the changes made in {settings.DEFAULT_STYLES_FILENAME} are invalid"
                 " and may result in your styles being incorrectly applied. "
             ),
             informative_msg="Please click 'Show Details' for more information.",
@@ -60,8 +58,9 @@ def get_config() -> dict:
         if not yaml_validator.validate(config, CONFIG_SCHEMA):
             pretty_errors = yaml.dump(yaml_validator.errors)
             raise_error_alert(
-                title=f"Failed to validate {CONFIG_FILENAME}",
-                msg=f"There are validation errors present in your {CONFIG_FILENAME} which need to be fixed."
+                title=f"Failed to validate {settings.DEFAULT_CONFIG_FILENAME}",
+                msg=f"There are validation errors present in your {settings.DEFAULT_CONFIG_FILENAME} "
+                    f"which need to be fixed."
                     f"\n\n{config_path}",
                 informative_msg="Please click 'Show Details' to view the config fields which failed validation.",
                 additional_details=pretty_errors
@@ -69,9 +68,9 @@ def get_config() -> dict:
         else:
             return yaml_validator.normalized(config)
     except Exception:
-        title = f"Failed to load {CONFIG_FILENAME}"
+        title = f"Failed to load {settings.DEFAULT_CONFIG_FILENAME}"
         message = (
-            f"This application requires a valid {CONFIG_FILENAME} file to be "
+            f"This application requires a valid {settings.DEFAULT_CONFIG_FILENAME} file to be "
             "present in order to configure your  bar(s)."
         )
         informative_message = (
@@ -90,9 +89,9 @@ def get_stylesheet() -> css.CSSStyleSheet:
         else:
             return load_stylesheet(DEFAULT_STYLES_PATH)
     except Exception:
-        title = f"Failed to load {STYLES_FILENAME}"
+        title = f"Failed to load {settings.DEFAULT_STYLES_FILENAME}"
         message = (
-            f"This application requires a valid {STYLES_FILENAME} file to be "
+            f"This application requires a valid {settings.DEFAULT_STYLES_FILENAME} file to be "
             "present in order to configure your bar(s)."
         )
         informative_message = (

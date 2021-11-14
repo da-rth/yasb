@@ -3,16 +3,14 @@ from PyQt6.QtWidgets import QApplication
 from core.bar_manager import BarManager
 from core.utils.config_loader import get_config_and_stylesheet
 from core.utils.alert_dialog import raise_info_alert
-from core.utils.komorebi.event_listener import KomorebiEventListener
-from core.utils.win32.event_listener import Win32EventListener
-
-DEBUG_MODE = True
+from core.tray import TrayIcon
+from core import settings
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
 
-    config, stylesheet = get_config_and_stylesheet(DEBUG_MODE)
+    config, stylesheet = get_config_and_stylesheet(settings.DEBUG_MODE)
     manager = BarManager(app, config, stylesheet)
     manager.initialize_bars()
 
@@ -28,11 +26,8 @@ if __name__ == "__main__":
             exit_on_close=True
         )
 
-    komorebi_event_listener = KomorebiEventListener()
-    win32_event_listener = Win32EventListener()
-
-    manager.add_background_task(komorebi_event_listener.listen_for_events)
-    manager.add_background_task(win32_event_listener.listen_for_events)
+    trayIcon = TrayIcon(manager)
+    trayIcon.show()
 
     manager.show_bars()
     manager.run_background_tasks()

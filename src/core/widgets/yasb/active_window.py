@@ -12,10 +12,17 @@ IGNORED_CLASSES = ['WorkerW']
 IGNORED_PROCESSES = ['SearchHost.exe']
 IGNORED_YASB_TITLES = [BAR_WM_TITLE]
 
+try:
+    from core.utils.win32.event_listener import SystemEventListener
+except ImportError:
+    SystemEventListener = None
+    print("Failed to load system event listener", traceback.format_exc())
+
 
 class ActiveWindowWidget(BaseWidget):
     foreground_change = pyqtSignal(dict)
     validation_schema = VALIDATION_SCHEMA
+    event_listener = SystemEventListener
 
     def __init__(
             self,
@@ -29,6 +36,7 @@ class ActiveWindowWidget(BaseWidget):
             max_length_ellipsis: str
     ):
         super().__init__(class_name="active-window-widget")
+
         self._win_info = None
         self._show_alt = False
         self._label = label

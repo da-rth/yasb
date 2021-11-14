@@ -80,7 +80,6 @@ class Win32AppBar:
         self.app_bar_data.rc.left = screen_geometry.x()
         self.app_bar_data.rc.right = screen_geometry.height()
 
-        print("screen_geo", screen_geometry)
         """
         # Vertical Bar Alignment
         if self.app_bar_data.uEdge in [AppBarEdge.Left, AppBarEdge.Right]:
@@ -101,8 +100,6 @@ class Win32AppBar:
             self.app_bar_data.rc.bottom = int(screen_geometry.height() * pixel_ratio)
             self.app_bar_data.rc.top = int((screen_geometry.height() - self.window.height()) * pixel_ratio)
 
-        pos_str = "{rc.top} {rc.left} {rc.bottom} {rc.right}".format(rc=self.app_bar_data.rc)
-        print("Setting appbar on screen", self.window.screen().name(), "at position", pos_str)
         shell32.SHAppBarMessage(AppBarMessage.QueryPos, AppBarDataPointer(self.app_bar_data))
         shell32.SHAppBarMessage(AppBarMessage.SetPos, AppBarDataPointer(self.app_bar_data))
 

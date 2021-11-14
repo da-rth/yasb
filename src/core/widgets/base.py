@@ -1,13 +1,14 @@
 import subprocess
 import traceback
-
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QFrame
 from PyQt6.QtGui import QMouseEvent
-from PyQt6.QtCore import QTimer, Qt
+from PyQt6.QtCore import QTimer, QThread, Qt
 from typing import Union
 
 
 class BaseWidget(QWidget):
+    validation_schema: dict = None
+    event_listener: QThread = None
 
     def __init__(
             self,

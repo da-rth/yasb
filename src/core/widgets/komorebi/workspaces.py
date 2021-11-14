@@ -9,6 +9,12 @@ from core.widgets.base import BaseWidget
 from core.utils.komorebi.client import KomorebiClient
 from core.validation.widgets.komorebi.workspaces import VALIDATION_SCHEMA
 
+try:
+    from core.utils.komorebi.event_listener import KomorebiEventListener
+except ImportError:
+    KomorebiEventListener = None
+    print("Failed to load komorebi event listener", traceback.format_exc())
+
 WorkspaceState = Literal["EMPTY", "POPULATED", "ACTIVE"]
 WORKSPACE_STATE_EMPTY: WorkspaceState = "EMPTY"
 WORKSPACE_STATE_POPULATED: WorkspaceState = "POPULATED"
@@ -44,6 +50,7 @@ class WorkspaceWidget(BaseWidget):
     k_signal_focus_change = pyqtSignal(dict)
     k_signal_workspace_focus = pyqtSignal(dict)
     validation_schema = VALIDATION_SCHEMA
+    event_listener = KomorebiEventListener
 
     def __init__(
             self,
@@ -51,6 +58,7 @@ class WorkspaceWidget(BaseWidget):
             hide_empty_workspaces: bool
     ):
         super().__init__(class_name="komorebi-workspaces")
+
         self._event_service = EventService()
         self._komorebic = KomorebiClient()
         self._komorebi_screen = None

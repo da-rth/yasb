@@ -2,16 +2,19 @@ import traceback
 import win32pipe
 import win32file
 import json
-from PyQt6.QtCore import QObject, QTimer
+from PyQt6.QtCore import QTimer, pyqtSignal, QThread
 from core.event_enums import KomorebiEvent
 from core.event_service import EventService
+from core.event_enums import BarEvent
 from core.utils.komorebi.client import KomorebiClient
+from core.utils.utilities import run_once
 
 KOMOREBI_PIPE_BUFF_SIZE = 64 * 1024
 KOMOREBI_PIPE_NAME = "yasb"
 
 
-class KomorebiEventListener(QObject):
+class KomorebiEventListener(QThread):
+    app_exit_signal = pyqtSignal()
 
     def __init__(
             self,
@@ -25,12 +28,17 @@ class KomorebiEventListener(QObject):
         self.buffer_size = buffer_size
         self.event_service = EventService()
         self.pipe = None
-
+        self._app_running = True
+        self.event_service.register_event(BarEvent.ExitApp, self.app_exit_signal)
+        self.app_exit_signal.connect(self._on_exit)
         self._pause_background_updater = False
         self._timer = QTimer()
         self._timer_interval = background_interval
         self._timer.timeout.connect(self._timer_callback)
         self._timer_start()
+
+    def _on_exit(self):
+        self._app_running = False
 
     def _timer_callback(self) -> None:
         if not self._pause_background_updater:
@@ -62,13 +70,15 @@ class KomorebiEventListener(QObject):
             security_attributes
         )
 
-    def listen_for_events(self) -> None:
+    @run_once
+    def run(self):
+        print("[Run Once] Initialising komorebi event listener")
         self._pause_background_updater = True
         self._create_pipe()
         self._wait_until_komorebi_online()
 
         try:
-            while True:
+            while self._app_running:
                 result, data = win32file.ReadFile(self.pipe, self.buffer_size, None)
 
                 # Filters out newlines
@@ -84,6 +94,9 @@ class KomorebiEventListener(QObject):
                         self.event_service.emit_event(KomorebiEvent[event_name], event_message)
                 except Exception:
                     print(traceback.format_exc())
+
+            if not self._app_running:
+                self.thread.stop()
 
         except Exception as e:
             print("Komorebi disconnected from named pipe", e)
