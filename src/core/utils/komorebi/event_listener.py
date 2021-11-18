@@ -2,18 +2,17 @@ import traceback
 import win32pipe
 import win32file
 import json
-from PyQt6.QtCore import QTimer, pyqtSignal, QThread
+from PyQt6.QtCore import QTimer, pyqtSignal, QObject
 from core.event_enums import KomorebiEvent
 from core.event_service import EventService
 from core.event_enums import BarEvent
 from core.utils.komorebi.client import KomorebiClient
-from core.utils.utilities import run_once
 
 KOMOREBI_PIPE_BUFF_SIZE = 64 * 1024
 KOMOREBI_PIPE_NAME = "yasb"
 
 
-class KomorebiEventListener(QThread):
+class KomorebiEventListener(QObject):
     app_exit_signal = pyqtSignal()
 
     def __init__(
@@ -70,8 +69,7 @@ class KomorebiEventListener(QThread):
             security_attributes
         )
 
-    @run_once
-    def run(self):
+    def start(self):
         print("[Run Once] Initialising komorebi event listener")
         self._pause_background_updater = True
         self._create_pipe()
@@ -95,14 +93,11 @@ class KomorebiEventListener(QThread):
                 except Exception:
                     print(traceback.format_exc())
 
-            if not self._app_running:
-                self.thread.stop()
-
         except Exception as e:
             print("Komorebi disconnected from named pipe", e)
             win32file.CloseHandle(self.pipe)
             self.event_service.emit_event(KomorebiEvent.KomorebiDisconnect)
-            self.listen_for_events()
+            self.start()
 
     def _wait_until_komorebi_online(self):
         print("Waiting for Komorebi")

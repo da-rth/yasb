@@ -26,10 +26,8 @@ if __name__ == "__main__":
             exit_on_close=True
         )
 
+    manager.run_listeners_in_threads()
     trayIcon = TrayIcon(manager)
     trayIcon.show()
-
     manager.show_bars()
-    manager.run_background_tasks()
-
     sys.exit(app.exec())

@@ -1,15 +1,14 @@
 import ctypes
 import time
-from PyQt6.QtCore import QThread, pyqtSignal
+from PyQt6.QtCore import QObject, pyqtSignal
 from win32gui import GetForegroundWindow
 from core.utils.win32.windows import WinEventProcType, WinEvent, user32, ole32, msg
 from core.event_service import EventService
 from core.utils.win32.utilities import get_hwnd_info
 from core.event_enums import BarEvent
-from core.utils.utilities import run_once
 
 
-class SystemEventListener(QThread):
+class SystemEventListener(QObject):
     app_exit_signal = pyqtSignal()
 
     def __init__(self):
@@ -51,8 +50,7 @@ class SystemEventListener(QThread):
         foreground_window_info = get_hwnd_info(foreground_window_hwnd, foreground_event)
         self._event_service.emit_event(foreground_event, foreground_window_info)
 
-    @run_once
-    def run(self):
+    def start(self):
         print("[Run Once] Initialising win32 event listener")
         self._hook = self._build_event_hook()
 

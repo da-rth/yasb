@@ -1,6 +1,5 @@
-import traceback
 from PyQt6.QtWidgets import QApplication
-from PyQt6.QtCore import QThreadPool, QObject, pyqtSignal
+from PyQt6.QtCore import QThread, QObject, pyqtSignal
 from cssutils.css import CSSStyleSheet
 from core.bar import Bar
 from core.utils.widget_builder import WidgetBuilder
@@ -9,27 +8,25 @@ from core.event_enums import BarEvent
 from copy import deepcopy
 
 
-# TODO - Finish 'event_listener' widget class field loading after widgets are constructed
-
 class BarManager(QObject):
     close_bar_signal = pyqtSignal(int)
     reload_bars_signal = pyqtSignal()
 
     def __init__(self, app: QApplication, config: dict, stylesheet: CSSStyleSheet):
         super().__init__()
+        self.event_service = EventService()
+        self.widget_event_listeners = set()
         self._app = app
         self._config = config
         self._stylesheet = stylesheet
         self._bars: list[Bar] = []
-        self.event_service = EventService()
-        self._thread_pool = QThreadPool.globalInstance()
-        self._thread_tasks = []
         self._register_signals_and_events()
+        self._widget_builder: WidgetBuilder = None
+        self._threads = {}
 
     def _register_signals_and_events(self):
         self.close_bar_signal.connect(self._on_close_bar_event)
         self.reload_bars_signal.connect(self._on_reload_bars_event)
-
         self.event_service.register_event(BarEvent.CloseBar, self.close_bar_signal)
         self.event_service.register_event(BarEvent.ReloadBars, self.reload_bars_signal)
 
@@ -40,19 +37,16 @@ class BarManager(QObject):
     def num_bars(self):
         return len(self._bars)
 
-    def add_background_task(self, func, *args):
-        self._thread_tasks.append([func, *args])
+    def run_listeners_in_threads(self):
+        for listener in self.widget_event_listeners:
+            print("Activating listener", listener)
+            thread = QThread()
+            event_listener = listener()
+            event_listener.moveToThread(thread)
+            thread.started.connect(event_listener.start)
+            thread.start()
 
-    def run_background_tasks(self):
-        for func, *args in self._thread_tasks:
-            try:
-                self._thread_pool.start(func, *args)
-            except Exception:
-                print(traceback.format_exc())
-
-    def clear_threadpool(self):
-        self._thread_pool.clear()
-        print("thread-pool cleared")
+            self._threads[listener] = thread
 
     def show_bars(self):
         for bar in self._bars:
@@ -69,41 +63,43 @@ class BarManager(QObject):
             bar.close()
 
     def initialize_bars(self) -> None:
-        widget_event_listeners = set()
-        widget_builder = WidgetBuilder(self._config['widgets'])
+        self._widget_builder = WidgetBuilder(self._config['widgets'])
 
         for bar_index, (bar_name, bar_config) in enumerate(self._config['bars'].items()):
 
             if not bar_config['enabled']:
                 continue
 
-            bar_options = deepcopy(bar_config)
-            bar_options['bar_index'] = bar_index
-            bar_options['bar_name'] = bar_name
-            bar_options['stylesheet'] = self._stylesheet.cssText.decode('utf-8')
-            bar_options['widgets'], event_listeners = widget_builder.build_widgets(bar_options.get('widgets', {}))
-
-            widget_event_listeners = widget_event_listeners.union(event_listeners)
-
-            del bar_options['enabled']
-            del bar_options['screens']
-
             if '*' in bar_config['screens']:
                 for screen in self._app.screens():
+                    bar_options = self._build_bar_options(bar_config, bar_index, bar_name)
                     bar = Bar(**bar_options, bar_screen=screen)
                     self._bars.append(bar)
             else:
                 for screen_name in bar_config['screens']:
                     screen = self._get_screen_by_name(screen_name)
                     if screen:
+                        bar_options = self._build_bar_options(bar_config, bar_index, bar_name)
                         bar = Bar(**bar_options, bar_screen=screen)
                         self._bars.append(bar)
 
-        widget_builder.raise_alerts_if_errors_present()
+        self._widget_builder.raise_alerts_if_errors_present()
 
-        for listener in widget_event_listeners:
-            ext_event_listener = listener()
-            ext_event_listener.start()
+    def _build_bar_options(self, bar_config, bar_index, bar_name):
+        bar_options = deepcopy(bar_config)
+        bar_widgets, widget_event_listeners = self._widget_builder.build_widgets(bar_options.get('widgets', {}))
+
+        bar_options['bar_index'] = bar_index
+        bar_options['bar_name'] = bar_name
+        bar_options['stylesheet'] = self._stylesheet.cssText.decode('utf-8')
+        bar_options['widgets'] = bar_widgets
+
+        self.widget_event_listeners = self.widget_event_listeners.union(widget_event_listeners)
+
+        del bar_options['enabled']
+        del bar_options['screens']
+
+        return bar_options
 
     def _get_screen_by_name(self, screen_name: str):
         return next(filter(lambda scr: screen_name in scr.name(), self._app.screens()), None)
