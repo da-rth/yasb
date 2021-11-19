@@ -11,15 +11,18 @@ from core import settings
 
 LOG_PATH = os.path.join(get_config_dir(), DEFAULT_LOG_FILENAME)
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    filename=os.path.join(get_config_dir(), DEFAULT_LOG_FILENAME),
+    format="%(asctime)s %(levelname)s %(filename)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
+
+logging.getLogger().addHandler(logging.StreamHandler())
+
+
 if __name__ == "__main__":
     print("Logging to", LOG_PATH)
-
-    logging.basicConfig(
-        level=logging.DEBUG,
-        filename=os.path.join(get_config_dir(), DEFAULT_LOG_FILENAME),
-        format="%(asctime)s %(levelname)s %(filename)s: %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
-    )
 
     logging.info(f"Starting {APP_NAME}")
     app = QApplication(sys.argv)
