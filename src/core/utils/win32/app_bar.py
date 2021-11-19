@@ -1,5 +1,6 @@
 import ctypes
 import win32api
+import logging
 from ctypes import wintypes, Structure, POINTER, sizeof, windll, c_ulong
 from PyQt6.QtWidgets import QWidget
 
@@ -72,6 +73,7 @@ class Win32AppBar:
         self.app_bar_data.uEdge = edge
 
     def create_appbar(self):
+        logging.info(f"Creating Win32 App Bar for bar {self.window.bar_index} with HWND {int(self.window.winId())}")
         self.app_bar_data.hWnd = self.window.winId().__int__()
         screen_geometry = self.window.screen().geometry()
         win32api.RegisterWindowMessage("AppBarMessage")
@@ -104,5 +106,5 @@ class Win32AppBar:
         shell32.SHAppBarMessage(AppBarMessage.SetPos, AppBarDataPointer(self.app_bar_data))
 
     def remove_appbar(self):
+        logging.info(f"Removing Win32 App Bar for HWND {self.app_bar_data.hWnd}")
         shell32.SHAppBarMessage(AppBarMessage.Remove, AppBarDataPointer(self.app_bar_data))
-        self.window.close()

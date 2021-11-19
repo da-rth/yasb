@@ -1,4 +1,4 @@
-import traceback
+import logging
 import webbrowser
 from PyQt6.QtWidgets import QSystemTrayIcon, QMenu
 from PyQt6.QtGui import QIcon
@@ -50,7 +50,7 @@ class TrayIcon(QSystemTrayIcon):
             self._bar_manager.close_bars()
             QCoreApplication.exit(0)
         except Exception:
-            print(traceback.format_exc())
+            logging.exception("Failed to gracefully exit application")
 
     def _open_docs_in_browser(self):
         webbrowser.open(self._docs_url)

@@ -1,5 +1,5 @@
+import logging
 import subprocess
-import traceback
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QFrame
 from PyQt6.QtGui import QMouseEvent
 from PyQt6.QtCore import QTimer, QThread, Qt
@@ -82,9 +82,8 @@ class BaseWidget(QWidget):
 
         try:
             self.callbacks[callback_type](*callback_args)
-        except Exception as e:
-            print(traceback.format_exc())
-            print(f"Failed to execute callback {callback_type} with args {callback_args}", e)
+        except Exception:
+            logging.exception(f"Failed to execute callback of type '{callback_type}' with args: {callback_args}")
 
     def _timer_callback(self):
         self._run_callback(self.callback_timer)

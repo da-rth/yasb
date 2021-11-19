@@ -1,5 +1,5 @@
 import yaml
-import traceback
+import logging
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtCore import QObject
 from typing import Optional
@@ -13,7 +13,7 @@ class WidgetBuilder(QObject):
     def __init__(self, widget_configs: dict):
         super().__init__()
         self._widget_event_listeners = set()
-        self._widget_configs = widget_configs
+        self._widget_configurations = widget_configs
         self._missing_widget_types = set()
         self._invalid_widget_names = set()
         self._invalid_widget_types = {}
@@ -29,13 +29,13 @@ class WidgetBuilder(QObject):
         return bar_widgets, self._widget_event_listeners
 
     def _build_widget(self, widget_name: str) -> Optional[QWidget]:
-        widget_config = self._widget_configs.get(widget_name, None)
+        widget_config = self._widget_configurations.get(widget_name, None)
 
         if (widget_name in self._invalid_widget_names) or (widget_name in self._invalid_widget_options):
-            print("Ignoring construction of invalid widget", widget_name)
+            logging.warning(f"Ignoring construction of invalid widget '{widget_name}'")
         elif not widget_config:
             self._invalid_widget_names.add(widget_name)
-            print("No widget config could be found for widget", widget_name)
+            logging.warning(f"No widget config could be found for widget '{widget_name}")
         else:
             try:
                 widget_module_str, widget_class_str = widget_config['type'].rsplit('.', 1)
@@ -61,13 +61,13 @@ class WidgetBuilder(QObject):
                     normalized_options = widget_options_validator.normalized(widget_options)
                     return widget_cls(**normalized_options)
             except (AttributeError, ValueError, ModuleNotFoundError):
-                print("Failed to import widget with type", widget_config['type'], traceback.format_exc())
+                logging.exception(f"Failed to import widget with type {widget_config['type']}")
                 self._invalid_widget_types[widget_name] = widget_config['type']
             except KeyError:
-                print("No type specified for widget", widget_name, traceback.format_exc())
+                logging.exception(f"No type specified for widget '{widget_name}'")
                 self._missing_widget_types.add(widget_name)
             except Exception:
-                print(f"Failed to import widget '{widget_name}':", traceback.format_exc())
+                logging.exception(f"Failed to import widget '{widget_name}'")
 
     def raise_alerts_if_errors_present(self):
         if self._invalid_widget_names:

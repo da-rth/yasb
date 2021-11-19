@@ -1,16 +1,32 @@
+import os
 import sys
+import logging
 from PyQt6.QtWidgets import QApplication
 from core.bar_manager import BarManager
-from core.utils.config_loader import get_config_and_stylesheet
+from core.utils.config_utils import get_config_and_stylesheet, get_config_dir
 from core.utils.alert_dialog import raise_info_alert
 from core.tray import TrayIcon
+from core.settings import DEFAULT_LOG_FILENAME, APP_NAME
 from core import settings
 
+LOG_PATH = os.path.join(get_config_dir(), DEFAULT_LOG_FILENAME)
+
 if __name__ == "__main__":
+    print("Logging to", LOG_PATH)
+
+    logging.basicConfig(
+        level=logging.DEBUG,
+        filename=os.path.join(get_config_dir(), DEFAULT_LOG_FILENAME),
+        format="%(asctime)s %(levelname)s %(filename)s: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S"
+    )
+
+    logging.info(f"Starting {APP_NAME}")
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
 
     config, stylesheet = get_config_and_stylesheet(settings.DEBUG_MODE)
+
     manager = BarManager(app, config, stylesheet)
     manager.initialize_bars()
 
@@ -27,6 +43,7 @@ if __name__ == "__main__":
         )
 
     manager.run_listeners_in_threads()
+
     trayIcon = TrayIcon(manager)
     trayIcon.show()
     manager.show_bars()

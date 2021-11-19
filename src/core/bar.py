@@ -68,6 +68,10 @@ class Bar(QWidget):
 
         self._add_widgets(widgets)
 
+    @property
+    def bar_index(self):
+        return self._bar_index
+
     def _calc_bar_width(self, width: Union[str, int]) -> int:
         if isinstance(width, str) and is_valid_percentage_str(width):
             return int(self.screen().geometry().width() * percent_to_float(width))

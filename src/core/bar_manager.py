@@ -1,4 +1,6 @@
+import logging
 from PyQt6.QtWidgets import QApplication
+from PyQt6.QtGui import QScreen
 from PyQt6.QtCore import QThread, QObject, pyqtSignal
 from cssutils.css import CSSStyleSheet
 from core.bar import Bar
@@ -23,6 +25,7 @@ class BarManager(QObject):
         self._register_signals_and_events()
         self._widget_builder: WidgetBuilder = None
         self._threads = {}
+        self._active_listeners = {}
 
     def _register_signals_and_events(self):
         self.close_bar_signal.connect(self._on_close_bar_event)
@@ -39,13 +42,13 @@ class BarManager(QObject):
 
     def run_listeners_in_threads(self):
         for listener in self.widget_event_listeners:
-            print("Activating listener", listener)
+            logging.info(f"Activating listener {listener}")
             thread = QThread()
             event_listener = listener()
             event_listener.moveToThread(thread)
             thread.started.connect(event_listener.start)
             thread.start()
-
+            self._active_listeners[listener] = event_listener
             self._threads[listener] = thread
 
     def show_bars(self):
@@ -65,25 +68,30 @@ class BarManager(QObject):
     def initialize_bars(self) -> None:
         self._widget_builder = WidgetBuilder(self._config['widgets'])
 
-        for bar_index, (bar_name, bar_config) in enumerate(self._config['bars'].items()):
+        for bar_name, bar_config in self._config['bars'].items():
 
             if not bar_config['enabled']:
                 continue
 
             if '*' in bar_config['screens']:
                 for screen in self._app.screens():
+                    bar_index = len(self._bars)
                     bar_options = self._build_bar_options(bar_config, bar_index, bar_name)
-                    bar = Bar(**bar_options, bar_screen=screen)
-                    self._bars.append(bar)
+                    self._create_bar(bar_options, screen)
             else:
                 for screen_name in bar_config['screens']:
                     screen = self._get_screen_by_name(screen_name)
                     if screen:
+                        bar_index = len(self._bars)
                         bar_options = self._build_bar_options(bar_config, bar_index, bar_name)
-                        bar = Bar(**bar_options, bar_screen=screen)
-                        self._bars.append(bar)
+                        self._create_bar(bar_options, screen)
 
         self._widget_builder.raise_alerts_if_errors_present()
+
+    def _create_bar(self, bar_options: dict, screen: QScreen):
+        bar = Bar(**bar_options, bar_screen=screen)
+        self._bars.append(bar)
+        logging.info(f"Created bar {bar_options['bar_index']} on monitor {screen.name()}")
 
     def _build_bar_options(self, bar_config, bar_index, bar_name):
         bar_options = deepcopy(bar_config)
@@ -105,7 +113,7 @@ class BarManager(QObject):
         return next(filter(lambda scr: screen_name in scr.name(), self._app.screens()), None)
 
     def _on_reload_bars_event(self):
-        print("Reloading all bars")
+        logging.info("Reloading all bars")
         self.close_bars()
         self.initialize_bars()
 
@@ -117,6 +125,6 @@ class BarManager(QObject):
                 bar.win32_app_bar.remove_appbar()
 
             bar.close()
-            print("Closed bar", bar_index, "on screen", bar.scree.name())
+            logging.info(f"Closed bar {bar_index} on screen {bar.scree.name()}")
         except IndexError:
-            print("Failed to close bar with index", bar_index, "due to IndexError")
+            logging.exception(f"Failed to close bar {bar_index}")

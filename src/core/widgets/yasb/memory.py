@@ -1,4 +1,4 @@
-import traceback
+import logging
 import psutil
 from humanize import naturalsize
 from core.widgets.base import BaseWidget
@@ -66,7 +66,7 @@ class MemoryWidget(BaseWidget):
             self._mem_text.setProperty("class", f"label status-{threshold}")
             self._mem_text.setStyleSheet('')
         except Exception:
-            print(traceback.format_exc())
+            logging.exception("Failed to retrieve updated memory info")
 
     def _get_virtual_memory_threshold(self, virtual_memory_percent) -> str:
         if virtual_memory_percent <= self._percent_thresholds['low']:

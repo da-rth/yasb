@@ -1,6 +1,6 @@
-import traceback
 import psutil
 import pywintypes
+import logging
 from core.utils.win32.windows import WinEvent
 from win32process import GetWindowThreadProcessId
 from win32gui import GetWindowText, GetClassName, GetWindowRect
@@ -111,4 +111,4 @@ def get_hwnd_info(hwnd: int, event: WinEvent) -> dict:
             'rect': get_window_rect(monitor_hwnd)
         }
     except Exception:
-        print(traceback.format_exc())
+        logging.exception(f"Failed to get info for HWND {hwnd}.")

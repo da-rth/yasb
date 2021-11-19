@@ -289,8 +289,8 @@ widgets:
   clock:
     type: "yasb.clock.ClockWidget"
     options:
-        label: "\uf017 {%H:%M:%S %Z}"
-        label_alt: "\uf017 {%d-%m-%y %H:%M:%S %Z}"
+        label: "{%H:%M:%S %Z}"
+        label_alt: "{%d-%m-%y %H:%M:%S %Z}"
         timezones: ["Europe/London", "America/New_York"]
         callbacks:
           on_middle: "exec explorer.exe shell:Appsfolder\\Microsoft.WindowsAlarms_8wekyb3d8bbwe!App"

@@ -1,4 +1,4 @@
-import traceback
+import logging
 import win32pipe
 import win32file
 import json
@@ -36,6 +36,9 @@ class KomorebiEventListener(QObject):
         self._timer.timeout.connect(self._timer_callback)
         self._timer_start()
 
+    def __str__(self):
+        return "Komorebi Event Listener"
+
     def _on_exit(self):
         self._app_running = False
 
@@ -70,7 +73,6 @@ class KomorebiEventListener(QObject):
         )
 
     def start(self):
-        print("[Run Once] Initialising komorebi event listener")
         self._pause_background_updater = True
         self._create_pipe()
         self._wait_until_komorebi_online()
@@ -91,19 +93,19 @@ class KomorebiEventListener(QObject):
                     if event_name in KomorebiEvent:
                         self.event_service.emit_event(KomorebiEvent[event_name], event_message)
                 except Exception:
-                    print(traceback.format_exc())
+                    logging.exception(f"Failed to emit event of type {event_name}")
 
-        except Exception as e:
-            print("Komorebi disconnected from named pipe", e)
+        except Exception:
+            logging.exception(f"Komorebi has disconnected from the named pipe {self.pipe_name}")
             win32file.CloseHandle(self.pipe)
             self.event_service.emit_event(KomorebiEvent.KomorebiDisconnect)
             self.start()
 
     def _wait_until_komorebi_online(self):
-        print("Waiting for Komorebi")
+        logging.info(f"Waiting for Komorebi to subscribe to named pipe {self.pipe_name}")
         self._komorebic.wait_until_subscribed_to_pipe(self.pipe_name)
         self._pause_background_updater = False
         win32pipe.ConnectNamedPipe(self.pipe, None)
-        print("Komorebi connected to named pipe:", self.pipe_name)
+        logging.info("Komorebi connected to named pipe:", self.pipe_name)
         state = self._komorebic.query_state()
         self.event_service.emit_event(KomorebiEvent.KomorebiConnect, state)

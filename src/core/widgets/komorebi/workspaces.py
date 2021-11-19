@@ -1,4 +1,4 @@
-import traceback
+import logging
 from PyQt6.QtWidgets import QPushButton, QWidget, QHBoxLayout, QLabel
 from PyQt6.QtCore import pyqtSignal
 from typing import Literal
@@ -13,7 +13,7 @@ try:
     from core.utils.komorebi.event_listener import KomorebiEventListener
 except ImportError:
     KomorebiEventListener = None
-    print("Failed to load komorebi event listener", traceback.format_exc())
+    logging.warning("Failed to load Komorebi Event Listener")
 
 WorkspaceState = Literal["EMPTY", "POPULATED", "ACTIVE"]
 WORKSPACE_STATE_EMPTY: WorkspaceState = "EMPTY"
@@ -40,7 +40,7 @@ class WorkspaceButton(QPushButton):
         try:
             self.komorebic.activate_workspace(self.workspace_index)
         except Exception:
-            print(f"Failed to focus workspace at index {self.workspace_index}")
+            logging.exception(f"Failed to focus workspace at index {self.workspace_index}")
 
 
 class WorkspaceWidget(BaseWidget):
@@ -141,7 +141,7 @@ class WorkspaceWidget(BaseWidget):
             elif self._offline_text.isHidden():
                 self._show_offline_status()
         except Exception:
-            print(traceback.format_exc())
+            logging.exception("Failed to update komorebi status and widget button state")
 
     def _update_komorebi_state(self, komorebi_state: dict):
         try:

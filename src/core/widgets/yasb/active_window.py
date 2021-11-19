@@ -1,4 +1,4 @@
-import traceback
+import logging
 from core.utils.win32.windows import WinEvent
 from core.widgets.base import BaseWidget
 from core.event_service import EventService
@@ -16,7 +16,7 @@ try:
     from core.utils.win32.event_listener import SystemEventListener
 except ImportError:
     SystemEventListener = None
-    print("Failed to load system event listener", traceback.format_exc())
+    logging.warning("Failed to load Win32 System Event Listener")
 
 
 class ActiveWindowWidget(BaseWidget):
@@ -82,16 +82,14 @@ class ActiveWindowWidget(BaseWidget):
         self._update_text()
 
     def _on_focus_change_event(self, win_info: dict) -> None:
-        try:
-            if win_info['title'] not in IGNORED_YASB_TITLES:
-                self._update_window_title(win_info)
-        except Exception:
-            print(traceback.format_exc())
+        if win_info['title'] not in IGNORED_YASB_TITLES:
+            self._update_window_title(win_info)
 
     def _update_window_title(self, win_info: dict) -> None:
+        hwnd = win_info.get('hwnd', None)
+        event = win_info.get('event', None)
+
         try:
-            hwnd = win_info['hwnd']
-            event = win_info['event']
             title = win_info['title']
             process = win_info['process']
             class_name = win_info['class_name']
@@ -118,7 +116,9 @@ class ActiveWindowWidget(BaseWidget):
                 if self._window_title_text.isHidden():
                     self._window_title_text.show()
         except Exception:
-            print(traceback.format_exc())
+            logging.exception(
+                f"Failed to update active window title for window with HWND {hwnd} emitted by event {event}"
+            )
 
     def _update_text(self):
         try:

@@ -10,10 +10,6 @@
     padding: 0 2px 0 4px;
 }
 
-.container-left .widget {
-  margin: 0 4px;
-}
-
 .container-right .widget {
   margin: 2px;
   border-radius: 5px;
@@ -27,20 +23,21 @@
 }
 .ws-btn {
     padding: 5px;
-    background: rgba(60, 56, 54, 0.5);
-    border: 1px solid #a89984;
-    margin: 2px;
+    background: rgba(60, 56, 54, 0.4);
+    border: 1px solid rgba(168, 153, 132, 0.4);
+    margin: 2px 1px;
     font-size: 12px;
     border-radius: 3px;
 }
 
 .ws-btn:hover {
-    background: #665c54;
+    color: #fbf1c7;
+    font-weight: bold;
 }
 
 .ws-btn.populated {
-    background: #a89984;
-    color: #121212;
+    border-color: rgba(168, 153, 132, 1.0);
+    color: #ebdbb2;
 }
 
 .ws-btn.active {
@@ -117,9 +114,11 @@
 .memory-widget .label.status-high {
   background: #cc241d;
 }
-
+.active-window-widget {
+  margin-left: 5px;
+}
 .active-window-widget .label {
-  padding: -5px 10px 0 10px;
+  padding: -5px 7px 0 7px;
   color: #242424;
   background: #83a598;
   margin-bottom: -1px;

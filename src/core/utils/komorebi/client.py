@@ -1,4 +1,5 @@
 import subprocess
+import logging
 import json
 import time
 from contextlib import suppress
@@ -20,9 +21,6 @@ class KomorebiClient:
         self._timeout_secs = timeout_secs
         self._komorebic_path = komorebic_path
         self._previous_poll_offline = False
-
-    def _log_error(self, exception: Exception, msg: str = None):
-        print(f"{self._komorebic_path} : {msg}", exception)
 
     def query_state(self) -> Optional[dict]:
         with suppress(json.JSONDecodeError, subprocess.SubprocessError):
@@ -85,20 +83,20 @@ class KomorebiClient:
     def next_workspace(self) -> None:
         try:
             subprocess.Popen([self._komorebic_path, "cycle-workspace", "next"])
-        except subprocess.SubprocessError as e:
-            self._log_error(e, "Failed to cycle komorebi workspace")
+        except subprocess.SubprocessError:
+            logging.exception("Failed to cycle komorebi workspace")
 
     def prev_workspace(self) -> None:
         try:
             subprocess.Popen([self._komorebic_path, "cycle-workspace", "prev"])
-        except subprocess.SubprocessError as e:
-            self._log_error(e, "Failed to cycle komorebi workspace")
+        except subprocess.SubprocessError:
+            logging.exception("Failed to cycle komorebi workspace")
 
     def toggle_focus_mouse(self) -> None:
         try:
             subprocess.Popen([self._komorebic_path, "toggle-focus-follows-mouse"])
-        except subprocess.SubprocessError as e:
-            self._log_error(e, "Failed to toggle focus-follows-mouse")
+        except subprocess.SubprocessError:
+            logging.exception("Failed to toggle focus-follows-mouse")
 
     def wait_until_subscribed_to_pipe(self, pipe_name: str):
         proc = subprocess.Popen(
@@ -110,8 +108,8 @@ class KomorebiClient:
         stdout, stderr = proc.communicate()
 
         if stderr:
-            print("Failed to subscribe komorebi to named pipe:", stderr.decode('utf-8'))
-            print("Retrying indefinitely until komorebi is online...")
+            logging.warning(f"Failed to subscribe komorebi to named pipe: {stderr.decode('utf-8')}")
+            logging.info("Named pipe waiting indefinitely for komorebi to re-subscribe...")
 
         while proc.returncode != 0:
             time.sleep(2)
