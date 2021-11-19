@@ -46,7 +46,7 @@ VALIDATION_SCHEMA = {
             },
             'on_right': {
                 'type': 'string',
-                'default': "do_nothing"
+                'default': DEFAULTS['callbacks']['on_right'],
             }
         },
         'default': DEFAULTS['callbacks']

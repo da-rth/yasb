@@ -98,6 +98,26 @@ class KomorebiClient:
         except subprocess.SubprocessError:
             logging.exception("Failed to toggle focus-follows-mouse")
 
+    def change_layout(self, layout: str) -> None:
+        try:
+            subprocess.Popen([self._komorebic_path, "change-layout", layout])
+        except subprocess.SubprocessError:
+            logging.exception(f"Failed to change layout of currently active workspace to {layout}")
+
+    def flip_layout(self) -> None:
+        try:
+            subprocess.Popen([self._komorebic_path, "flip-layout"],
+                             stdout=subprocess.DEVNULL,
+                             stderr=subprocess.DEVNULL)
+        except subprocess.SubprocessError:
+            pass
+
+    def toggle(self, toggle_type: str):
+        try:
+            subprocess.Popen([self._komorebic_path, f"toggle-{toggle_type}"])
+        except subprocess.SubprocessError:
+            logging.exception(f"Failed to toggle {toggle_type} for currently active workspace")
+
     def wait_until_subscribed_to_pipe(self, pipe_name: str):
         proc = subprocess.Popen(
             [self._komorebic_path, "subscribe", pipe_name],

@@ -85,7 +85,7 @@ bars:
       x: 0
       y: 0
     widgets:
-      left:   ["komorebi_workspaces", "active_window"]
+      left:   ["komorebi_workspaces", "komorebi_active_layout", "active_window"]
       center: ["clock"]
       right:  ["explorer_button", "ip_info", "memory", "battery"]
 
@@ -236,6 +236,39 @@ bars:
       # hide_empty_workspaces: False
         # ^ Specifies if empty workspaces should be shown in the list of komorebi workspaces. Accepts: boolean
 
+  # komorebi_active_layout:
+    # type: "komorebi.active_layout.ActiveLayoutWidget"
+    # options:
+      # hide_if_offline: false
+        # ^ Specifies if the active layout label should be shown when komorebi is offline
+      # label: "{icon}"
+        # ^ The label shown when an active layout change is detected. Accepts: string containing format options {icon} and {layout_name}
+      # layout_icons:
+        # bsp: "[\\]"
+        # columns: "[||]"
+        # rows: "[---]"
+        # vertical_stack: "[]="
+        # horizontal_stack: "H/="
+        # ultrawide_vertical_stack: "[|]="
+        # monocle: "[M]"
+        # maximised: "[X]"
+        # floating: "><>"
+        # paused: "|P|"
+      # callbacks
+        # ^ callback options include:
+          # "next_layout" - Cycles the next layout for the active workspace
+          # "prev_layout" - Cycles the previous layout for the active workspace
+          # "flip_layout" - Flips layout of active workspace. Works for BSP tiling mode only
+          # "toggle_tiling" - Toggles tiling of all windows for the active workspace
+          # "toggle_float" - Toggles floating of active window for current workspace
+          # "toggle_monocle" - Toggles monocle mode for active window for current workspace
+          # "toggle_maximise" -  Toggles maximising active window for current workspace
+          # "toggle_pause" - Toggles pausing komorebi on/off for all workspaces
+        # on_left: "next_layout"
+        # on_middle: "toggle_monocle"
+        # on_right: "prev_layout"
+
+
   # custom-weather-widget-example:
     # type: "yasb.clock.CustomWidget"
     # options:
@@ -310,6 +343,27 @@ widgets:
     options:
         label_offline: "Komorebi Offline"
         hide_empty_workspaces: false
+
+  komorebi_active_layout:
+    type: "komorebi.active_layout.ActiveLayoutWidget"
+    options:
+      hide_if_offline: false
+      label: "{icon}"
+      layout_icons:
+        bsp: "[ \\ \\ ]"
+        columns: "[ | | ]"
+        rows: "[----]"
+        vertical_stack: "[ V ]="
+        horizontal_stack: "[ H ]="
+        ultrawide_vertical_stack: "[ | ]="
+        monocle: "[ M ]"
+        maximised: "[ X ]"
+        floating: "><>"
+        paused: "[ P ]"
+      callbacks:
+        on_left: 'next_layout'
+        on_middle: 'toggle_monocle'
+        on_right: 'prev_layout'
 
   # Some custom widgets
 

@@ -20,7 +20,6 @@ logging.basicConfig(
 
 logging.getLogger().addHandler(logging.StreamHandler())
 
-
 if __name__ == "__main__":
     print("Logging to", LOG_PATH)
 
@@ -48,6 +47,7 @@ if __name__ == "__main__":
     manager.run_listeners_in_threads()
 
     trayIcon = TrayIcon(manager)
+    trayIcon.setObjectName("YasbTrayIcon")
     trayIcon.show()
     manager.show_bars()
     sys.exit(app.exec())

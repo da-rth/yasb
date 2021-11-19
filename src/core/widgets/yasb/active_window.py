@@ -11,6 +11,7 @@ IGNORED_TITLES = ['']
 IGNORED_CLASSES = ['WorkerW']
 IGNORED_PROCESSES = ['SearchHost.exe']
 IGNORED_YASB_TITLES = [BAR_WM_TITLE]
+IGNORED_YASB_CLASSES = ['Qt620QWindowIcon']
 
 try:
     from core.utils.win32.event_listener import SystemEventListener
@@ -62,15 +63,14 @@ class ActiveWindowWidget(BaseWidget):
 
         if not callbacks:
             callbacks = {
-                "on_left": "toggle_window_title_text",
+                "on_left": "toggle_label",
                 "on_middle": "do_nothing",
-                "on_right": "toggle_window_title_text"
+                "on_right": "toggle_label"
             }
 
         self.callback_left = callbacks['on_left']
         self.callback_right = callbacks['on_right']
         self.callback_middle = callbacks['on_middle']
-        self.callback_timer = "update_clock_text"
 
         self._event_service.register_event(WinEvent.EventSystemForeground, self.foreground_change)
         self._event_service.register_event(WinEvent.EventSystemMoveSizeEnd, self.foreground_change)
@@ -82,7 +82,7 @@ class ActiveWindowWidget(BaseWidget):
         self._update_text()
 
     def _on_focus_change_event(self, win_info: dict) -> None:
-        if win_info['title'] not in IGNORED_YASB_TITLES:
+        if win_info['title'] not in IGNORED_YASB_TITLES and win_info['class_name'] not in IGNORED_YASB_CLASSES:
             self._update_window_title(win_info)
 
     def _update_window_title(self, win_info: dict) -> None:
@@ -99,7 +99,7 @@ class ActiveWindowWidget(BaseWidget):
                 return
             elif self._monitor_exclusive and self.screen().name() != monitor_name:
                 return self._window_title_text.hide()
-            elif (title in self._ignore_window['titles']) or \
+            elif (title.strip() in self._ignore_window['titles']) or \
                  (class_name in self._ignore_window['classes']) or \
                  (process in self._ignore_window['processes']):
                 if not self._label_no_window:

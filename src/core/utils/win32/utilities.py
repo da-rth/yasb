@@ -84,13 +84,6 @@ def get_class_name(hwnd: int) -> str:
         return 'unknown class'
 
 
-def get_window_text(hwnd: int) -> str:
-    try:
-        return GetWindowText(hwnd)
-    except pywintypes.error:
-        return ''
-
-
 def get_hwnd_info(hwnd: int, event: WinEvent) -> dict:
     try:
         try:
@@ -103,7 +96,7 @@ def get_hwnd_info(hwnd: int, event: WinEvent) -> dict:
         return {
             'hwnd': hwnd,
             'event': event,
-            'title': get_window_text(hwnd),
+            'title': GetWindowText(hwnd),
             'class_name': get_class_name(hwnd),
             'process': get_process_info(hwnd),
             'monitor_hwnd': monitor_hwnd,

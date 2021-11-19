@@ -1,6 +1,7 @@
 import ctypes
 import time
 import logging
+from contextlib import suppress
 from PyQt6.QtCore import QObject, pyqtSignal
 from win32gui import GetForegroundWindow
 from core.utils.win32.windows import WinEventProcType, WinEvent, user32, ole32, msg
@@ -27,11 +28,11 @@ class SystemEventListener(QObject):
     def _event_handler(self, win_event_hook, event, hwnd, id_object, id_child, event_thread, event_time) -> None:
         if not self._app_running:
             self._quit()
-
         elif event in WinEvent:
-            event_type = WinEvent._value2member_map_[event]
-            event_info = get_hwnd_info(hwnd, event_type)
-            self._event_service.emit_event(event_type, event_info)
+            with suppress(Exception):
+                event_type = WinEvent._value2member_map_[event]
+                event_info = get_hwnd_info(hwnd, event_type)
+                self._event_service.emit_event(event_type, event_info)
 
     def _build_event_hook(self) -> int:
         # Hooks onto System events only
@@ -66,11 +67,10 @@ class SystemEventListener(QObject):
         logging.info("SetWinEventHook Successful. Emitting focused window and waiting for events.")
         self._emit_foreground_window_event()
 
-        if user32.GetMessageW(ctypes.byref(msg), 0, 0, 0) == 0:
-            self._quit()
+        while user32.GetMessageW(ctypes.byref(msg), 0, 0, 0) == 0 and self._app_running:
+            pass
 
     def _quit(self):
         logging.info("Exiting Win32 event listener")
         user32.UnhookWinEvent(self._hook)
         ole32.CoUninitialize()
-        self.exit()

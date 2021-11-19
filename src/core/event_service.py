@@ -1,4 +1,6 @@
 import functools
+import logging
+
 from PyQt6.QtCore import QObject, pyqtSignal
 from typing import Any
 from core.event_enums import Event
@@ -19,4 +21,7 @@ class EventService(QObject):
     def emit_event(self, event_type: Event, *args: Any):
         event_signals = self._registered_event_signals.get(event_type, [])
         for event_signal in event_signals:
-            event_signal.emit(*args)
+            try:
+                event_signal.emit(*args)
+            except Exception:
+                logging.exception(f"Failed to emit event signal {event_signal} with args: {args}")

@@ -4,7 +4,7 @@ from PyQt6.QtCore import pyqtSignal
 from typing import Literal
 from core.utils.win32.utilities import get_monitor_hwnd
 from core.event_service import EventService
-from core.event_enums import BarEvent, KomorebiEvent
+from core.event_enums import KomorebiEvent
 from core.widgets.base import BaseWidget
 from core.utils.komorebi.client import KomorebiClient
 from core.validation.widgets.komorebi.workspaces import VALIDATION_SCHEMA
@@ -152,9 +152,7 @@ class WorkspaceWidget(BaseWidget):
                 self._komorebi_workspaces = self._komorebic.get_workspaces(self._komorebi_screen)
                 return True
         except TypeError:
-            # Monitor for widget hwnd no longer exists
-            self._event_service.emit_event(BarEvent.CloseBar,  self.bar_index)
-        return False
+            return False
 
     def _update_workspace_indexes(self) -> bool:
         focused_workspace = self._komorebic.get_focused_workspace(self._komorebi_screen)

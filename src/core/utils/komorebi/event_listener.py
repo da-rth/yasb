@@ -106,6 +106,6 @@ class KomorebiEventListener(QObject):
         self._komorebic.wait_until_subscribed_to_pipe(self.pipe_name)
         self._pause_background_updater = False
         win32pipe.ConnectNamedPipe(self.pipe, None)
-        logging.info("Komorebi connected to named pipe:", self.pipe_name)
+        logging.info(f"Komorebi connected to named pipe: {self.pipe_name}")
         state = self._komorebic.query_state()
         self.event_service.emit_event(KomorebiEvent.KomorebiConnect, state)
