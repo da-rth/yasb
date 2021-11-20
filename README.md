@@ -35,6 +35,7 @@ Each task bar can also be configured through a configuration file, allowing you 
   - Capable of running command-line executables
   - Can be used to interact with HTTP APIs via the likes of cURL
   - Configurable mouse button callbacks
+- Left, Center and Right align widgets
 
 ### How do you run it?
 - (Optional) Create a virtual python environment and enter it
