@@ -11,7 +11,7 @@
 ### What is it?
 **Yasb** is a highly configurable and hackable status bar written in Python using PyQt6. It supports any Operating System which is capable of running Python, its python dependencies and the Qt6 GUI Framework, including Windows, Mac OSX and Linux.
 
-**Be warned, this project is still in early development... If you encounter any bugs, please submit an [issue](/issues) :bug:**
+**Be warned, this project is still in early development... If you encounter any bugs, please submit an [issue](https://github.com/denBot/yasb/issues) :bug:**
 
 ### What can it look like?
 As Yasb is fully customisable, make a status bar your own by applying a variety of styles directly from a CSS Stylesheet. The power of CSS allows you to make your status bar look just they way you want it to. Each widget can be styled individually by creating style rules using widget class names.
@@ -72,4 +72,4 @@ python -m pylama        # or just `pylama`
 
 #### Commit Formatting and Pull Requests
 - Commit messages should ideally follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
-- Pull Requests should be submitted [here](/pulls)
+- Pull Requests should be submitted [here](https://github.com/denBot/yasb/pulls)
