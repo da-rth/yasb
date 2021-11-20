@@ -1,8 +1,12 @@
 <p align="center"><img src="https://raw.githubusercontent.com/denBot/yasb/main/img/yasb_icon.png" width="120"></p>
 <h2 align="center">Yasb - Yet Another Status Bar</h2>
-<p align="center">A highlight configurable cross-platform status bar written in Python.</p>
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<p align="center">
+  A highly configurable cross-platform status bar written in Python.
+  <br><br>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
+  <a href="https://github.com/denBot/yasb"><img src="https://img.shields.io/github/languages/top/denBot/yasb"></a>
+  <a href="https://github.com/denBot/yasb/issues"><img src="https://img.shields.io/github/issues/denBot/yasb"></a>
+</p>
 
 ### What is it?
 **Yasb** is a highly configurable and hackable status bar written in Python using PyQt6. It supports for Windows, Mac OSX and Linux.
