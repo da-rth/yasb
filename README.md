@@ -2,6 +2,8 @@
 <h2 align="center">Yasb - Yet Another Status Bar</h2>
 <p align="center">A highlight configurable cross-platform status bar written in Python.</p>
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ### What is it?
 **Yasb** is a highly configurable and hackable status bar written in Python using PyQt6. It supports for Windows, Mac OSX and Linux.
 
