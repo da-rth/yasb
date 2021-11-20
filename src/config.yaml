@@ -79,11 +79,11 @@ bars:
       always_on_top: false
       windows_app_bar: true
     dimensions:
-      width: "99%"
+      width: "40%"
       height: 32
     offset:
       x: 0
-      y: 20
+      y: 10
     widgets:
       left:   ["komorebi_workspaces", "active_window"]
       center: ["clock"]
