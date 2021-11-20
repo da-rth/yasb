@@ -74,18 +74,18 @@ bars:
     class_name: "yasb-bar"
     alignment:
       position: "top"
-      center: false
+      center: true
     window_flags:
       always_on_top: false
       windows_app_bar: true
     dimensions:
-      width: "100%"
-      height: 30
+      width: "99%"
+      height: 32
     offset:
       x: 0
-      y: 0
+      y: 20
     widgets:
-      left:   ["komorebi_workspaces", "komorebi_active_layout", "active_window"]
+      left:   ["komorebi_workspaces", "active_window"]
       center: ["clock"]
       right:  ["explorer_button", "ip_info", "memory", "battery"]
 
@@ -307,7 +307,7 @@ widgets:
   active_window:
     type: "yasb.active_window.ActiveWindowWidget"
     options:
-      label: "[ {win[title]} ]"
+      label: "{win[title]}"
       label_alt: "[class_name='{win[class_name]}' exe='{win[process][name]}' hwnd={win[hwnd]}]"
       label_no_window: ""
       max_length: 48
@@ -350,16 +350,16 @@ widgets:
       hide_if_offline: false
       label: "{icon}"
       layout_icons:
-        bsp: "[ \\ \\ ]"
-        columns: "[ | | ]"
-        rows: "[----]"
-        vertical_stack: "[ V ]="
-        horizontal_stack: "[ H ]="
-        ultrawide_vertical_stack: "[ | ]="
-        monocle: "[ M ]"
-        maximised: "[ X ]"
+        bsp: "[\\\\]"
+        columns: "[||]"
+        rows: "[==]"
+        vertical_stack: "[V]="
+        horizontal_stack: "[H]="
+        ultrawide_vertical_stack: "||="
+        monocle: "[M]"
+        maximised: "[X]"
         floating: "><>"
-        paused: "[ P ]"
+        paused: "[P]"
       callbacks:
         on_left: 'next_layout'
         on_middle: 'toggle_monocle'

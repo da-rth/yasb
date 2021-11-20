@@ -2,16 +2,16 @@ DEFAULTS = {
     'hide_if_offline': False,
     "label": "{icon}",
     'layout_icons': {
-        "bsp": "[ \\ \\ ]",
-        "columns": "[ | | ]",
-        "rows": "[----]",
-        "vertical_stack": "[ V ]=",
-        "horizontal_stack": "[ H ]=",
-        "ultrawide_vertical_stack": "[ | ]=",
-        "monocle": "[ M ]",
-        "maximised": "[ X ]",
+        "bsp": "[\\\\]",
+        "columns": "[||]",
+        "rows": "[==]",
+        "vertical_stack": "[V]=",
+        "horizontal_stack": "[H]=",
+        "ultrawide_vertical_stack": "||=",
+        "monocle": "[M]",
+        "maximised": "[X]",
         "floating": "><>",
-        "paused": "[ P ]"
+        "paused": "[P]"
     },
     'callbacks': {
         'on_left': 'next_layout',

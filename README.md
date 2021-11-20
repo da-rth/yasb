@@ -1,40 +1,68 @@
-# Yasb: Yet Another Status Bar
-**Yasb** is a highly configurable and hackable taskbar written in python with Qt6. This project is still in (very) early development, and the number of available widgets are currently very limited.
+<p align="center"><img src="https://raw.githubusercontent.com/denBot/yasb/main/img/yasb_icon.png" width="120"></p>
+<h2 align="center">Yasb - Yet Another Status Bar</h2>
+<p align="center">A highlight configurable cross-platform status bar written in Python.</p>
 
-The feature set stands as follows:
+### What is it?
+**Yasb** is a highly configurable and hackable status bar written in Python using PyQt6.
+
+**Be warned, this project is still in early development... If you encounter any bugs, please submit an [issue](/issues) :bug:**
+
+### What can it look like?
+As Yasb is fully customisable, make a status bar your own by applying a variety of styles directly from a CSS Stylesheet. The power of CSS allows you to make your status bar look just they way you want it to. Each widget can be styled individually by creating style rules using widget class names.
+
+Each task bar can also be configured through a configuration file, allowing you to center, offset and change the width/height of a number of task bars on specific screens.
+
+![](img/yasb_example.png)
+
+### Some interesting features:
 - Multiple taskbars for each screen
-- Fully customisable user interface via CSS stylesheet
-- [Komorebi](https://github.com/LGUG2Z/komorebi) workspace navigation (very early development)
-- Clock widgets with time-zone cycling and alternate label formatting
-- Custom widgets capable of parsing/displaying content from command-line applications and on-click events
+- Customisable User Interface via CSS stylesheet
+- Customisable widgets via YAML Configuration file
+- Informative Configuration File Validation
+- [Komorebi Window Manager](https://github.com/LGUG2Z/komorebi) Integration
+- A variety of built-in widgets including:
+  - Active Window Title Widget
+  - Battery Widget
+  - Clock Widget
+  - Memory Widget
+- Custom widgets
+  - Capable of running command-line executables
+  - Can be used to interact with HTTP APIs via the likes of cURL
+  - Configurable mouse button callbacks
 
-## Configuration
-All taskbars can be configured in a user-defined YAML config file `config.yaml` located in either of the following directories:
+### How do you run it?
+- (Optional) Create a virtual python environment and enter it
+- pip install -r [requirements.txt](requirements.txt)
+- Configure [styles.css](src/styles.css) and [config.yaml](src/config.yaml) accordingly
+- Start application by running `python main.py`
+
+### How do you configure it?
+All taskbars can be configured in a user-defined YAML config file [config.yaml](src/config.yaml) located in either of the following directories:
 - `C:/Users/{username}/.yasb/config.yaml`
 - `/path/to/yasb/src/config.yaml`
 
-All taskbars can also be styled using a configurable stylesheet `styles.css`:
+All taskbars can also be styled using a configurable stylesheet [styles.css](src/styles.css):
 - `C:/Users/{username}/.yasb/styles.css`
 - `/path/to/yasb/src/styles.css`
 
 NOTE: If either of these configuration files are not present in the user's `$HOME/.yasb` directory (or if they contain errors), the default config and stylesheet will be loaded instead.
 
-## Development
-### Requirements
+### How do I contribute?
+
+#### Requirements
+You'll need to have a development environment with Python 3 installed:
 - Python 3.6 or above (3.9+ recommended)
+- For some widgets, you may need to install OS-dependent python packages (e.g. pywin32)
 
-### Local setup
-- Create a virtual python environment
-- Enter the venv and `pip install -r requirements.txt`
-- Configure `styles.css` and `config.yaml` accordingly
-- Run `main.py`
-
-### Linting
+#### Linting
 To lint the project, simply run the following in the root source directory:
 ```
 pip install pylama
 python -m pylama        # or just `pylama`
 ```
-- You can configure the linting tool via `pylama.ini`
+- You can configure the linting tool via [pylama.ini](pylama.ini)
 - If you choose to contribute, **please lint your code beforehand.**
 
+#### Commit Formatting and Pull Requests
+- Commit messages should ideally follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
+- Pull Requests should be submitted [here](/pulls)
