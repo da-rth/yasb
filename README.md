@@ -16,9 +16,9 @@
 ### What can it look like?
 As Yasb is fully customisable, make a status bar your own by applying a variety of styles directly from a CSS Stylesheet. The power of CSS allows you to make your status bar look just they way you want it to. Each widget can be styled individually by creating style rules using widget class names.
 
-Each task bar can also be configured through a configuration file, allowing you to center, offset and change the width/height of a number of task bars on specific screens.
+![](img/yasb_bar.png)
 
-![](img/yasb_example.png)
+Each task bar can also be configured through a configuration file, allowing you to center, offset and change the width/height of a number of task bars on specific screens.
 
 ### Some interesting features:
 - Multiple taskbars for each screen
