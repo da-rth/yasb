@@ -9,7 +9,7 @@
 </p>
 
 ### What is it?
-**Yasb** is a highly configurable and hackable status bar written in Python using PyQt6. It supports for Windows, Mac OSX and Linux.
+**Yasb** is a highly configurable and hackable status bar written in Python using PyQt6. It supports any Operating System which is capable of running Python, its python dependencies and the Qt6 GUI Framework, including Windows, Mac OSX and Linux.
 
 **Be warned, this project is still in early development... If you encounter any bugs, please submit an [issue](/issues) :bug:**
 
