@@ -48,6 +48,12 @@ All taskbars can be configured in a user-defined YAML config file [config.yaml](
 - `C:/Users/{username}/.yasb/config.yaml`
 - `/path/to/yasb/src/config.yaml`
 
+### Komorebi Integration
+Yasb comes with a Komorebi Workspace widget whcih allows you to view and interact with komorebi workspaces directly from the status bar.
+As of right now, you will need a build of [komorebi](https://github.com/LGUG2Z/komorebi) from the master branch, as release 0.17.0 (containing komorebi's pipe subscription feature) has yet to be released.
+
+Once you have a working build for komorebi 0.17.0, run yasb with a `komorebi.workspaces.WorkspacesWidget` widget and yasb should have komorebi subscribe to a named pipe and will start receiving/parsing its events. Yasb will also allow you to run `komorebic` commands, such as switching workspaces, directly through python's subprocess library.
+
 All taskbars can also be styled using a configurable stylesheet [styles.css](src/styles.css):
 - `C:/Users/{username}/.yasb/styles.css`
 - `/path/to/yasb/src/styles.css`
