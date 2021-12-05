@@ -87,7 +87,7 @@ bars:
     widgets:
       left:   ["komorebi_workspaces", "active_window"]
       center: ["clock"]
-      right:  ["explorer_button", "ip_info", "memory", "battery"]
+      right:  ["cpu", "explorer_button", "ip_info", "memory", "battery"]
 
 # widgets:
   # my-clock-widget:
@@ -180,6 +180,45 @@ bars:
           # ^ The icon shown when full status threshold is reached
       # callbacks:
         # on_left: "toggle_label" - toggles between the clock and alternate clock labels
+        # on_middle: "do_nothing"
+        # on_right: "do_nothing"
+
+  # cpu-widget:
+    # type: "yasb.cpu.CpuWidget"
+    # options:
+        # label: "{info[histograms][cpu_percent]}"
+          # ^ The format label for the widget. Accepts: string containing any of the below format options
+          # {info[cores][physical]} - The total number of physical cores available to the system
+          # {info[cores][total]} - The total number of cores available to the system
+          # {info[freq][min]} - The minimum possible frequency of the CPU
+          # {info[freq][max]} - The maximum possible frequency of the CPU
+          # {info[freq][current]} - The current frequency of the CPU
+          # {info[stats][context_switches]} - The number of context switches performed since boot
+          # {info[stats][interrupts] -  The number of interrupts performed since boot
+          # {info[stats][soft_interrupts] - The number of soft interrupts performed since boot
+          # {info[stats][sys_calls] - The number of system calls performed since boot
+          # {info[histograms][cpu_freq] - A unicode histogram representation of the lat N CPU frequency readings
+          # {info[histograms][cpu_percent] - A unicode histogram representation of the last N CPU percent readings
+        # label_alt: "{percent}% | remaining: {time_remaining}"
+          # ^ The alternate format label for the widget. Accepts: string
+        # update_interval: 1000
+          # ^ The interval at which the CPU widget will update. Accepts: positive integer
+        # histogram_icons:
+          # ^ The unicode characters used to represent CPU the frequency/percentage histogram data. Accepts: list of 9 unicode strings.
+          # ^ Note: the below unicode characters require the following graph bars font: https://github.com/and3rson/graph-bars-font
+          # - ' ' # 0%
+          # - '\u2581' # 10%
+          # - '\u2582' # 20%
+          # - '\u2583' # 30%
+          # - '\u2584' # 40%
+          # - '\u2585' # 50%
+          # - '\u2586' # 60%
+          # - '\u2587' # 70%
+          # - '\u2588  # 80%+
+        # histogram_num_columns: 10
+          # ^ The number of columns displayed for each generated histogram. Accepts: positive integer between 0 and 128.
+      # callbacks:
+        # on_left: "toggle_label" - toggles between the cpu and alternate cpu labels
         # on_middle: "do_nothing"
         # on_right: "do_nothing"
 
@@ -328,6 +367,9 @@ widgets:
         callbacks:
           on_middle: "exec explorer.exe shell:Appsfolder\\Microsoft.WindowsAlarms_8wekyb3d8bbwe!App"
           on_right: "next_timezone"
+
+  cpu:
+    type: "yasb.cpu.CpuWidget"
 
   memory:
     type: "yasb.memory.MemoryWidget"

@@ -44,7 +44,7 @@ class WidgetBuilder(QObject):
                 widget_schema = getattr(widget_cls, 'validation_schema')
                 widget_event_listener = getattr(widget_cls, 'event_listener')
 
-                if not widget_schema:
+                if type(widget_schema) != dict and not widget_schema:
                     raise Exception(f"The widget {widget_cls.__name__} has no validation_schema")
 
                 if widget_event_listener:

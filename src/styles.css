@@ -1,5 +1,7 @@
 * {
-    font-family: 'Calibri', 'Font Awesome 5 Free';
+    /* Bar measurement icons: https://github.com/and3rson/graph-bars-font */
+    /* Icon set: https://fontawesome.com/v5.15/how-to-use/on-the-desktop/setup/getting-started */
+    font-family: 'Calibri', 'Bars', 'Font Awesome 5 Free';
     font-size: 16px;
     color: #f2e5bc;
 }
@@ -74,13 +76,35 @@
     cursor: pointer;
 }
 
-
+.cpu-widget .label,
 .memory-widget .label,
 .battery-widget .label {
   padding: 2px 5px;
   font-size: 14px;
   border-radius: 5px;
 }
+
+.cpu-widget .label {
+  background: white;
+  color: black;
+}
+
+.cpu-widget .label .hist-0 {
+  color: red;
+}
+
+.cpu-widget .label .hist-1 {
+  color: blue;
+}
+
+.cpu-widget .label .hist-2 {
+  color: yellow;
+}
+
+.cpu-widget .label .hist-3 {
+  color: green;
+}
+
 
 .battery-widget .label.status-critical {
   background: #fb4934;
