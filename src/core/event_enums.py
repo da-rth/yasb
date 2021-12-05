@@ -19,12 +19,14 @@ class KomorebiEvent(Event):
     KomorebiUpdate = "KomorebiUpdate"
     KomorebiDisconnect = "KomorebiDisconnect"
     FocusWorkspaceNumber = "FocusWorkspaceNumber"
+    FocusMonitorWorkspaceNumber = "FocusMonitorWorkspaceNumber"
     FocusChange = "FocusChange"
     ChangeLayout = "ChangeLayout"
     ToggleTiling = "ToggleTiling"
     ToggleMonocle = "ToggleMonocle"
     ToggleMaximise = "ToggleMaximise"
     TogglePause = "TogglePause"
+
 
 
 class BarEvent(Event):

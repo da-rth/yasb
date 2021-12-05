@@ -102,6 +102,7 @@ class WorkspaceWidget(BaseWidget):
         self._event_service.register_event(KomorebiEvent.KomorebiDisconnect, self.k_signal_disconnect)
         self._event_service.register_event(KomorebiEvent.FocusChange, self.k_signal_focus_change)
         self._event_service.register_event(KomorebiEvent.FocusWorkspaceNumber, self.k_signal_workspace_focus)
+        self._event_service.register_event(KomorebiEvent.FocusMonitorWorkspaceNumber, self.k_signal_workspace_focus)
 
     def _reset(self):
         self._komorebi_state = None
