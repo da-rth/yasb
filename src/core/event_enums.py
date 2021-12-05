@@ -28,7 +28,6 @@ class KomorebiEvent(Event):
     TogglePause = "TogglePause"
 
 
-
 class BarEvent(Event):
     CloseBar = "CloseBar"
     ReloadBars = "ReloadBars"

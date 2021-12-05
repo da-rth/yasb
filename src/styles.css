@@ -85,26 +85,8 @@
 }
 
 .cpu-widget .label {
-  background: white;
-  color: black;
+  background: #d3869b;
 }
-
-.cpu-widget .label .hist-0 {
-  color: red;
-}
-
-.cpu-widget .label .hist-1 {
-  color: blue;
-}
-
-.cpu-widget .label .hist-2 {
-  color: yellow;
-}
-
-.cpu-widget .label .hist-3 {
-  color: green;
-}
-
 
 .battery-widget .label.status-critical {
   background: #fb4934;
