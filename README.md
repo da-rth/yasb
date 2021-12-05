@@ -48,19 +48,36 @@ All taskbars can be configured in a user-defined YAML config file [config.yaml](
 - `C:/Users/{username}/.yasb/config.yaml`
 - `/path/to/yasb/src/config.yaml`
 
-### Komorebi Integration
-Yasb comes with a Komorebi Workspace widget whcih allows you to view and interact with komorebi workspaces directly from the status bar.
-As of right now, you will need a build of [komorebi](https://github.com/LGUG2Z/komorebi) from the master branch, as release 0.17.0 (containing komorebi's pipe subscription feature) has yet to be released.
-
-Once you have a working build for komorebi 0.17.0, run yasb with a `komorebi.workspaces.WorkspacesWidget` widget and yasb should have komorebi subscribe to a named pipe and will start receiving/parsing its events. Yasb will also allow you to run `komorebic` commands, such as switching workspaces, directly through python's subprocess library.
-
 All taskbars can also be styled using a configurable stylesheet [styles.css](src/styles.css):
 - `C:/Users/{username}/.yasb/styles.css`
 - `/path/to/yasb/src/styles.css`
 
 NOTE: If either of these configuration files are not present in the user's `$HOME/.yasb` directory (or if they contain errors), the default config and stylesheet will be loaded instead.
 
-### How do I contribute?
+## Troubleshooting
+
+#### Why aren't icons being displayed correctly in my bar?
+Yasb uses special fonts to render icons within the status bar. In the screenshot above, the Font Awesome 5 Icon font is used to display a number of icons, including the clock icon, battery icon, etc. Simply install your desitred icon font onto your system and update your `styles.css` file to include the icon font within the font-family of whatever class you would like to use the font with:
+
+```css
+* {
+    font-family: 'Calibri', 'Font Awesome 5 Free';
+    font-size: 16px;
+    color: #f2e5bc;
+}
+```
+The above snippet can be found in the default [styles.css](https://github.com/denBot/yasb/blob/main/src/styles.css#L1-L5)
+
+#### Why isn't the komorebi widget working?
+Yasb comes with a Komorebi Workspace widget whcih allows you to view and interact with komorebi workspaces directly from the status bar.
+As of right now, you will need a build of [komorebi](https://github.com/LGUG2Z/komorebi) from the master branch, as release 0.17.0 (containing komorebi's pipe subscription feature) has yet to be released.
+
+Once you have a working build for komorebi 0.17.0, run yasb with a `komorebi.workspaces.WorkspacesWidget` widget and yasb should have komorebi subscribe to a named pipe and will start receiving/parsing its events. Yasb will also allow you to run `komorebic` commands, such as switching workspaces, directly through python's subprocess library.
+
+**Note**: Since yasb executes komorebic.exe commands from the command-line, you must have `komoreb.exe` and `komorebic.exe` [added to your system PATH](https://medium.com/@kevinmarkvi/how-to-add-executables-to-your-path-in-windows-5ffa4ce61a53). 
+
+
+## How do I contribute?
 
 #### Requirements
 You'll need to have a development environment with Python 3 installed:
