@@ -9,12 +9,10 @@
 </p>
 
 ### What is it?
-**Yasb** is a highly configurable and hackable status bar written in Python using PyQt6. It supports any Operating System which is capable of running Python, its python dependencies and the Qt6 GUI Framework, including Windows, Mac OSX and Linux.
-
-**Be warned, this project is still in early development... If you encounter any bugs, please submit an [issue](https://github.com/denBot/yasb/issues) :bug:**
+**Yasb** is a highly configurable and hackable status bar written in Python using PyQt6. Although yasb currently focuses on providing polybar/waybar-style features for the Windows operating system through the likes of providing some windows-only widgets, it is entirely cross-platform and is capable of supporting any Operating System capable of running Python and the Qt6 GUI Framework, including Mac OSX and Linux.
 
 ### What can it look like?
-As Yasb is fully customisable, make a status bar your own by applying a variety of styles directly from a CSS Stylesheet. The power of CSS allows you to make your status bar look just they way you want it to. Each widget can be styled individually by creating style rules using widget class names.
+Anything you'd like. Yasb is fully customisable. You can make a status bar your own by applying a variety of styles directly from a CSS Stylesheet and customising a variety of widgets. Each bar and widget can be styled individually through applying styles to specific CSS classes and their children.
 
 ![](img/yasb_bar.png)
 
@@ -25,12 +23,14 @@ Each task bar can also be configured through a configuration file, allowing you 
 - Customisable User Interface via CSS stylesheet
 - Customisable widgets via YAML Configuration file
 - Informative Configuration File Validation
+- Reserve desktop space on Windows (just like the Windows taskbar does!)
 - [Komorebi Window Manager](https://github.com/LGUG2Z/komorebi) Integration
 - A variety of built-in widgets including:
   - Active Window Title Widget
   - Battery Widget
   - Clock Widget
   - Memory Widget
+  - and more to come
 - Custom widgets
   - Capable of running command-line executables
   - Can be used to interact with HTTP APIs via the likes of cURL
@@ -43,6 +43,11 @@ Each task bar can also be configured through a configuration file, allowing you 
 - Configure [styles.css](src/styles.css) and [config.yaml](src/config.yaml) accordingly
 - Start application by running `python main.py`
 
+### What do I do if I've spotted a bug?
+**This project is still in early development... If you encounter any bugs, please submit an [issue](https://github.com/denBot/yasb/issues) :bug:**
+
+*Note: Please include a log file along with steps to reproduce when submitting a bug report, it really helps!*
+
 ### How do you configure it?
 All taskbars can be configured in a user-defined YAML config file [config.yaml](src/config.yaml) located in either of the following directories:
 - `C:/Users/{username}/.yasb/config.yaml`
@@ -54,7 +59,30 @@ All taskbars can also be styled using a configurable stylesheet [styles.css](src
 
 NOTE: If either of these configuration files are not present in the user's `$HOME/.yasb` directory (or if they contain errors), the default config and stylesheet will be loaded instead.
 
-### How do I contribute?
+## Troubleshooting
+
+#### Why aren't icons being displayed correctly in my bar?
+Yasb uses special fonts to render icons within the status bar. In the screenshot above, the [Font Awesome 5 Free](https://fontawesome.com/v5.15/how-to-use/on-the-desktop/setup/getting-started) Desktop font is used to display a number of icons, including the clock icon, battery icon, etc. Simply install your desitred icon font onto your system and update your `styles.css` file to include the icon font within the font-family of whatever class you would like to use the font with:
+
+```css
+* {
+    font-family: 'Calibri', 'Font Awesome 5 Free';
+    font-size: 16px;
+    ...
+}
+```
+The above snippet can be found in the default [styles.css](https://github.com/denBot/yasb/blob/main/src/styles.css#L1-L5)
+
+#### Why isn't the komorebi widget working?
+Yasb comes with a Komorebi Workspace widget whcih allows you to view and interact with komorebi workspaces directly from the status bar.
+As of right now, you will need a build of [komorebi](https://github.com/LGUG2Z/komorebi) from the master branch, as release 0.17.0 (containing komorebi's pipe subscription feature) has yet to be released.
+
+Once you have a working build for komorebi 0.17.0, run yasb with a `komorebi.workspaces.WorkspacesWidget` widget and yasb should have komorebi subscribe to a named pipe and will start receiving/parsing its events. Yasb will also allow you to run `komorebic` commands, such as switching workspaces, directly through python's subprocess library.
+
+**Note**: Since yasb executes komorebic.exe commands from the command-line, you must have `komoreb.exe` and `komorebic.exe` [added to your system PATH](https://medium.com/@kevinmarkvi/how-to-add-executables-to-your-path-in-windows-5ffa4ce61a53). 
+
+
+## How do I contribute?
 
 #### Requirements
 You'll need to have a development environment with Python 3 installed:
