@@ -8,6 +8,7 @@ from core.utils.alert_dialog import raise_info_alert
 from core.tray import TrayIcon
 from core.settings import DEFAULT_LOG_FILENAME, APP_NAME
 from core import settings
+# from core.utils.win32.active_window_border import ActiveWindowBorder
 
 LOG_PATH = os.path.join(get_config_dir(), DEFAULT_LOG_FILENAME)
 
@@ -15,7 +16,8 @@ logging.basicConfig(
     level=logging.DEBUG,
     filename=os.path.join(get_config_dir(), DEFAULT_LOG_FILENAME),
     format="%(asctime)s %(levelname)s %(filename)s: %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S"
+    datefmt="%Y-%m-%d %H:%M:%S",
+    filemode="w",
 )
 
 logging.getLogger().addHandler(logging.StreamHandler())
@@ -47,7 +49,11 @@ if __name__ == "__main__":
     manager.run_listeners_in_threads()
 
     trayIcon = TrayIcon(manager)
-    trayIcon.setObjectName("YasbTrayIcon")
     trayIcon.show()
+
     manager.show_bars()
+
+    # Experimental Feature
+    # awb = ActiveWindowBorder()
+
     sys.exit(app.exec())

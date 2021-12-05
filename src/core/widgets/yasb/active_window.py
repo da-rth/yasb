@@ -6,12 +6,18 @@ from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtWidgets import QLabel
 from core.bar import BAR_WM_TITLE
 from core.validation.widgets.yasb.active_window import VALIDATION_SCHEMA
+from core.utils.win32.utilities import get_hwnd_info
 
-IGNORED_TITLES = ['']
+IGNORED_TITLES = ['', ' ']
 IGNORED_CLASSES = ['WorkerW']
 IGNORED_PROCESSES = ['SearchHost.exe']
 IGNORED_YASB_TITLES = [BAR_WM_TITLE]
-IGNORED_YASB_CLASSES = ['Qt620QWindowIcon']
+IGNORED_YASB_CLASSES = [
+    'Qt620QWindowIcon',
+    'Qt621QWindowIcon',
+    'Qt620QWindowToolSaveBits',
+    'Qt621QWindowToolSaveBits'
+]
 
 try:
     from core.utils.win32.event_listener import SystemEventListener
@@ -21,7 +27,7 @@ except ImportError:
 
 
 class ActiveWindowWidget(BaseWidget):
-    foreground_change = pyqtSignal(dict)
+    foreground_change = pyqtSignal(int, WinEvent)
     validation_schema = VALIDATION_SCHEMA
     event_listener = SystemEventListener
 
@@ -74,34 +80,37 @@ class ActiveWindowWidget(BaseWidget):
 
         self._event_service.register_event(WinEvent.EventSystemForeground, self.foreground_change)
         self._event_service.register_event(WinEvent.EventSystemMoveSizeEnd, self.foreground_change)
-        self._event_service.register_event(WinEvent.EventObjectNameChange, self.foreground_change)
+        self._event_service.register_event(WinEvent.EventSystemCaptureEnd, self.foreground_change)
 
     def _toggle_title_text(self) -> None:
         self._show_alt = not self._show_alt
         self._active_label = self._label_alt if self._show_alt else self._label
         self._update_text()
 
-    def _on_focus_change_event(self, win_info: dict) -> None:
-        if win_info['title'] not in IGNORED_YASB_TITLES and win_info['class_name'] not in IGNORED_YASB_CLASSES:
-            self._update_window_title(win_info)
+    def _on_focus_change_event(self, hwnd: int, event: WinEvent) -> None:
+        win_info = get_hwnd_info(hwnd)
+        if (not win_info or not hwnd or
+                not win_info['title'] or
+                win_info['title'] in IGNORED_YASB_TITLES or
+                win_info['class_name'] in IGNORED_YASB_CLASSES):
+            return
 
-    def _update_window_title(self, win_info: dict) -> None:
-        hwnd = win_info.get('hwnd', None)
-        event = win_info.get('event', None)
+        monitor_name = win_info['monitor_info'].get('device', None)
 
+        if self._monitor_exclusive and self.screen().name() != monitor_name:
+            self._window_title_text.hide()
+        else:
+            self._update_window_title(hwnd, win_info, event)
+
+    def _update_window_title(self, hwnd: int, win_info: dict, event: WinEvent) -> None:
         try:
             title = win_info['title']
             process = win_info['process']
             class_name = win_info['class_name']
-            monitor_name = win_info['monitor_info'].get('device', None)
 
-            if not hwnd or (event == WinEvent.EventObjectNameChange and not title):
-                return
-            elif self._monitor_exclusive and self.screen().name() != monitor_name:
-                return self._window_title_text.hide()
-            elif (title.strip() in self._ignore_window['titles']) or \
-                 (class_name in self._ignore_window['classes']) or \
-                 (process in self._ignore_window['processes']):
+            if (title.strip() in self._ignore_window['titles'] or
+                    class_name in self._ignore_window['classes'] or
+                    process in self._ignore_window['processes']):
                 if not self._label_no_window:
                     return self._window_title_text.hide()
             else:

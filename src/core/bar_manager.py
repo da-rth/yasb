@@ -42,7 +42,7 @@ class BarManager(QObject):
 
     def run_listeners_in_threads(self):
         for listener in self.widget_event_listeners:
-            logging.info(f"Activating listener {listener}")
+            logging.info(f"Activating listener {listener.__name__}")
             thread = QThread()
             event_listener = listener()
             event_listener.moveToThread(thread)

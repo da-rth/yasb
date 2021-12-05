@@ -45,7 +45,9 @@ class KomorebiEventListener(QObject):
     def _timer_callback(self) -> None:
         if not self._pause_background_updater:
             state = self._komorebic.query_state()
-            self.event_service.emit_event(KomorebiEvent.KomorebiUpdate, state)
+
+            if state:
+                self.event_service.emit_event(KomorebiEvent.KomorebiUpdate, state)
 
     def _timer_start(self) -> None:
         if self._timer_interval and self._timer_interval > 0:
@@ -93,7 +95,7 @@ class KomorebiEventListener(QObject):
                     if event_name in KomorebiEvent:
                         self.event_service.emit_event(KomorebiEvent[event_name], event_message)
                 except Exception:
-                    logging.exception(f"Failed to emit event of type {event_name}")
+                    logging.exception(f"Failed to emit komorebi event of type {event_name} with data {data}")
 
         except Exception:
             logging.exception(f"Komorebi has disconnected from the named pipe {self.pipe_name}")
