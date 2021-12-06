@@ -15,7 +15,7 @@ class KomorebiClient:
     def __init__(
             self,
             komorebic_path: str = "komorebic.exe",
-            timeout_secs: int = 1
+            timeout_secs: int = 0.5
     ):
         super().__init__()
         self._timeout_secs = timeout_secs
@@ -23,10 +23,9 @@ class KomorebiClient:
         self._previous_poll_offline = False
 
     def query_state(self) -> Optional[dict]:
-        with suppress(json.JSONDecodeError, subprocess.SubprocessError):
-            proc = subprocess.Popen([self._komorebic_path, "state"],  stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
-            stdout, stderr = proc.communicate(timeout=self._timeout_secs)
-            return json.loads(stdout)
+        with suppress(json.JSONDecodeError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+            output = subprocess.check_output([self._komorebic_path, "state"], timeout=self._timeout_secs)
+            return json.loads(output)
 
     def get_screens(self, state: dict) -> list:
         return state['monitors']['elements']
