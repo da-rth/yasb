@@ -1,3 +1,4 @@
+import traceback
 import psutil
 from collections import deque
 from core.widgets.base import BaseWidget
@@ -60,6 +61,7 @@ class CpuWidget(BaseWidget):
         max_freq = cpu_freq.max
         current_freq = cpu_freq.current
         current_perc = psutil.cpu_percent()
+        cores_perc = psutil.cpu_percent(percpu=True)
 
         self._cpu_freq_history.append(current_freq)
         self._cpu_perc_history.append(current_perc)
@@ -75,7 +77,7 @@ class CpuWidget(BaseWidget):
                 'current': current_freq
             },
             'percent': {
-                'core': psutil.cpu_percent(percpu=True),
+                'core': cores_perc,
                 'total': current_perc
             },
             'stats': {
@@ -87,10 +89,13 @@ class CpuWidget(BaseWidget):
             'histograms': {
                 'cpu_freq': "".join([
                     self._get_histogram_bar(freq, min_freq, max_freq) for freq in self._cpu_freq_history
-                ]),
+                ]).encode('utf-8').decode('unicode_escape'),
                 'cpu_percent': "".join([
                     self._get_histogram_bar(percent, 0, 100) for percent in self._cpu_perc_history
-                ])
+                ]).encode('utf-8').decode('unicode_escape'),
+                'cores': "".join([
+                    self._get_histogram_bar(percent, 0, 100) for percent in cores_perc
+                ]).encode('utf-8').decode('unicode_escape'),
             }
         }
 
@@ -100,3 +105,4 @@ class CpuWidget(BaseWidget):
             self._label_text.setText(self._active_label.format(info=info))
         except Exception:
             self._label_text.setText(self._active_label)
+            print(traceback.format_exc())

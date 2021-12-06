@@ -3,7 +3,7 @@ DEFAULTS = {
     'label_alt': '\uf200 CPU: {info[percent][total]}% | freq: {info[freq][current]:.2f} Mhz',
     'update_interval': 1000,
     'histogram_icons': [
-        ' ',
+        '\u2581',
         '\u2581',
         '\u2582',
         '\u2583',
