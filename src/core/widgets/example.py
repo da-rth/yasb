@@ -46,9 +46,10 @@ class ExampleWidget(BaseWidget):
             self._label.show()
             self._label_alt.hide()
 
-        self._update_label_content()
+        self._update_label()
 
     def _update_label(self):
-        # Update the label at each timer interval
-        self._label.setText(self._label_content)
-        self._label_alt.setText(self._label_alt_content)
+        # Update the active label at each timer interval
+        active_label = self._label_alt if self._show_alt_label else self._label
+        active_label_content = self._label_alt_content if self._show_alt_label else self._label_content
+        active_label.setText(active_label_content)

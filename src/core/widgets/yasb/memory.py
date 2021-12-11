@@ -18,36 +18,52 @@ class MemoryWidget(BaseWidget):
             memory_thresholds: dict[str, int]
     ):
         super().__init__(update_interval, class_name="memory-widget")
-        self._show_alt = False
-        self._label = label
-        self._label_alt = label_alt
-        self._active_label = label
-        self._mem_text = QLabel()
-        self._mem_text.setProperty("class", "label")
-        self.widget_layout.addWidget(self._mem_text)
+        self._memory_thresholds = memory_thresholds
 
-        self.register_callback("toggle_label", self._toggle_memory_info)
-        self.register_callback("update_memory_info", self._update_memory_info)
+        self._show_alt_label = False
+        self._label_content = label
+        self._label_alt_content = label_alt
+
+        self._label = QLabel()
+        self._label_alt = QLabel()
+        self._label.setProperty("class", "label")
+        self._label_alt.setProperty("class", "label alt")
+        self.widget_layout.addWidget(self._label)
+        self.widget_layout.addWidget(self._label_alt)
+
+        self.register_callback("toggle_label", self._toggle_label)
+        self.register_callback("update_label", self._update_label)
 
         self.callback_left = callbacks['on_left']
         self.callback_right = callbacks['on_right']
         self.callback_middle = callbacks['on_middle']
-        self.callback_timer = "update_memory_info"
+        self.callback_timer = "update_label"
 
-        self._percent_thresholds = memory_thresholds
-
+        self._label.show()
+        self._label_alt.hide()
         self.start_timer()
 
-    def _toggle_memory_info(self):
-        self._show_alt = not self._show_alt
-        self._active_label = self._label_alt if self._show_alt else self._label
-        self._update_memory_info()
+    def _toggle_label(self):
+        self._show_alt_label = not self._show_alt_label
 
-    def _update_memory_info(self):
+        if self._show_alt_label:
+            self._label.hide()
+            self._label_alt.show()
+        else:
+            self._label.show()
+            self._label_alt.hide()
+
+        self._update_label()
+
+    def _update_label(self):
+        active_label = self._label_alt if self._show_alt_label else self._label
+        active_label_content = self._label_alt_content if self._show_alt_label else self._label_content
+        active_label_formatted = active_label_content
+
         try:
             virtual_mem = psutil.virtual_memory()
             swap_mem = psutil.swap_memory()
-            mem_text = self._active_label
+
             threshold = self._get_virtual_memory_threshold(virtual_mem.percent)
             label_options = [
                 ("{virtual_mem_free}", naturalsize(virtual_mem.free)),
@@ -60,20 +76,22 @@ class MemoryWidget(BaseWidget):
             ]
 
             for fmt_str, value in label_options:
-                mem_text = mem_text.replace(fmt_str, str(value))
+                active_label_formatted = active_label_formatted.replace(fmt_str, str(value))
 
-            self._mem_text.setText(mem_text)
-            self._mem_text.setProperty("class", f"label status-{threshold}")
-            self._mem_text.setStyleSheet('')
+            alt_class = "alt" if self._show_alt_label else ""
+            active_label.setText(active_label_formatted)
+            active_label.setProperty("class", f"label {alt_class} status-{threshold}")
+            active_label.setStyleSheet('')
         except Exception:
+            active_label.setText(active_label_content)
             logging.exception("Failed to retrieve updated memory info")
 
     def _get_virtual_memory_threshold(self, virtual_memory_percent) -> str:
-        if virtual_memory_percent <= self._percent_thresholds['low']:
+        if virtual_memory_percent <= self._memory_thresholds['low']:
             return "low"
-        elif self._percent_thresholds['low'] < virtual_memory_percent <= self._percent_thresholds['medium']:
+        elif self._memory_thresholds['low'] < virtual_memory_percent <= self._memory_thresholds['medium']:
             return "medium"
-        elif self._percent_thresholds['medium'] < virtual_memory_percent <= self._percent_thresholds['high']:
+        elif self._memory_thresholds['medium'] < virtual_memory_percent <= self._memory_thresholds['high']:
             return "high"
-        elif self._percent_thresholds['high'] < virtual_memory_percent:
+        elif self._memory_thresholds['high'] < virtual_memory_percent:
             return "critical"
