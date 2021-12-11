@@ -22,6 +22,9 @@ class BatteryWidget(BaseWidget):
             callbacks: dict[str, str]
     ):
         super().__init__(update_interval, class_name="battery-widget")
+        self._time_remaining_natural = time_remaining_natural
+        self._status_thresholds = status_thresholds
+        self._status_icons = status_icons
         self._battery_state = None
         self._blink = False
         self._show_alt = False
@@ -30,35 +33,41 @@ class BatteryWidget(BaseWidget):
         self._icon_charging_format = charging_options['icon_format']
         self._icon_charging_blink = charging_options['blink_charging_icon']
 
-        self._label = label
-        self._label_alt = label_alt
-        self._active_label = label
-        self._time_remaining_natural = time_remaining_natural
+        self._show_alt_label = False
+        self._label_content = label
+        self._label_alt_content = label_alt
 
-        self._status_thresholds = status_thresholds
-        self._status_icons = status_icons
+        self._label = QLabel()
+        self._label_alt = QLabel()
+        self._label.setProperty("class", "label")
+        self._label_alt.setProperty("class", "label alt")
+        self.widget_layout.addWidget(self._label)
+        self.widget_layout.addWidget(self._label_alt)
 
-        self.register_callback("update_battery_info", self.update_battery_info)
-        self.register_callback("toggle_label", self.toggle_label)
+        self.register_callback("update_label", self._update_label)
+        self.register_callback("toggle_label", self._toggle_label)
 
         self.callback_left = callbacks['on_left']
         self.callback_right = callbacks['on_right']
         self.callback_middle = callbacks['on_middle']
-        self.callback_timer = "update_battery_info"
+        self.callback_timer = "update_label"
 
-        self._battery_label = QLabel()
-        self._battery_label.setProperty("class", "label")
-        self.widget_layout.addWidget(self._battery_label)
+        self._label.show()
+        self._label_alt.hide()
+
         self.start_timer()
 
-    def update_battery_info(self):
-        self._battery_state = psutil.sensors_battery()
-        self._update_charging_label()
+    def _toggle_label(self):
+        self._show_alt_label = not self._show_alt_label
 
-    def toggle_label(self):
-        self._show_alt = not self._show_alt
-        self._active_label = self._label_alt if self._show_alt else self._label
-        self.update_battery_info()
+        if self._show_alt_label:
+            self._label.hide()
+            self._label_alt.show()
+        else:
+            self._label.show()
+            self._label_alt.hide()
+
+        self._update_label()
 
     def _get_time_remaining(self) -> str:
         secs_left = self._battery_state.secsleft
@@ -104,12 +113,18 @@ class BatteryWidget(BaseWidget):
         else:
             return self._status_icons[f"icon_{threshold}"]
 
-    def _update_charging_label(self):
+    def _update_label(self):
+        active_label = self._label_alt if self._show_alt_label else self._label
+        active_label_content = self._label_alt_content if self._show_alt_label else self._label_content
+        active_label.setText(active_label_content)
+
+        self._battery_state = psutil.sensors_battery()
+
         threshold = self._get_battery_threshold()
         time_remaining = self._get_time_remaining()
         is_charging_str = "yes" if self._battery_state.power_plugged else "no"
         charging_icon = self._get_charging_icon(threshold)
-        battery_status = self._active_label\
+        battery_status = active_label_content\
             .replace("{percent}", str(self._battery_state.percent)) \
             .replace("{time_remaining}", time_remaining) \
             .replace("{is_charging}", is_charging_str) \
@@ -118,6 +133,7 @@ class BatteryWidget(BaseWidget):
         if self._battery_state.power_plugged:
             threshold = "charging"
 
-        self._battery_label.setText(battery_status)
-        self._battery_label.setProperty("class", f"label status-{threshold}")
-        self._battery_label.setStyleSheet('')
+        alt_class = "alt" if self._show_alt_label else ""
+        active_label.setText(battery_status)
+        active_label.setProperty("class", f"label {alt_class} status-{threshold}")
+        active_label.setStyleSheet('')
