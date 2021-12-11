@@ -1,9 +1,5 @@
 DEFAULTS = {
     'label_max_length': None,
-    'icon': {
-        'position': 'left',
-        'label': None
-    },
     'exec_options': {
         'run_cmd': None,
         'run_once': False,
@@ -19,6 +15,10 @@ DEFAULTS = {
 
 
 VALIDATION_SCHEMA = {
+    'class_name': {
+        'type': 'string',
+        'required': True,
+    },
     'label': {
         'type': 'string',
         'required': True
@@ -26,26 +26,6 @@ VALIDATION_SCHEMA = {
     'label_alt': {
         'type': 'string',
         'default': True
-    },
-    'class_name': {
-        'type': 'string',
-        'required': True,
-    },
-    'icon': {
-        'type': 'dict',
-        'schema': {
-            'position': {
-                'type': 'string',
-                'allowed': ['left', 'right'],
-                'default': DEFAULTS['icon']['position']
-            },
-            'label': {
-                'type': 'string',
-                'nullable': True,
-                'default': DEFAULTS['icon']['label']
-            }
-        },
-        'default': DEFAULTS['icon']
     },
     'label_max_length': {
         'type': 'integer',

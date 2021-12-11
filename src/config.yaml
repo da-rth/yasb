@@ -428,41 +428,35 @@ widgets:
     type: "yasb.custom.CustomWidget"
     options:
       label: "\uf07c"
-      label_alt: "Open Explorer"
+      label_alt: "Explorer"
       class_name: "explorer-widget"
+      exec_options:
+        run_once: true
       callbacks:
         on_left: "exec explorer.exe"
+        on_right: "toggle_label"
 
   ip_info:
     type: "yasb.custom.CustomWidget"
     options:
-      label: "{data[city]}, {data[region]}"
-      label_alt: "{data[ip]} [{data[country]}]"
+      label: "\uf3c5 {data[city]}, {data[region]}"
+      label_alt: "\uf3c5 {data[ip]} [{data[country]}]"
       class_name: "ip-info-widget"
-      icon:
-        position: "left"
-        label: "\uf3c5"
       exec_options:
         run_cmd: "curl.exe https://ipinfo.io"
-        # every 5 minutes
-        run_interval: 120000
+        run_interval: 120000                                        # every 5 minutes
         return_format: "json"
       callbacks:
         on_left: "toggle_label"
-        # open network settings
-        on_middle: "exec cmd /c ncpa.cpl"
-        # open ipinfo in browser
-        on_right: "exec cmd /c start https://ipinfo.io/{data[ip]} "
+        on_middle: "exec cmd /c ncpa.cpl"                           # open network settings
+        on_right: "exec cmd /c start https://ipinfo.io/{data[ip]} " # open ipinfo in browser
 
   weather:
     type: "yasb.custom.CustomWidget"
     options:
-      label: "{data[main][temp]}\u00b0c"
-      label_alt: "{data[weather][0][description]}"
+      label: "\uf0c2 {data[main][temp]}\u00b0c"
+      label_alt: "\uf0c2 {data[weather][0][description]}"
       class_name: "weather-widget"
-      icon:
-        position: "left"
-        label: "\uf0c2"
       exec_options:
         run_cmd: "curl.exe api.openweathermap.org/data/2.5/weather?q=Glasgow&units=metric&appid={YOUR_API_KEY_HERE}"
         # run every hour

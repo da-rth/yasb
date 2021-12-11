@@ -13,67 +13,76 @@ class CustomWidget(BaseWidget):
             label: str,
             label_alt: str,
             label_max_length: int,
-            icon: dict,
             exec_options: dict,
             callbacks: dict,
             class_name: str
     ):
         super().__init__(exec_options['run_interval'], class_name=f"custom-widget {class_name}")
-        self._show_alt = False
-        self._label = label
-        self._label_alt = label_alt if label_alt else label
         self._label_max_length = label_max_length
-
-        self.register_callback("toggle_label", self.toggle)
-        self.register_callback("exec_custom", self._exec_callback)
         self._exec_data = None
-        self._exec_cmd = exec_options['run_cmd']
-
-        if self._exec_cmd:
-            self._exec_cmd = self._exec_cmd.split(" ")
-
+        self._exec_cmd = exec_options['run_cmd'].split(" ") if exec_options.get('run_cmd', False) else None
         self._exec_return_type = exec_options['return_format']
+
+        self._show_alt_label = False
+        self._label_content = label
+        self._label_alt_content = label_alt
+
+        self._label = QLabel()
+        self._label_alt = QLabel()
+        self._label.setProperty("class", "label")
+        self._label_alt.setProperty("class", "label alt")
+        self.widget_layout.addWidget(self._label)
+        self.widget_layout.addWidget(self._label_alt)
+
+        self.register_callback("toggle_label", self._toggle_label)
+        self.register_callback("exec_custom", self._exec_callback)
 
         self.callback_left = callbacks['on_left']
         self.callback_right = callbacks['on_right']
         self.callback_middle = callbacks['on_middle']
         self.callback_timer = "exec_custom"
 
-        if class_name:
-            self.widget_layout.setProperty("class", class_name)
-
-        self._custom_text = QLabel()
-        self._custom_text.setProperty("class",  "label")
-        self._custom_text.setText(label)
-
-        if icon and icon['label']:
-            self._icon_text = QLabel()
-            self._icon_text.setText(icon['label'])
-            self._icon_text.setProperty("class", f"icon icon-{icon['position']}")
-
-            if icon['position'] == 'left':
-                self.widget_layout.addWidget(self._icon_text)
-                self.widget_layout.addWidget(self._custom_text)
-            else:
-                self.widget_layout.addWidget(self._custom_text)
-                self.widget_layout.addWidget(self._icon_text)
-        else:
-            self.widget_layout.addWidget(self._custom_text)
+        self._label.show()
+        self._label_alt.hide()
+        self._update_label()
 
         if exec_options['run_once']:
             self._exec_callback()
         else:
             self.start_timer()
 
-    def toggle(self):
-        self._show_alt = not self._show_alt
+    def _toggle_label(self):
+        self._show_alt_label = not self._show_alt_label
+
+        if self._show_alt_label:
+            self._label.hide()
+            self._label_alt.show()
+        else:
+            self._label.show()
+            self._label_alt.hide()
+
         self._update_label()
+
+    def _truncate_label(self, label):
+        if self._label_max_length and len(label) > self._label_max_length:
+            return label[:self._label_max_length] + "..."
+
+        return label
+
+    def _update_label(self):
+        # Update the active label at each timer interval
+        active_label = self._label_alt if self._show_alt_label else self._label
+        active_label_content = self._label_alt_content if self._show_alt_label else self._label_content
+
+        try:
+            active_label.setText(self._truncate_label(active_label_content.format(data=self._exec_data)))
+        except Exception:
+            active_label.setText(self._truncate_label(active_label_content))
 
     def _exec_callback(self):
         self._exec_data = None
 
         if self._exec_cmd:
-            # TODO: Log stderr if present
             proc = subprocess.Popen(self._exec_cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
             output = proc.stdout.read()
 
@@ -84,24 +93,8 @@ class CustomWidget(BaseWidget):
 
             self._update_label()
 
-    def _truncate_label(self, label):
-        if self._label_max_length and len(label) > self._label_max_length:
-            return label[:self._label_max_length] + "..."
-        else:
-            return label
-
-    def _update_label(self):
-        active_label = self._label_alt if self._show_alt else self._label
-
-        try:
-            label = active_label.format(data=self._exec_data)
-        except Exception:
-            label = active_label
-
-        self._custom_text.setText(self._truncate_label(label))
-
     def _cb_execute_subprocess(self, cmd: str, *cmd_args: list[str]):
-        # Overrides 'exec' callback to allow for data formatting
+        # Overrides the default 'exec' callback from BaseWidget to allow for data formatting
         if self._exec_data:
             formatted_cmd_args = []
             for cmd_arg in cmd_args:
