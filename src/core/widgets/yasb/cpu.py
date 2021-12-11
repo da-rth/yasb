@@ -1,12 +1,8 @@
-import traceback
 import psutil
 from collections import deque
 from core.widgets.base import BaseWidget
 from core.validation.widgets.yasb.cpu import VALIDATION_SCHEMA
 from PyQt6.QtWidgets import QLabel
-
-
-# TODO : Add CPU temperature format options
 
 
 class CpuWidget(BaseWidget):
@@ -26,13 +22,16 @@ class CpuWidget(BaseWidget):
         self._cpu_freq_history = deque([0] * histogram_num_columns, maxlen=histogram_num_columns)
         self._cpu_perc_history = deque([0] * histogram_num_columns, maxlen=histogram_num_columns)
 
-        self._show_alt = False
-        self._label = label
-        self._label_alt = label_alt
-        self._active_label = label
-        self._label_text = QLabel()
-        self._label_text.setProperty("class", "label")
-        self.widget_layout.addWidget(self._label_text)
+        self._show_alt_label = False
+        self._label_content = label
+        self._label_alt_content = label_alt
+
+        self._label = QLabel()
+        self._label_alt = QLabel()
+        self._label.setProperty("class", "label")
+        self._label_alt.setProperty("class", "label alt")
+        self.widget_layout.addWidget(self._label)
+        self.widget_layout.addWidget(self._label_alt)
 
         self.register_callback("toggle_label", self._toggle_label)
         self.register_callback("update_label", self._update_label)
@@ -42,12 +41,33 @@ class CpuWidget(BaseWidget):
         self.callback_middle = callbacks['on_middle']
         self.callback_timer = "update_label"
 
+        self._label.show()
+        self._label_alt.hide()
+
         self.start_timer()
 
     def _toggle_label(self):
-        self._show_alt = not self._show_alt
-        self._active_label = self._label_alt if self._show_alt else self._label
+        self._show_alt_label = not self._show_alt_label
+
+        if self._show_alt_label:
+            self._label.hide()
+            self._label_alt.show()
+        else:
+            self._label.show()
+            self._label_alt.hide()
+
         self._update_label()
+
+    def _update_label(self):
+        active_label = self._label_alt if self._show_alt_label else self._label
+        active_label_content = self._label_alt_content if self._show_alt_label else self._label_content
+        active_label.setText(active_label_content)
+
+        try:
+            info = self._get_cpu_info()
+            active_label.setText(active_label_content.format(info=info))
+        except Exception:
+            active_label.setText(active_label_content)
 
     def _get_histogram_bar(self, num, num_min, num_max):
         bar_index = int((num - num_min) / (num_max - num_min) * 10)
@@ -98,11 +118,3 @@ class CpuWidget(BaseWidget):
                 ]).encode('utf-8').decode('unicode_escape'),
             }
         }
-
-    def _update_label(self):
-        try:
-            info = self._get_cpu_info()
-            self._label_text.setText(self._active_label.format(info=info))
-        except Exception:
-            self._label_text.setText(self._active_label)
-            print(traceback.format_exc())
