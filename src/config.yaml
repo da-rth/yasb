@@ -460,5 +460,5 @@ widgets:
       exec_options:
         run_cmd: "curl.exe api.openweathermap.org/data/2.5/weather?q=Glasgow&units=metric&appid={YOUR_API_KEY_HERE}"
         # run every hour
-        run_interval: 6000000
+        run_interval: 3600000
         return_format: "json"
