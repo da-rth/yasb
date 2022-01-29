@@ -371,7 +371,7 @@ widgets:
   cpu:
     type: "yasb.cpu.CpuWidget"
     options:
-      label: "\uf200   {info[histograms][cpu_percent]}"
+      label: "\uf200 {info[histograms][cpu_percent]}"
       label_alt: "\uf200 CPU: {info[percent][total]}% | freq: {info[freq][current]:.2f} Mhz"
       update_interval: 500
       histogram_icons:
@@ -389,8 +389,8 @@ widgets:
   memory:
     type: "yasb.memory.MemoryWidget"
     options:
-        label: "\uf538  {virtual_mem_free}"
-        label_alt: "\uf538  {virtual_mem_percent}%"
+        label: "\uf538 {virtual_mem_free}"
+        label_alt: "\uf538 {virtual_mem_percent}%"
         update_interval: 5000
         callbacks:
           on_right: "exec cmd /c Taskmgr"

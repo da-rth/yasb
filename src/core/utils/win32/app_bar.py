@@ -76,9 +76,11 @@ class Win32AppBar:
         logging.info(f"Creating Win32 App Bar for bar {self.window.bar_index} with HWND {int(self.window.winId())}")
         self.app_bar_data.hWnd = self.window.winId().__int__()
         screen_geometry = self.window.screen().geometry()
+
         win32api.RegisterWindowMessage("AppBarMessage")
         shell32.SHAppBarMessage(AppBarMessage.New, AppBarDataPointer(self.app_bar_data))
         pixel_ratio = self.window.screen().devicePixelRatio()
+
         self.app_bar_data.rc.left = screen_geometry.x()
         self.app_bar_data.rc.right = screen_geometry.height()
 
@@ -95,13 +97,17 @@ class Win32AppBar:
                 self.app_bar_data.rc.right = screen_geometry.width()
                 self.app_bar_data.rc.left = screen_geometry.width() - self.window.width()
         """
-        y_offset_adjust = int(self.window._offset['y'] * pixel_ratio)
+        y_offset = int(self.window._offset.get('y', 0) * pixel_ratio)
+
         if self.app_bar_data.uEdge == AppBarEdge.Top:
             self.app_bar_data.rc.top = int(screen_geometry.y() * pixel_ratio)
-            self.app_bar_data.rc.bottom = int(self.window.height() * pixel_ratio) + y_offset_adjust
+            self.app_bar_data.rc.bottom = (self.window.y() + int(self.window.height() * pixel_ratio) + y_offset)
         else:
-            self.app_bar_data.rc.bottom = int(screen_geometry.height() * pixel_ratio) + y_offset_adjust
-            self.app_bar_data.rc.top = int((screen_geometry.height() - self.window.height()) * pixel_ratio)
+            self.app_bar_data.rc.bottom = int(screen_geometry.height() * pixel_ratio) + y_offset
+            self.app_bar_data.rc.top = (
+                    self.window.y() +
+                    int((screen_geometry.height() - self.window.height()) * pixel_ratio)
+            )
 
         shell32.SHAppBarMessage(AppBarMessage.QueryPos, AppBarDataPointer(self.app_bar_data))
         shell32.SHAppBarMessage(AppBarMessage.SetPos, AppBarDataPointer(self.app_bar_data))
