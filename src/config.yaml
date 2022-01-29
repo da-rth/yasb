@@ -95,7 +95,7 @@ bars:
       right: 0
     widgets:
       left:   ["komorebi_workspaces", "komorebi_active_layout", "active_window"]
-      center: ["clock"]
+      center: ["media"]
       right:  ["explorer_button", "ip_info", "cpu", "memory", "battery"]
 
 # widgets:
@@ -482,3 +482,6 @@ widgets:
         # run every hour
         run_interval: 3600000
         return_format: "json"
+
+  media:
+    type: "win32.media_player.MediaWidget"

@@ -1,3 +1,7 @@
+from contextlib import suppress
+with suppress(ImportError):
+    import winrt # noqa
+
 from sys import argv, exit
 from PyQt6.QtWidgets import QApplication
 from core.bar_manager import BarManager
