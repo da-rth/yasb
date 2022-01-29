@@ -1,9 +1,11 @@
 from typing import Union
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QGridLayout, QFrame
 from PyQt6.QtGui import QScreen
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QEvent
 from core.utils.utilities import is_valid_percentage_str, percent_to_float
 from core.validation.bar import BAR_DEFAULTS
+from win32gui import SetWindowPos
+import win32con
 
 try:
     from core.utils.win32.app_bar import Win32AppBar, AppBarEdge
@@ -48,6 +50,11 @@ class Bar(QWidget):
 
         if self._window_flags['always_on_top']:
             self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint)
+            # SetWindowPos(self.winId(),
+            #              win32con.HWND_TOPMOST,
+            #              0, 0, 0, 0,
+            #              win32con.SWP_NOMOVE | win32con.SWP_NOSIZE | win32con.SWP_SHOWWINDOW)
+            # self.raise_()
 
         self._bar_frame = QFrame(self)
         self._bar_frame.setProperty("class", f"bar {class_name}")

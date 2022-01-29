@@ -1,3 +1,4 @@
+from contextlib import suppress
 from winrt.windows.media.control import GlobalSystemMediaTransportControlsSessionManager
 from winrt.windows.storage.streams import DataReader, Buffer, InputStreamOptions
 
