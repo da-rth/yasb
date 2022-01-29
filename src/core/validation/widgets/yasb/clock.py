@@ -1,6 +1,6 @@
 DEFAULTS = {
-    'label': '\uf017  {%H:%M:%S}',
-    'label_alt': '\uf017  {%d-%m-%y %H:%M:%S}',
+    'label': '\uf017 {%H:%M:%S}',
+    'label_alt': '\uf017 {%d-%m-%y %H:%M:%S}',
     'update_interval': 1000,
     'timezones': [],
     'callbacks': {

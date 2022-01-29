@@ -4,7 +4,7 @@ DEFAULTS = {
     'update_interval': 5000,
     'time_remaining_natural': False,
     'charging_options': {
-        'icon_format': '{charging_icon}  {icon}',
+        'icon_format': '{charging_icon} {icon}',
         'blink_charging_icon': True
     },
     'status_thresholds': {
