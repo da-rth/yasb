@@ -81,6 +81,10 @@ class Bar(QWidget):
     def bar_id(self) -> str:
         return self._bar_id
 
+    @property
+    def dimensions(self):
+        return self._dimensions
+
     def on_geometry_changed(self, geo: QRect) -> None:
         logging.info(f"Screen geometry changed. Updating position for bar ({self.bar_id})")
         self.position_bar()
@@ -159,7 +163,7 @@ class Bar(QWidget):
             for widget in widgets[layout_type]:
                 widget.setFixedHeight(self._bar_frame.geometry().height())
                 widget.parent_layout_type = layout_type
-                widget.bar_id = self.bar_id
+                widget.bar = self
                 layout.addWidget(widget, 0)
 
             if layout_type in ["left", "center"]:
