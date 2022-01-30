@@ -25,7 +25,7 @@ class Bar(QWidget):
             alignment: dict = BAR_DEFAULTS['alignment'],
             window_flags: dict = BAR_DEFAULTS['window_flags'],
             dimensions: dict = BAR_DEFAULTS['dimensions'],
-            offset: dict = BAR_DEFAULTS['offset'],
+            padding: dict = BAR_DEFAULTS['padding'],
             widgets: list[QWidget] = BAR_DEFAULTS['widgets']
     ):
         super().__init__()
@@ -35,7 +35,7 @@ class Bar(QWidget):
         self._alignment = alignment
         self._window_flags = window_flags
         self._dimensions = dimensions
-        self._offset = offset
+        self._padding = padding
 
         if bar_screen:
             self.setScreen(bar_screen)
@@ -53,10 +53,21 @@ class Bar(QWidget):
         self._bar_frame.setProperty("class", f"bar {class_name}")
 
         bar_width = self._calc_bar_width(self._dimensions['width'])
-        bar_height = self._dimensions['height']
-        bar_x, bar_y = self._calc_adjusted_bar_offset(self._offset['x'], self._offset['y'], bar_width, bar_height)
+        bar_height = self._dimensions['height'] + (self._padding['top'] + self._padding['bottom'])
+        bar_x, bar_y = self._calc_adjusted_bar_padding(
+            self._padding['left'],
+            bar_width,
+            bar_height
+        )
+
         self.setGeometry(bar_x, bar_y, bar_width, bar_height)
-        self._bar_frame.setGeometry(0, 0, bar_width, bar_height)
+
+        self._bar_frame.setGeometry(
+            0,
+            self._padding['top'],
+            bar_width - (self._padding['left'] + self._padding['right']),
+            bar_height - (self._padding['top'] + self._padding['bottom'])
+        )
 
         if self._window_flags['windows_app_bar'] and IMPORT_APP_BAR_MANAGER_SUCCESSFUL:
             self.appbar_edge = AppBarEdge.Top if self._alignment['position'] == "top" else AppBarEdge.Bottom
@@ -77,18 +88,18 @@ class Bar(QWidget):
             return int(self.screen().geometry().width() * percent_to_float(width))
         return width
 
-    def _calc_adjusted_bar_offset(self, x_offset: int, y_offset: int, bar_w: int, bar_h: int) -> tuple[int, int]:
+    def _calc_adjusted_bar_padding(self, x_padding: int, bar_w: int, bar_h: int) -> tuple[int, int]:
         geo = self.screen().geometry()
 
         if self._alignment['center']:
             x = int(geo.x() + (geo.width() / 2) - int(bar_w / 2))
         else:
-            x = geo.x() + x_offset
+            x = geo.x() + x_padding
 
         if self._alignment['position'] == "bottom":
-            y = geo.height() - y_offset - bar_h
+            y = geo.y() + geo.height() - bar_h
         else:
-            y = geo.y() + y_offset
+            y = geo.y()
 
         return x, y
 
@@ -109,7 +120,7 @@ class Bar(QWidget):
                 layout.addStretch()
 
             for widget in widgets[layout_type]:
-                widget.setFixedHeight(self._bar_frame.geometry().height() - 2)
+                widget.setFixedHeight(self._bar_frame.geometry().height())
                 widget.parent_layout_type = layout_type
                 widget.bar_index = self._bar_index
                 layout.addWidget(widget, 0)

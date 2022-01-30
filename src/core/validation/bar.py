@@ -5,7 +5,7 @@ BAR_DEFAULTS = {
     'alignment': {'position': 'top', 'center': False},
     'window_flags': {'always_on_top': False, 'windows_app_bar': False},
     'dimensions': {'width': '100%', 'height': 30},
-    'offset': {'x': 0, 'y': 0},
+    'padding': {'top': 0, 'left': 0, 'bottom': 0, 'right': 0},
     'widgets': {'left': [], 'center': [], 'right': []}
 }
 
@@ -76,19 +76,27 @@ BAR_SCHEMA = {
             },
             'default': BAR_DEFAULTS['dimensions']
         },
-        'offset': {
+        'padding': {
             'type': 'dict',
             'schema': {
-                'x': {
+                'top': {
                     'type': 'integer',
-                    'default': BAR_DEFAULTS['offset']['x']
+                    'default': BAR_DEFAULTS['padding']['top']
                 },
-                'y': {
+                'left': {
                     'type': 'integer',
-                    'default': BAR_DEFAULTS['offset']['y']
+                    'default': BAR_DEFAULTS['padding']['left']
+                },
+                'bottom': {
+                    'type': 'integer',
+                    'default': BAR_DEFAULTS['padding']['bottom']
+                },
+                'right': {
+                    'type': 'integer',
+                    'default': BAR_DEFAULTS['padding']['right']
                 }
             },
-            'default': BAR_DEFAULTS['offset']
+            'default': BAR_DEFAULTS['padding']
         },
         'widgets': {
             'type': 'dict',

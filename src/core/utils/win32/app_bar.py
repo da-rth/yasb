@@ -97,18 +97,18 @@ class Win32AppBar:
                 self.app_bar_data.rc.right = screen_geometry.width()
                 self.app_bar_data.rc.left = screen_geometry.width() - self.window.width()
         """
-        y_offset = int(self.window._offset.get('y', 0) * pixel_ratio)
-
         if self.app_bar_data.uEdge == AppBarEdge.Top:
             self.app_bar_data.rc.top = int(screen_geometry.y() * pixel_ratio)
-            self.app_bar_data.rc.bottom = (self.window.y() + int(self.window.height() * pixel_ratio) + y_offset)
-        else:
-            self.app_bar_data.rc.bottom = int(screen_geometry.height() * pixel_ratio) + y_offset
-            self.app_bar_data.rc.top = (
-                    self.window.y() +
-                    int((screen_geometry.height() - self.window.height()) * pixel_ratio)
+            self.app_bar_data.rc.bottom = int(
+                (screen_geometry.y() + self.window.height()) * pixel_ratio
             )
+        else:
+            self.app_bar_data.rc.top = int(
+                (screen_geometry.y() + screen_geometry.height() - self.window.height()) * pixel_ratio
+            )
+            self.app_bar_data.rc.bottom = int((screen_geometry.y() + screen_geometry.height()) * pixel_ratio)
 
+        print(self.app_bar_data.rc.top, self.app_bar_data.rc.bottom)
         shell32.SHAppBarMessage(AppBarMessage.QueryPos, AppBarDataPointer(self.app_bar_data))
         shell32.SHAppBarMessage(AppBarMessage.SetPos, AppBarDataPointer(self.app_bar_data))
 
