@@ -42,7 +42,7 @@ For an example of the default bar configuration, see the image below:
 - Create the directory `C:/Users/{username}/.yasb/` and copy [styles.css](src/styles.css) and [config.yaml](src/config.yaml) into folder.
   - Configure [styles.css](src/styles.css) and [config.yaml](src/config.yaml) to your liking.
 - Start the application:
-  - run `python main.py` in your terminal (or create a startup shortcut)
+  - run `python src/main.py` in your terminal (or create a startup shortcut)
 
 ### What do I do if I've spotted a bug?
 **This project is still in early development... If you encounter any bugs, please submit an [issue](https://github.com/denBot/yasb/issues) :bug:**
