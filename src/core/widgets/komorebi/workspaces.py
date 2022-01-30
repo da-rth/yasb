@@ -31,6 +31,7 @@ class WorkspaceButton(QPushButton):
         self.setProperty("class", "ws-btn")
         self.setText(label if label else str(workspace_index + 1))
         self.clicked.connect(self.activate_workspace)
+        self.hide()
 
     def update_state_and_redraw(self, state: WorkspaceState):
         self.state = state
@@ -65,7 +66,7 @@ class WorkspaceWidget(BaseWidget):
         self._komorebi_workspaces = []
         self._prev_workspace_index = None
         self._curr_workspace_index = None
-        self._workspace_buttons: list[QPushButton] = []
+        self._workspace_buttons: list[WorkspaceButton] = []
         self._hide_empty_workspaces = hide_empty_workspaces
 
         # Disable default mouse event handling inherited from BaseWidget
@@ -175,15 +176,23 @@ class WorkspaceWidget(BaseWidget):
 
             if ws_btn:
                 self._update_button_state(ws_btn)
+                self._update_button_visibility(ws_btn)
 
         self._workspace_container.setStyleSheet('')
 
-    def _try_add_workspace_button(self, workspace_index: int) -> QPushButton:
+    def _update_button_visibility(self, ws_btn: WorkspaceButton) -> None:
+        if self._hide_empty_workspaces and ws_btn.state == WORKSPACE_STATE_EMPTY:
+            ws_btn.hide()
+        else:
+            ws_btn.show()
+
+    def _try_add_workspace_button(self, workspace_index: int) -> WorkspaceButton:
         workspace_button_indexes = [ws_btn.workspace_index for ws_btn in self._workspace_buttons]
 
         if workspace_index not in workspace_button_indexes:
             workspace_btn = WorkspaceButton(workspace_index)
             self._update_button_state(workspace_btn)
+            self._update_button_visibility(workspace_btn)
             self._workspace_buttons.append(workspace_btn)
             self._clear_container_layout()
 
@@ -192,7 +201,7 @@ class WorkspaceWidget(BaseWidget):
 
             return workspace_btn
 
-    def _update_button_state(self, workspace_btn: QPushButton) -> None:
+    def _update_button_state(self, workspace_btn: WorkspaceButton) -> None:
         workspace_index = workspace_btn.workspace_index
         workspace = self._komorebic.get_workspace_by_index(self._komorebi_screen, workspace_index)
 

@@ -108,7 +108,6 @@ class Win32AppBar:
             )
             self.app_bar_data.rc.bottom = int((screen_geometry.y() + screen_geometry.height()) * pixel_ratio)
 
-        print(self.app_bar_data.rc.top, self.app_bar_data.rc.bottom)
         shell32.SHAppBarMessage(AppBarMessage.QueryPos, AppBarDataPointer(self.app_bar_data))
         shell32.SHAppBarMessage(AppBarMessage.SetPos, AppBarDataPointer(self.app_bar_data))
 
