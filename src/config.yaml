@@ -73,7 +73,7 @@ bars:
     screens: ['*']
     class_name: "yasb-bar"
     alignment:
-      position: "top"
+      position: "bottom"
       center: false
     window_flags:
       always_on_top: false
@@ -86,7 +86,7 @@ bars:
       y: 0
     widgets:
       left:   ["komorebi_workspaces", "active_window"]
-      center: ["clock", "media"]
+      center: ["media"]
       right:  ["explorer_button", "ip_info", "cpu", "memory", "battery"]
 
 # widgets:
@@ -464,4 +464,4 @@ widgets:
         return_format: "json"
 
   media:
-    type: "win32.media_player.MediaPlayerWidget"
+    type: "win32.media_player.MediaWidget"

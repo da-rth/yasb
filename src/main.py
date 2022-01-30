@@ -1,19 +1,25 @@
 import os
 import sys
 import logging
-from PyQt6.QtWidgets import QApplication
+import contextlib
+
+with contextlib.suppress(RuntimeError, ModuleNotFoundError):
+    import winrt # noqa
+
 from core.bar_manager import BarManager
 from core.utils.config_utils import get_config_and_stylesheet, get_config_dir
 from core.utils.alert_dialog import raise_info_alert
 from core.tray import TrayIcon
 from core.settings import DEFAULT_LOG_FILENAME, APP_NAME
 from core import settings
+from PyQt6.QtWidgets import QApplication
+
 # from core.utils.win32.active_window_border import ActiveWindowBorder
 
 LOG_PATH = os.path.join(get_config_dir(), DEFAULT_LOG_FILENAME)
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     filename=os.path.join(get_config_dir(), DEFAULT_LOG_FILENAME),
     format="%(asctime)s %(levelname)s %(filename)s: %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
@@ -22,7 +28,8 @@ logging.basicConfig(
 
 logging.getLogger().addHandler(logging.StreamHandler())
 
-if __name__ == "__main__":
+
+def main():
     print("Logging to", LOG_PATH)
 
     logging.info(f"Starting {APP_NAME}")
@@ -48,12 +55,16 @@ if __name__ == "__main__":
 
     manager.run_listeners_in_threads()
 
-    trayIcon = TrayIcon(manager)
-    trayIcon.show()
+    tray_icon = TrayIcon(manager)
+    tray_icon.show()
 
     manager.show_bars()
 
     # Experimental Feature
     # awb = ActiveWindowBorder()
 
-    sys.exit(app.exec())
+    app.exec()
+
+
+if __name__ == "__main__":
+    main()

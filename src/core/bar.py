@@ -1,11 +1,9 @@
 from typing import Union
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QGridLayout, QFrame
 from PyQt6.QtGui import QScreen
-from PyQt6.QtCore import Qt, QEvent
+from PyQt6.QtCore import Qt
 from core.utils.utilities import is_valid_percentage_str, percent_to_float
 from core.validation.bar import BAR_DEFAULTS
-from win32gui import SetWindowPos
-import win32con
 
 try:
     from core.utils.win32.app_bar import Win32AppBar, AppBarEdge
@@ -79,6 +77,14 @@ class Bar(QWidget):
     def bar_index(self):
         return self._bar_index
 
+    @property
+    def dimensions(self):
+        return self._dimensions
+
+    @property
+    def name(self):
+        return self._bar_name
+
     def _calc_bar_width(self, width: Union[str, int]) -> int:
         if isinstance(width, str) and is_valid_percentage_str(width):
             return int(self.screen().geometry().width() * percent_to_float(width))
@@ -117,8 +123,9 @@ class Bar(QWidget):
 
             for widget in widgets[layout_type]:
                 widget.setFixedHeight(self._bar_frame.geometry().height() - 2)
-                widget.parent_layout_type = layout_type
-                widget.bar_index = self._bar_index
+                widget.layout_type = layout_type
+                widget.bar = self
+
                 layout.addWidget(widget, 0)
 
             if layout_type in ["left", "center"]:
