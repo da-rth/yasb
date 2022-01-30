@@ -1,7 +1,7 @@
 <p align="center"><img src="https://raw.githubusercontent.com/denBot/yasb/main/img/yasb_icon.png" width="120"></p>
 <h2 align="center">Yasb - Yet Another Status Bar</h2>
 <p align="center">
-  A highly configurable cross-platform status bar written in Python.
+  A highly configurable cross-platform (Windows) status bar written in Python.
   <br><br>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
   <a href="https://github.com/denBot/yasb"><img src="https://img.shields.io/github/languages/top/denBot/yasb"></a>
@@ -9,7 +9,7 @@
 </p>
 
 ### What is it?
-**Yasb** is a highly configurable status bar written in Python using the Qt6 GUI Framework. The current goal of yasb is to bring a [polybar](https://github.com/polybar/polybar)/[waybar](https://github.com/Alexays/Waybar)-style status bar to the Windows platform. However, as yasb is written in Python + Qt6, it is cross-platform capable. With some minor adjustments and OS-specific widgets, yasb can also be configured to run on both Linux and Mac OSX.
+**Yasb** (Yet Another Status Bar) is a highly configurable status bar written in Python using the Qt6 GUI Framework. The current goal of yasb is to bring a [polybar](https://github.com/polybar/polybar)/[waybar](https://github.com/Alexays/Waybar)-style status bar to the Windows platform. However, as yasb is written in Python + Qt6, it is cross-platform capable. With some minor adjustments and OS-specific widgets, yasb can also be configured to run on both Linux and Mac OSX.
 
 ### What can it look like?
 Although yasb comes with **default stylesheet and configuration files**, the user is given complete control over how their status bar is structured and how it will look.
@@ -42,7 +42,7 @@ For an example of the default bar configuration, see the image below:
 - Create the directory `C:/Users/{username}/.yasb/` and copy [styles.css](src/styles.css) and [config.yaml](src/config.yaml) into folder.
   - Configure [styles.css](src/styles.css) and [config.yaml](src/config.yaml) to your liking.
 - Start the application:
-  - run `python main.py` in your terminal (or create a startup shortcut)
+  - run `python src/main.py` in your terminal (or create a startup shortcut)
 
 ### What do I do if I've spotted a bug?
 **This project is still in early development... If you encounter any bugs, please submit an [issue](https://github.com/denBot/yasb/issues) :bug:**
