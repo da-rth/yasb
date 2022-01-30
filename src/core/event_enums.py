@@ -26,6 +26,7 @@ class KomorebiEvent(Event):
     ToggleMonocle = "ToggleMonocle"
     ToggleMaximise = "ToggleMaximise"
     TogglePause = "TogglePause"
+    WorkspaceName = "WorkspaceName"
 
 
 class BarEvent(Event):

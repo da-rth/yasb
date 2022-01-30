@@ -270,11 +270,19 @@ bars:
         # on_middle: "do_nothing"
         # on_right: "do_nothing"
 
-  # komorebi-workspaces-widget:
+  # komorebi_workspaces:
     # type: "komorebi.workspaces.WorkspacesWidget"
     # options:
       # label_offline: "Komorebi Offline"
         # ^ The message shown when YASB cannot connect with the komorebi window manager. Accepts: string
+      # label_workspace_btn: "{index}"
+        # ^ The label format for all workspace buttons. Accepts: string.
+          # Format options: {name}, {index}, {monitor_index}
+      # label_default_name: "{index}"
+        # ^ The default name value used if no workspace name is set via Komorebi. Accepts: string
+          # Format options: {index}, {monitor_index}
+      # label_zero_index: false
+        # ^ Specifies if the workspace and monitor index values should be zero-indexed. Accepts: boolean
       # hide_empty_workspaces: False
         # ^ Specifies if empty workspaces should be shown in the list of komorebi workspaces. Accepts: boolean
 
@@ -401,6 +409,9 @@ widgets:
     type: "komorebi.workspaces.WorkspaceWidget"
     options:
         label_offline: "Komorebi Offline"
+        label_workspace_btn: "{index}"
+        label_default_name: "{index}"
+        label_zero_index: false
         hide_empty_workspaces: false
 
   komorebi_active_layout:

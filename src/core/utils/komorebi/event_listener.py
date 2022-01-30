@@ -92,6 +92,8 @@ class KomorebiEventListener(QObject):
                 event_name = event.get('type', None)
 
                 try:
+                    if event_name == "WorkspaceName":
+                        print(event_message)
                     if event_name in KomorebiEvent:
                         self.event_service.emit_event(KomorebiEvent[event_name], event_message)
                 except Exception:

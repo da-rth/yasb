@@ -72,10 +72,6 @@
     font-size: 14px;
 }
 
-.custom-widget.explorer-widget {
-    cursor: pointer;
-}
-
 .cpu-widget .label,
 .memory-widget .label,
 .battery-widget .label {

@@ -91,7 +91,8 @@ class BarManager(QObject):
     def _create_bar(self, bar_options: dict, screen: QScreen):
         bar = Bar(**bar_options, bar_screen=screen)
         self._bars.append(bar)
-        logging.info(f"Created bar {bar_options['bar_index']} on monitor {screen.name()}")
+        w, h = screen.geometry().width(), screen.geometry().height()
+        logging.info(f"Created bar {bar_options['bar_index']} on monitor {screen.name()} [{w}x{h}]")
 
     def _build_bar_options(self, bar_config, bar_index, bar_name):
         bar_options = deepcopy(bar_config)

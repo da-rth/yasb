@@ -50,18 +50,26 @@ class WorkspaceWidget(BaseWidget):
     k_signal_disconnect = pyqtSignal()
     k_signal_focus_change = pyqtSignal(dict)
     k_signal_workspace_focus = pyqtSignal(dict)
+    k_signal_workspace_name = pyqtSignal(dict)
+
     validation_schema = VALIDATION_SCHEMA
     event_listener = KomorebiEventListener
 
     def __init__(
             self,
             label_offline: str,
+            label_workspace_btn: str,
+            label_default_name: str,
+            label_zero_index: bool,
             hide_empty_workspaces: bool
     ):
         super().__init__(class_name="komorebi-workspaces")
 
         self._event_service = EventService()
         self._komorebic = KomorebiClient()
+        self._label_workspace_btn = label_workspace_btn
+        self._label_default_name = label_default_name
+        self._label_zero_index = label_zero_index
         self._komorebi_screen = None
         self._komorebi_workspaces = []
         self._prev_workspace_index = None
@@ -97,6 +105,7 @@ class WorkspaceWidget(BaseWidget):
         self.k_signal_disconnect.connect(self._on_komorebi_disconnect_event)
         self.k_signal_focus_change.connect(self._on_komorebi_focus_change_event)
         self.k_signal_workspace_focus.connect(self._on_komorebi_focus_change_event)
+        self.k_signal_workspace_name.connect(self._on_komorebi_workspace_name_event)
 
         self._event_service.register_event(KomorebiEvent.KomorebiConnect,  self.k_signal_connect)
         self._event_service.register_event(KomorebiEvent.KomorebiUpdate, self.k_signal_update)
@@ -104,6 +113,7 @@ class WorkspaceWidget(BaseWidget):
         self._event_service.register_event(KomorebiEvent.FocusChange, self.k_signal_focus_change)
         self._event_service.register_event(KomorebiEvent.FocusWorkspaceNumber, self.k_signal_workspace_focus)
         self._event_service.register_event(KomorebiEvent.FocusMonitorWorkspaceNumber, self.k_signal_workspace_focus)
+        self._event_service.register_event(KomorebiEvent.WorkspaceName, self.k_signal_workspace_name)
 
     def _reset(self):
         self._komorebi_state = None
@@ -113,6 +123,16 @@ class WorkspaceWidget(BaseWidget):
         self._prev_workspace_index = None
         self._workspace_buttons = []
         self._clear_container_layout()
+
+    def _on_komorebi_workspace_name_event(self, event_content: dict) -> None:
+        state = event_content.get('state', None)
+
+        if self._update_komorebi_state(state):
+            monitor_index, workspace_index, _new_name = event_content['event']['content']
+
+            if monitor_index == self._komorebi_screen['index']:
+                ws_label = self._get_workspace_label(workspace_index)
+                self._workspace_buttons[workspace_index].setText(ws_label)
 
     def _clear_container_layout(self):
         for i in reversed(range(self._workspace_container_layout.count())):
@@ -186,11 +206,29 @@ class WorkspaceWidget(BaseWidget):
         else:
             ws_btn.show()
 
+    def _get_workspace_label(self, workspace_index):
+        workspace = self._komorebic.get_workspace_by_index(self._komorebi_screen, workspace_index)
+        monitor_index = self._komorebi_screen['index']
+
+        ws_index = workspace_index if self._label_zero_index else workspace_index + 1
+        ws_monitor_index = monitor_index if self._label_zero_index else monitor_index + 1
+        ws_name = workspace['name'] if workspace['name'] else self._label_default_name.format(
+            index=ws_index,
+            monitor_index=ws_monitor_index
+        )
+        return self._label_workspace_btn.format(
+            name=ws_name,
+            index=ws_index,
+            monitor_index=ws_monitor_index
+        )
+
     def _try_add_workspace_button(self, workspace_index: int) -> WorkspaceButton:
         workspace_button_indexes = [ws_btn.workspace_index for ws_btn in self._workspace_buttons]
 
         if workspace_index not in workspace_button_indexes:
-            workspace_btn = WorkspaceButton(workspace_index)
+            ws_label = self._get_workspace_label(workspace_index)
+            workspace_btn = WorkspaceButton(workspace_index, ws_label)
+
             self._update_button_state(workspace_btn)
             self._update_button_visibility(workspace_btn)
             self._workspace_buttons.append(workspace_btn)
