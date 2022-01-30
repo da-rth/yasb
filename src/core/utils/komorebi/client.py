@@ -24,7 +24,7 @@ class KomorebiClient:
 
     def query_state(self) -> Optional[dict]:
         with suppress(json.JSONDecodeError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
-            output = subprocess.check_output([self._komorebic_path, "state"], timeout=self._timeout_secs)
+            output = subprocess.check_output([self._komorebic_path, "state"], timeout=self._timeout_secs, shell=True)
             return json.loads(output)
 
     def get_screens(self, state: dict) -> list:
@@ -77,43 +77,46 @@ class KomorebiClient:
                         return add_index(workspace, i)
 
     def activate_workspace(self, ws_idx: int) -> None:
-        subprocess.Popen([self._komorebic_path, "focus-workspace", str(ws_idx)])
+        subprocess.Popen([self._komorebic_path, "focus-workspace", str(ws_idx)], shell=True)
 
     def next_workspace(self) -> None:
         try:
-            subprocess.Popen([self._komorebic_path, "cycle-workspace", "next"])
+            subprocess.Popen([self._komorebic_path, "cycle-workspace", "next"], shell=True)
         except subprocess.SubprocessError:
             logging.exception("Failed to cycle komorebi workspace")
 
     def prev_workspace(self) -> None:
         try:
-            subprocess.Popen([self._komorebic_path, "cycle-workspace", "prev"])
+            subprocess.Popen([self._komorebic_path, "cycle-workspace", "prev"], shell=True)
         except subprocess.SubprocessError:
             logging.exception("Failed to cycle komorebi workspace")
 
     def toggle_focus_mouse(self) -> None:
         try:
-            subprocess.Popen([self._komorebic_path, "toggle-focus-follows-mouse"])
+            subprocess.Popen([self._komorebic_path, "toggle-focus-follows-mouse"], shell=True)
         except subprocess.SubprocessError:
             logging.exception("Failed to toggle focus-follows-mouse")
 
     def change_layout(self, layout: str) -> None:
         try:
-            subprocess.Popen([self._komorebic_path, "change-layout", layout])
+            subprocess.Popen([self._komorebic_path, "change-layout", layout], shell=True)
         except subprocess.SubprocessError:
             logging.exception(f"Failed to change layout of currently active workspace to {layout}")
 
     def flip_layout(self) -> None:
         try:
-            subprocess.Popen([self._komorebic_path, "flip-layout"],
-                             stdout=subprocess.DEVNULL,
-                             stderr=subprocess.DEVNULL)
+            subprocess.Popen(
+                [self._komorebic_path, "flip-layout"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                shell=True
+             )
         except subprocess.SubprocessError:
             pass
 
     def toggle(self, toggle_type: str):
         try:
-            subprocess.Popen([self._komorebic_path, f"toggle-{toggle_type}"])
+            subprocess.Popen([self._komorebic_path, f"toggle-{toggle_type}"], shell=True)
         except subprocess.SubprocessError:
             logging.exception(f"Failed to toggle {toggle_type} for currently active workspace")
 

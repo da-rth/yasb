@@ -89,7 +89,7 @@ class BaseWidget(QWidget):
         self._run_callback(self.callback_timer)
 
     def _cb_execute_subprocess(self, cmd: str, *cmd_args: list[str]):
-        subprocess.Popen([cmd, *cmd_args] if cmd_args else [cmd])
+        subprocess.Popen([cmd, *cmd_args] if cmd_args else [cmd], shell=True)
 
     def _cb_do_nothing(self):
         pass

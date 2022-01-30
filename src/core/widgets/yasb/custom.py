@@ -82,7 +82,7 @@ class CustomWidget(BaseWidget):
         self._exec_data = None
 
         if self._exec_cmd:
-            proc = subprocess.Popen(self._exec_cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+            proc = subprocess.Popen(self._exec_cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, shell=True)
             output = proc.stdout.read()
 
             if self._exec_return_type == "json":
@@ -102,4 +102,4 @@ class CustomWidget(BaseWidget):
                 except KeyError:
                     formatted_cmd_args.append(cmd_args)
             cmd_args = formatted_cmd_args
-        subprocess.Popen([cmd, *cmd_args] if cmd_args else [cmd])
+        subprocess.Popen([cmd, *cmd_args] if cmd_args else [cmd], shell=True)
