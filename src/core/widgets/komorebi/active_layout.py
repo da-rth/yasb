@@ -37,7 +37,7 @@ layout_snake_case = {
 class ActiveLayoutWidget(BaseWidget):
     k_signal_connect = pyqtSignal(dict)
     k_signal_disconnect = pyqtSignal()
-    k_signal_layout_change = pyqtSignal(dict)
+    k_signal_layout_change = pyqtSignal(dict, dict)
 
     validation_schema = VALIDATION_SCHEMA
     event_listener = KomorebiEventListener
@@ -96,23 +96,29 @@ class ActiveLayoutWidget(BaseWidget):
         )
 
     def _register_signals_and_events(self):
+        active_layout_change_event_watchlist = [
+            KomorebiEvent.ChangeLayout,
+            KomorebiEvent.TogglePause,
+            KomorebiEvent.ToggleTiling,
+            KomorebiEvent.ToggleMonocle,
+            KomorebiEvent.ToggleMaximise
+        ]
+
         self.k_signal_connect.connect(self._on_komorebi_connect_event)
         self.k_signal_disconnect.connect(self._on_komorebi_disconnect_event)
         self.k_signal_layout_change.connect(self._on_komorebi_layout_change_event)
 
         self._event_service.register_event(KomorebiEvent.KomorebiConnect,  self.k_signal_connect)
         self._event_service.register_event(KomorebiEvent.KomorebiDisconnect, self.k_signal_disconnect)
-        self._event_service.register_event(KomorebiEvent.ChangeLayout, self.k_signal_layout_change)
-        self._event_service.register_event(KomorebiEvent.TogglePause, self.k_signal_layout_change)
-        self._event_service.register_event(KomorebiEvent.ToggleTiling, self.k_signal_layout_change)
-        self._event_service.register_event(KomorebiEvent.ToggleMonocle, self.k_signal_layout_change)
-        self._event_service.register_event(KomorebiEvent.ToggleMaximise, self.k_signal_layout_change)
+
+        for event_type in active_layout_change_event_watchlist:
+            self._event_service.register_event(event_type, self.k_signal_layout_change)
 
     def _on_komorebi_connect_event(self, state: dict) -> None:
         self._update_active_layout(state, is_connect_event=True)
 
-    def _on_komorebi_layout_change_event(self, event_info: dict) -> None:
-        self._update_active_layout(event_info.get('state', {}))
+    def _on_komorebi_layout_change_event(self, _event: dict, state: dict) -> None:
+        self._update_active_layout(state)
 
     def _on_komorebi_disconnect_event(self) -> None:
         if self._hide_if_offline:
@@ -122,6 +128,9 @@ class ActiveLayoutWidget(BaseWidget):
         try:
             if self._update_komorebi_state(state):
                 self._focused_workspace = self._komorebic.get_focused_workspace(self._komorebi_screen)
+
+                if not self._focused_workspace:
+                    return
 
                 layout_name, layout_icon = self._get_layout_label_info()
 

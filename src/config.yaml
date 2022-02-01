@@ -87,7 +87,7 @@ bars:
       bottom: 0
       right: 0
     widgets:
-      left:   ["komorebi_workspaces", "active_window"]
+      left:   ["komorebi_workspaces", "komorebi_active_layout", "active_window"]
       center: ["clock"]
       right:  ["explorer_button", "ip_info", "cpu", "memory", "battery"]
 

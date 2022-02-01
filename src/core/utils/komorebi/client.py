@@ -39,15 +39,21 @@ class KomorebiClient:
         return [add_index(workspace, i) for i, workspace in enumerate(screen['workspaces']['elements'])]
 
     def get_workspace_by_index(self, screen: dict, workspace_index: int) -> Optional[dict]:
-        return self.get_workspaces(screen)[workspace_index]
+        try:
+            return self.get_workspaces(screen)[workspace_index]
+        except IndexError:
+            return None
 
-    def get_focused_workspace(self, screen: dict):
-        focused_workspace_index = screen['workspaces']['focused']
-        focused_workspace = self.get_workspace_by_index(screen, focused_workspace_index)
-        focused_workspace['index'] = focused_workspace_index
-        return focused_workspace
+    def get_focused_workspace(self, screen: dict) -> Optional[dict]:
+        try:
+            focused_workspace_index = screen['workspaces']['focused']
+            focused_workspace = self.get_workspace_by_index(screen, focused_workspace_index)
+            focused_workspace['index'] = focused_workspace_index
+            return focused_workspace
+        except (KeyError, TypeError):
+            return None
 
-    def workspace_has_windows(self, workspace: dict):
+    def get_num_windows(self, workspace: dict):
         containers = workspace['containers']['elements']
         if workspace.get('floating_windows', []):
             return True

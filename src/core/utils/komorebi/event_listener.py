@@ -1,9 +1,10 @@
 import logging
 import time
+
 import win32pipe
 import win32file
 import json
-from PyQt6.QtCore import QTimer, pyqtSignal, QObject
+from PyQt6.QtCore import pyqtSignal, QObject
 from core.event_enums import KomorebiEvent
 from core.event_service import EventService
 from core.event_enums import BarEvent
@@ -32,27 +33,12 @@ class KomorebiEventListener(QObject):
         self.event_service.register_event(BarEvent.ExitApp, self.app_exit_signal)
         self.app_exit_signal.connect(self._on_exit)
         self._pause_background_updater = False
-        self._timer = QTimer()
-        self._timer_interval = background_interval
-        self._timer.timeout.connect(self._timer_callback)
-        self._timer_start()
 
     def __str__(self):
         return "Komorebi Event Listener"
 
     def _on_exit(self):
         self._app_running = False
-
-    def _timer_callback(self) -> None:
-        if not self._pause_background_updater:
-            state = self._komorebic.query_state()
-
-            if state:
-                self.event_service.emit_event(KomorebiEvent.KomorebiUpdate, state)
-
-    def _timer_start(self) -> None:
-        if self._timer_interval and self._timer_interval > 0:
-            self._timer.start(self._timer_interval)
 
     def _create_pipe(self) -> None:
         pipe_name_full = f"\\\\.\\pipe\\{self.pipe_name}"
@@ -84,29 +70,32 @@ class KomorebiEventListener(QObject):
             while self._app_running:
                 result, data = win32file.ReadFile(self.pipe, self.buffer_size, None)
 
-                # Filters out newlines
                 if not data.strip():
                     continue
 
                 try:
                     event_message = json.loads(data.decode("utf-8"))
-                except Exception:
-                    event_message = {}
+                    event = event_message['event']
+                    state = event_message['state']
 
-                event = event_message.get('event', {})
-                event_name = event.get('type', None)
-
-                try:
-                    if event_name in KomorebiEvent:
-                        self.event_service.emit_event(KomorebiEvent[event_name], event_message)
-                except Exception:
-                    logging.exception(f"Failed to emit komorebi event of type {event_name} with data {data}")
-
+                    if event and state:
+                        self._emit_event(event, state)
+                except (KeyError, ValueError):
+                    logging.exception(f"Failed parse komorebi state. Received data: {data}")
         except Exception:
             logging.exception(f"Komorebi has disconnected from the named pipe {self.pipe_name}")
             win32file.CloseHandle(self.pipe)
             self.event_service.emit_event(KomorebiEvent.KomorebiDisconnect)
             self.start()
+
+    def _emit_event(self, event: dict, state: dict) -> None:
+        try:
+            event_name = event['type']
+            self.event_service.emit_event(KomorebiEvent.KomorebiUpdate, event, state)
+            if event_name in KomorebiEvent:
+                self.event_service.emit_event(KomorebiEvent[event_name], event, state)
+        except (KeyError, TypeError):
+            logging.exception(f"Failed to emit komorebi event {event_name}: {event_name} ")
 
     def _wait_until_komorebi_online(self):
         logging.info(f"Waiting for Komorebi to subscribe to named pipe {self.pipe_name}")
@@ -125,4 +114,3 @@ class KomorebiEventListener(QObject):
             state = self._komorebic.query_state()
 
         self.event_service.emit_event(KomorebiEvent.KomorebiConnect, state)
-

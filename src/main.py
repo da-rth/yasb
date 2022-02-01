@@ -2,7 +2,6 @@ import os
 import sys
 import logging
 from PyQt6.QtWidgets import QApplication
-from PyQt6.QtGui import QFont
 from core.bar_manager import BarManager
 from core.utils.config_utils import get_config_and_stylesheet, get_config_dir
 from core.utils.alert_dialog import raise_info_alert
@@ -29,10 +28,6 @@ if __name__ == "__main__":
     logging.info(f"Starting {APP_NAME}")
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
-
-    font = QFont("Courier New")
-    font.setStyleHint(QFont.StyleHint.Monospace)
-    app.setFont(font)
 
     config, stylesheet = get_config_and_stylesheet(settings.DEBUG_MODE)
 
