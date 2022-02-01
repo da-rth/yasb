@@ -1,4 +1,5 @@
 import logging
+import time
 import win32pipe
 import win32file
 import json
@@ -87,13 +88,15 @@ class KomorebiEventListener(QObject):
                 if not data.strip():
                     continue
 
-                event_message = json.loads(data.decode("utf-8"))
+                try:
+                    event_message = json.loads(data.decode("utf-8"))
+                except Exception:
+                    event_message = {}
+
                 event = event_message.get('event', {})
                 event_name = event.get('type', None)
 
                 try:
-                    if event_name == "WorkspaceName":
-                        print(event_message)
                     if event_name in KomorebiEvent:
                         self.event_service.emit_event(KomorebiEvent[event_name], event_message)
                 except Exception:
@@ -112,4 +115,14 @@ class KomorebiEventListener(QObject):
         win32pipe.ConnectNamedPipe(self.pipe, None)
         logging.info(f"Komorebi connected to named pipe: {self.pipe_name}")
         state = self._komorebic.query_state()
+
+        while state is None and self._app_running:
+            logging.error(
+                "Failed to retrieve komorebi state before starting event listener: None returned. "
+                "Retrying in 1 second... Is komorebi online and its binaries added to $PATH?"
+            )
+            time.sleep(1)
+            state = self._komorebic.query_state()
+
         self.event_service.emit_event(KomorebiEvent.KomorebiConnect, state)
+

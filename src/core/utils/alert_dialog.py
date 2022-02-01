@@ -1,9 +1,8 @@
 import sys
 import traceback
+from core.settings import APP_NAME
 from PyQt6.QtWidgets import QMessageBox, QTextEdit, QSizePolicy
 from PyQt6.QtCore import Qt
-
-PROGRAM_NAME = "Yasb"
 
 
 class AlertDialog(QMessageBox):
@@ -74,7 +73,7 @@ def raise_error_alert(
 ):
     alert = AlertDialog(
         icon=QMessageBox.Icon.Critical,
-        title=f"{PROGRAM_NAME}: {title}",
+        title=f"{APP_NAME}: {title}",
         message=msg,
         informative_message=informative_msg,
         additional_details=additional_details if additional_details else traceback.format_exc(),
@@ -100,7 +99,7 @@ def raise_info_alert(
 ):
     alert = AlertDialog(
         icon=QMessageBox.Icon.Information,
-        title=f"{PROGRAM_NAME}: {title}",
+        title=f"{APP_NAME}: {title}",
         message=msg,
         informative_message=informative_msg,
         additional_details=additional_details

@@ -45,6 +45,23 @@ class WorkspaceButton(QPushButton):
 
 
 class WorkspaceWidget(BaseWidget):
+    """
+    TODO add checks for
+     MoveToMonitor,
+     MoveToWorkspace,
+     SendToMonitor,
+     SendToWorkspace
+     FocusMonitor
+     FocusWorkspace
+     CycleMonitor
+     CycleWorkspace
+     NewWorkspace
+     EnsureWorkspaces
+     ReloadConfiguration
+     WatchConfiguration
+     Manage
+     Unmanage
+    """
     k_signal_connect = pyqtSignal(dict)
     k_signal_update = pyqtSignal(dict)
     k_signal_disconnect = pyqtSignal()
