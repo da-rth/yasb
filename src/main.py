@@ -2,13 +2,12 @@ import os
 import sys
 import logging
 from PyQt6.QtWidgets import QApplication
+from PyQt6.QtCore import Qt
+from settings import DEFAULT_LOG_FILENAME, APP_NAME, APP_NAME_FULL
 from core.bar_manager import BarManager
 from core.utils.config_utils import get_config_and_stylesheet, get_config_dir
-from core.utils.alert_dialog import raise_info_alert
 from core.tray import TrayIcon
-from core.settings import DEFAULT_LOG_FILENAME, APP_NAME
-from core import settings
-# from core.utils.win32.active_window_border import ActiveWindowBorder
+
 
 LOG_PATH = os.path.join(get_config_dir(), DEFAULT_LOG_FILENAME)
 
@@ -22,38 +21,29 @@ logging.basicConfig(
 
 logging.getLogger().addHandler(logging.StreamHandler())
 
+
 if __name__ == "__main__":
-    print("Logging to", LOG_PATH)
+    logging.info(f"Starting {APP_NAME} - {APP_NAME_FULL}")
+    config, stylesheet = get_config_and_stylesheet()
 
-    logging.info(f"Starting {APP_NAME}")
+    if not config or not stylesheet:
+        sys.exit()
+
     app = QApplication(sys.argv)
-    app.setQuitOnLastWindowClosed(False)
-
-    config, stylesheet = get_config_and_stylesheet(settings.DEBUG_MODE)
-
-    manager = BarManager(app, config, stylesheet)
+    manager = BarManager(config, stylesheet)
     manager.initialize_bars()
+    manager.run_listeners_in_threads()
 
-    if manager.num_bars() == 0:
-        raise_info_alert(
-            title="No bars added",
-            msg="Your config must specify the name of the screen where your bar will appear",
-            informative_msg=(
-                "Tip: try setting <pre>\"screen\": \"all\"</pre>"
-                "to display your bar on all screens."
-            ),
-            rich_text=True,
-            exit_on_close=True
+    if not manager.bars:
+        logging.warning(
+            "No bars added. You must specify the screen name(s) on which your bar(s) will appear within the config."
         )
 
-    manager.run_listeners_in_threads()
+    app.setQuitOnLastWindowClosed(False)
+    app.screenAdded.connect(manager.on_screen_connect, type=Qt.ConnectionType.QueuedConnection)
+    app.screenRemoved.connect(manager.on_screen_disconnect)
 
     trayIcon = TrayIcon(manager)
     trayIcon.show()
-
-    manager.show_bars()
-
-    # Experimental Feature
-    # awb = ActiveWindowBorder()
 
     sys.exit(app.exec())

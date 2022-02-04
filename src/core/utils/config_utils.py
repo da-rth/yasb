@@ -2,11 +2,12 @@ import os
 import sys
 import yaml
 import logging
+import settings
 from pathlib import Path
-from core import settings
+from PyQt6.QtCore import QCoreApplication
 from core.utils.alert_dialog import raise_error_alert, raise_info_alert
 from core.validation.config import CONFIG_SCHEMA
-from cssutils import css, CSSParser, parseFile
+from cssutils import css, CSSParser
 from cerberus import Validator, schema
 
 MAIN_CONFIGURATION_DIR = os.path.dirname(sys.argv[0])
@@ -51,18 +52,16 @@ def load_stylesheet(stylesheet_path) -> css.CSSStyleSheet:
             informative_msg="Please click 'Show Details' for more information.",
             additional_details=e.__str__()
         )
-    finally:
-        return parseFile(stylesheet_path)
 
 
 def get_config() -> dict:
+    if os.path.isdir(HOME_CONFIGURATION_DIR) and os.path.isfile(HOME_CONFIG_PATH):
+        config_path = HOME_CONFIG_PATH
+    else:
+        config_path = DEFAULT_CONFIG_PATH
+
     try:
-        if os.path.isdir(HOME_CONFIGURATION_DIR) and os.path.isfile(HOME_CONFIG_PATH):
-            config_path = HOME_CONFIG_PATH
-            config = load_config(HOME_CONFIG_PATH)
-        else:
-            config_path = DEFAULT_CONFIG_PATH
-            config = load_config(DEFAULT_CONFIG_PATH)
+        config = load_config(config_path)
 
         if not yaml_validator.validate(config, CONFIG_SCHEMA):
             logging.exception(f"Failed to validate {settings.DEFAULT_CONFIG_FILENAME} at path {config_path}")
@@ -102,7 +101,7 @@ def get_stylesheet() -> css.CSSStyleSheet:
 
         return load_stylesheet(stylesheet_path)
     except Exception:
-        logging.exception(f"Failed to stylesheet {settings.DEFAULT_STYLES_FILENAME} at path {stylesheet_path}")
+        logging.error(f"Failed to stylesheet {settings.DEFAULT_STYLES_FILENAME} at path {stylesheet_path}")
         title = f"Failed to load {settings.DEFAULT_STYLES_FILENAME}"
         message = (
             f"This application requires a valid {settings.DEFAULT_STYLES_FILENAME} file to be "
@@ -117,7 +116,7 @@ def get_stylesheet() -> css.CSSStyleSheet:
         raise_error_alert(title, message, informative_message)
 
 
-def get_config_and_stylesheet(debug_mode: bool = False) -> tuple[dict, css.CSSStyleSheet]:
+def get_config_and_stylesheet() -> tuple[dict, css.CSSStyleSheet]:
     try:
         config = get_config()
         stylesheet = get_stylesheet()
@@ -125,10 +124,10 @@ def get_config_and_stylesheet(debug_mode: bool = False) -> tuple[dict, css.CSSSt
         return config, stylesheet
     except Exception:
         logging.exception("Failed to load config and stylesheet")
-        if not debug_mode:
+        if not settings.DEBUG:
             raise_error_alert(
-                title="Program Error",
-                msg="This application has encountered a critical error. Sorry about that.",
+                title=f"{settings.APP_NAME} - Program Error",
+                msg="Failed to load config and stylesheet files.",
                 informative_msg=(
                     f"You can <strong>submit a bug report</strong> at:"
                     f"<br/><br/><a href='{GITHUB_ISSUES_URL}'>{GITHUB_ISSUES_URL}</a><br/><br/>"
@@ -136,3 +135,4 @@ def get_config_and_stylesheet(debug_mode: bool = False) -> tuple[dict, css.CSSSt
                 ),
                 rich_text=True
             )
+        QCoreApplication.exit(1)

@@ -20,7 +20,7 @@ class BaseWidget(QWidget):
         self._widget_frame_layout = QHBoxLayout()
         self.widget_layout = QHBoxLayout()
         self.timer_interval = timer_interval
-        self.bar_index = None
+        self.bar_id = None
 
         if class_name:
             self._widget_frame.setProperty("class", f"widget {class_name}")

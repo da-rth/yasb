@@ -41,9 +41,3 @@ class KomorebiEvent(Event):
     SendContainerToMonitorNumber = "SendContainerToMonitorNumber"
     SendContainerToWorkspaceNumber = "SendContainerToWorkspaceNumber"
     WorkspaceName = "WorkspaceName"
-
-
-class BarEvent(Event):
-    CloseBar = "CloseBar"
-    ReloadBars = "ReloadBars"
-    ExitApp = "ExitApp"

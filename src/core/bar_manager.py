@@ -1,4 +1,5 @@
 import logging
+import uuid
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtGui import QScreen
 from PyQt6.QtCore import QThread, QObject, pyqtSignal
@@ -6,43 +7,48 @@ from cssutils.css import CSSStyleSheet
 from core.bar import Bar
 from core.utils.widget_builder import WidgetBuilder
 from core.event_service import EventService
-from core.event_enums import BarEvent
 from copy import deepcopy
 
 
 class BarManager(QObject):
-    close_bar_signal = pyqtSignal(int)
-    reload_bars_signal = pyqtSignal()
 
-    def __init__(self, app: QApplication, config: dict, stylesheet: CSSStyleSheet):
+    screen_disconnect = pyqtSignal(QScreen)
+
+    def __init__(self, config: dict, stylesheet: CSSStyleSheet):
         super().__init__()
+        self.config = config
+        self.stylesheet = stylesheet
         self.event_service = EventService()
         self.widget_event_listeners = set()
-        self._app = app
-        self._config = config
-        self._stylesheet = stylesheet
-        self._bars: list[Bar] = []
-        self._register_signals_and_events()
-        self._widget_builder: WidgetBuilder = None
+        self.bars: list[Bar] = list()
+        self.config['bars'] = {n: bar for n, bar in self.config['bars'].items() if bar['enabled']}
+
         self._threads = {}
         self._active_listeners = {}
+        self._widget_builder = WidgetBuilder(self.config['widgets'])
+        self.screen_disconnect.connect(self.on_screen_connect)
 
-    def _register_signals_and_events(self):
-        self.close_bar_signal.connect(self._on_close_bar_event)
-        self.reload_bars_signal.connect(self._on_reload_bars_event)
-        self.event_service.register_event(BarEvent.CloseBar, self.close_bar_signal)
-        self.event_service.register_event(BarEvent.ReloadBars, self.reload_bars_signal)
+    def on_screen_disconnect(self, screen: QScreen) -> None:
+        logging.info(f"Screen disconnected: {screen.name()}")
+        for bar_idx in self._get_bar_idxs_by_screen_name(screen.name()):
+            self.bars[bar_idx].close()
+            self.bars[bar_idx] = None
 
-    def add_bar(self, bar_options: dict):
-        bar = Bar(**bar_options)
-        self._bars.append(bar)
+    def on_screen_connect(self, screen: QScreen) -> None:
+        logging.info(f"Screen connected: {screen.name()}")
+        for bar_name, bar_config in self.config['bars'].items():
+            if '*' in bar_config['screens'] or screen.name() in bar_config['screens']:
+                self.create_bar(bar_config, bar_name, screen)
 
-    def num_bars(self):
-        return len(self._bars)
+    def _get_bar_idxs_by_screen_name(self, screen_name: str) -> list[int]:
+        return [i for i, bar in enumerate(self.bars) if bar.screen_name == screen_name]
+
+    def _get_screen_by_name(self, screen_name: str) -> QScreen:
+        return next(filter(lambda scr: screen_name in scr.name(), QApplication.screens()), None)
 
     def run_listeners_in_threads(self):
         for listener in self.widget_event_listeners:
-            logging.info(f"Activating listener {listener.__name__}")
+            logging.info(f"Starting '{listener.__name__}'")
             thread = QThread()
             event_listener = listener()
             event_listener.moveToThread(thread)
@@ -51,81 +57,58 @@ class BarManager(QObject):
             self._active_listeners[listener] = event_listener
             self._threads[listener] = thread
 
-    def show_bars(self):
-        for bar in self._bars:
-            bar.show()
+    def stop_listener_threads(self):
+        for listener in self.widget_event_listeners:
+            self._active_listeners[listener].stop()
+            self._threads[listener].terminate()
+            del self._threads[listener]
+            del self._active_listeners[listener]
 
-    def hide_bars(self):
-        for bar in self._bars:
-            bar.hide()
+    def close_all_bars(self):
+        self.stop_listener_threads()
 
-    def close_bars(self):
-        for bar in self._bars:
-            if bar.app_bar_manager:
-                bar.app_bar_manager.remove_appbar()
+        for bar in self.bars:
+            logging.info(f"Closing bar '{self.bar_id}'")
             bar.close()
 
+        self.event_service.clear()
+        self.bars.clear()
+
     def initialize_bars(self) -> None:
-        self._widget_builder = WidgetBuilder(self._config['widgets'])
+        self._widget_builder = WidgetBuilder(self.config['widgets'])
 
-        for bar_name, bar_config in self._config['bars'].items():
-
-            if not bar_config['enabled']:
-                continue
+        for bar_name, bar_config in self.config['bars'].items():
 
             if '*' in bar_config['screens']:
-                for screen in self._app.screens():
-                    bar_index = len(self._bars)
-                    bar_options = self._build_bar_options(bar_config, bar_index, bar_name)
-                    self._create_bar(bar_options, screen)
-            else:
-                for screen_name in bar_config['screens']:
-                    screen = self._get_screen_by_name(screen_name)
-                    if screen:
-                        bar_index = len(self._bars)
-                        bar_options = self._build_bar_options(bar_config, bar_index, bar_name)
-                        self._create_bar(bar_options, screen)
+                for screen in QApplication.screens():
+                    self.create_bar(bar_config, bar_name, screen)
+                return
+
+            for screen_name in bar_config['screens']:
+                screen = self._get_screen_by_name(screen_name)
+                if screen:
+                    self.create_bar(bar_config, bar_name, screen)
 
         self._widget_builder.raise_alerts_if_errors_present()
 
-    def _create_bar(self, bar_options: dict, screen: QScreen):
-        bar = Bar(**bar_options, bar_screen=screen)
-        self._bars.append(bar)
-        w, h = screen.geometry().width(), screen.geometry().height()
-        logging.info(f"Created bar {bar_options['bar_index']} on monitor {screen.name()} [{w}x{h}]")
+    def create_bar(self, config: dict, name: str, screen: QScreen) -> None:
+        screen_name = screen.name().replace('\\', '').replace('.', '')
+        bar_id = f"{name}_{screen_name}_{str(uuid.uuid4())[:8]}"
+        logging.info(f"Creating bar '{bar_id}' {screen.geometry().getRect()}")
 
-    def _build_bar_options(self, bar_config, bar_index, bar_name):
-        bar_options = deepcopy(bar_config)
-        bar_widgets, widget_event_listeners = self._widget_builder.build_widgets(bar_options.get('widgets', {}))
-
-        bar_options['bar_index'] = bar_index
-        bar_options['bar_name'] = bar_name
-        bar_options['stylesheet'] = self._stylesheet.cssText.decode('utf-8')
-        bar_options['widgets'] = bar_widgets
-
-        self.widget_event_listeners = self.widget_event_listeners.union(widget_event_listeners)
+        bar_config = deepcopy(config)
+        bar_widgets, widget_event_listeners = self._widget_builder.build_widgets(bar_config.get('widgets', {}))
+        bar_options = {
+            **bar_config,
+            'bar_id': bar_id,
+            'bar_name': name,
+            'bar_screen': screen,
+            'stylesheet': self.stylesheet.cssText.decode('utf-8'),
+            'widgets': bar_widgets
+        }
 
         del bar_options['enabled']
         del bar_options['screens']
 
-        return bar_options
-
-    def _get_screen_by_name(self, screen_name: str):
-        return next(filter(lambda scr: screen_name in scr.name(), self._app.screens()), None)
-
-    def _on_reload_bars_event(self):
-        logging.info("Reloading all bars")
-        self.close_bars()
-        self.initialize_bars()
-
-    def _on_close_bar_event(self, bar_index: int):
-        try:
-            bar = self._bars[bar_index]
-
-            if bar.win32_app_bar:
-                bar.win32_app_bar.remove_appbar()
-
-            bar.close()
-            logging.info(f"Closed bar {bar_index} on screen {bar.scree.name()}")
-        except IndexError:
-            logging.exception(f"Failed to close bar {bar_index}")
+        self.widget_event_listeners = self.widget_event_listeners.union(widget_event_listeners)
+        self.bars.append(Bar(**bar_options))

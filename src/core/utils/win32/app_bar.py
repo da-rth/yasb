@@ -1,9 +1,6 @@
 import ctypes
-import win32api
-import logging
 from ctypes import wintypes, Structure, POINTER, sizeof, windll, c_ulong
-from PyQt6.QtWidgets import QWidget
-
+from PyQt6.QtGui import QScreen
 
 shell32 = windll.shell32
 user32 = windll.user32
@@ -13,21 +10,6 @@ Application Desktop Toolbar (with added support for PyQt6)
 
 https://docs.microsoft.com/en-us/windows/win32/shell/application-desktop-toolbars
 """
-
-
-class AppBarData(Structure):
-    """
-    AppBarData struct
-    Documentation: https://docs.microsoft.com/en-us/windows/win32/api/shellapi/ns-shellapi-appbardata#syntax
-    """
-    _fields_ = [
-        ("cbSize", wintypes.DWORD),
-        ("hWnd", wintypes.HWND),
-        ("uCallbackMessage", ctypes.c_ulong),
-        ("uEdge", c_ulong),
-        ("rc", wintypes.RECT),
-        ("lParam", wintypes.LPARAM),
-    ]
 
 
 class AppBarEdge:
@@ -61,56 +43,59 @@ class AppBarMessage:
     SetAutoHideBarEx = 12
 
 
-AppBarDataPointer = POINTER(AppBarData)
+class AppBarData(Structure):
+    """
+    AppBarData struct
+    Documentation: https://docs.microsoft.com/en-us/windows/win32/api/shellapi/ns-shellapi-appbardata#syntax
+    """
+    _fields_ = [
+        ("cbSize", wintypes.DWORD),
+        ("hWnd", wintypes.HWND),
+        ("uCallbackMessage", ctypes.c_ulong),
+        ("uEdge", c_ulong),
+        ("rc", wintypes.RECT),
+        ("lParam", wintypes.LPARAM),
+    ]
+
+
+P_APPBAR_DATA = POINTER(AppBarData)
 
 
 class Win32AppBar:
+    def __init__(self, ):
+        self.app_bar_data = None
 
-    def __init__(self, window: QWidget, edge: AppBarEdge):
-        self.window = window
+    def create_appbar(self, hwnd: int, edge: AppBarEdge, app_bar_height: int, screen: QScreen):
         self.app_bar_data = AppBarData()
         self.app_bar_data.cbSize = wintypes.DWORD(sizeof(self.app_bar_data))
         self.app_bar_data.uEdge = edge
+        self.app_bar_data.hWnd = hwnd
+        self.register_new()
+        self.position_bar(app_bar_height, screen)
+        self.set_position()
 
-    def create_appbar(self):
-        logging.info(f"Creating Win32 App Bar for bar {self.window.bar_index} with HWND {int(self.window.winId())}")
-        self.app_bar_data.hWnd = self.window.winId().__int__()
-        screen_geometry = self.window.screen().geometry()
+    def position_bar(self, app_bar_height: int, screen: QScreen) -> None:
+        self.app_bar_data.rc.left = screen.geometry().x()
+        self.app_bar_data.rc.right = screen.geometry().x() + screen.geometry().width()
 
-        win32api.RegisterWindowMessage("AppBarMessage")
-        shell32.SHAppBarMessage(AppBarMessage.New, AppBarDataPointer(self.app_bar_data))
-        pixel_ratio = self.window.screen().devicePixelRatio()
-
-        self.app_bar_data.rc.left = screen_geometry.x()
-        self.app_bar_data.rc.right = screen_geometry.height()
-
-        """
-        # Vertical Bar Alignment
-        if self.app_bar_data.uEdge in [AppBarEdge.Left, AppBarEdge.Right]:
-            self.app_bar_data.rc.top = screen_geometry.y()
-            self.app_bar_data.rc.bottom = int(screen_geometry.height() * pixel_ratio)
-
-            if self.app_bar_data.uEdge == AppBarEdge.Left:
-                self.app_bar_data.rc.left = screen_geometry.x()
-                self.app_bar_data.rc.right = self.window.width()
-            else:
-                self.app_bar_data.rc.right = screen_geometry.width()
-                self.app_bar_data.rc.left = screen_geometry.width() - self.window.width()
-        """
         if self.app_bar_data.uEdge == AppBarEdge.Top:
-            self.app_bar_data.rc.top = int(screen_geometry.y() * pixel_ratio)
-            self.app_bar_data.rc.bottom = int(
-                (screen_geometry.y() + self.window.height()) * pixel_ratio
-            )
+            self.app_bar_data.rc.top = screen.geometry().y()
+            self.app_bar_data.rc.bottom = screen.geometry().y() + app_bar_height
         else:
-            self.app_bar_data.rc.top = int(
-                (screen_geometry.y() + screen_geometry.height() - self.window.height()) * pixel_ratio
-            )
-            self.app_bar_data.rc.bottom = int((screen_geometry.y() + screen_geometry.height()) * pixel_ratio)
+            self.app_bar_data.rc.top = screen.geometry().y() + screen.geometry().height() - app_bar_height
+            self.app_bar_data.rc.bottom = screen.geometry().y() + screen.geometry().height()
 
-        shell32.SHAppBarMessage(AppBarMessage.QueryPos, AppBarDataPointer(self.app_bar_data))
-        shell32.SHAppBarMessage(AppBarMessage.SetPos, AppBarDataPointer(self.app_bar_data))
+    def register_new(self):
+        shell32.SHAppBarMessage(AppBarMessage.New, P_APPBAR_DATA(self.app_bar_data))
+
+    def window_pos_changed(self):
+        shell32.SHAppBarMessage(AppBarMessage.WindowPosChanged, P_APPBAR_DATA(self.app_bar_data))
+
+    def query_appbar_position(self):
+        shell32.SHAppBarMessage(AppBarMessage.QueryPos, P_APPBAR_DATA(self.app_bar_data))
+
+    def set_position(self):
+        shell32.SHAppBarMessage(AppBarMessage.SetPos, P_APPBAR_DATA(self.app_bar_data))
 
     def remove_appbar(self):
-        logging.info(f"Removing Win32 App Bar for HWND {self.app_bar_data.hWnd}")
-        shell32.SHAppBarMessage(AppBarMessage.Remove, AppBarDataPointer(self.app_bar_data))
+        shell32.SHAppBarMessage(AppBarMessage.Remove, P_APPBAR_DATA(self.app_bar_data))

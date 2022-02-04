@@ -21,14 +21,14 @@ DEFAULTS = {
 }
 
 ALLOWED_CALLBACKS = [
- "next_layout",
- "prev_layout",
- "flip_layout",
- "toggle_tiling",
- "toggle_float",
- "toggle_monocle",
- "toggle_maximise",
- "toggle_pause"
+    "next_layout",
+    "prev_layout",
+    "flip_layout",
+    "toggle_tiling",
+    "toggle_float",
+    "toggle_monocle",
+    "toggle_maximise",
+    "toggle_pause"
 ]
 
 VALIDATION_SCHEMA = {

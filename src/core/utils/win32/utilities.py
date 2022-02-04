@@ -62,10 +62,10 @@ def get_window_extended_frame_bounds(hwnd: int) -> dict:
     )
 
     return {
-            'x': rect.left,
-            'y': rect.top,
-            'width': rect.right - rect.left,
-            'height': rect.bottom - rect.top
+        'x': rect.left,
+        'y': rect.top,
+        'width': rect.right - rect.left,
+        'height': rect.bottom - rect.top
     }
 
 

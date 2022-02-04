@@ -1,24 +1,19 @@
 import ctypes
 import time
 import logging
-from PyQt6.QtCore import QObject, pyqtSignal
+from PyQt6.QtCore import QObject
 from win32gui import GetForegroundWindow
 from core.utils.win32.windows import WinEventProcType, WinEvent, user32, ole32, msg
 from core.event_service import EventService
-from core.event_enums import BarEvent
 
 
 class SystemEventListener(QObject):
-    app_exit_signal = pyqtSignal()
 
     def __init__(self):
         super().__init__()
         self._hook = None
-        self._app_running = True
         self._event_service = EventService()
         self._win_event_process = WinEventProcType(self._event_handler)
-        self._event_service.register_event(BarEvent.ExitApp, self.app_exit_signal)
-        self.app_exit_signal.connect(self._on_exit)
 
     def __str__(self):
         return "Win32 System Event Listener"
@@ -33,9 +28,7 @@ class SystemEventListener(QObject):
         _event_thread,
         _event_time
     ) -> None:
-        if not self._app_running:
-            self._quit()
-        elif event in WinEvent:
+        if event in WinEvent:
             try:
                 if event in WinEvent:
                     event_type = WinEvent._value2member_map_[event]
@@ -54,9 +47,6 @@ class SystemEventListener(QObject):
             WinEvent.WinEventOutOfContext.value
         )
 
-    def _on_exit(self):
-        self._app_running = False
-
     def _emit_foreground_window_event(self):
         foreground_event = WinEvent.EventSystemForeground
         foreground_window_hwnd = GetForegroundWindow()
@@ -74,12 +64,11 @@ class SystemEventListener(QObject):
             time.sleep(1)
             self._hook = self._build_event_hook()
 
-        logging.info("SetWinEventHook Successful. Emitting focused window and waiting for events.")
         self._emit_foreground_window_event()
 
         user32.GetMessageW(ctypes.byref(msg), 0, 0, 0)
 
-    def _quit(self):
+    def stop(self):
         logging.info("Exiting Win32 event listener")
         user32.UnhookWinEvent(self._hook)
         ole32.CoUninitialize()

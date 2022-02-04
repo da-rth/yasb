@@ -23,5 +23,6 @@ class EventService(QObject):
         for event_signal in event_signals:
             try:
                 event_signal.emit(*args)
-            except Exception:
-                logging.exception(f"Failed to emit event signal {event_signal} with args: {args}")
+            except AttributeError:
+                logging.error(f"Failed to emit signal {event_signal.__str__()}. Removing link to {event_type}.")
+                event_signals.pop(event_signals.index(event_signal))

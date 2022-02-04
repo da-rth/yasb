@@ -1,17 +1,17 @@
 import logging
+from settings import APP_BAR_TITLE
 from core.utils.win32.windows import WinEvent
 from core.widgets.base import BaseWidget
 from core.event_service import EventService
 from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtWidgets import QLabel
-from core.bar import BAR_WM_TITLE
 from core.validation.widgets.yasb.active_window import VALIDATION_SCHEMA
 from core.utils.win32.utilities import get_hwnd_info
 
 IGNORED_TITLES = ['', ' ']
 IGNORED_CLASSES = ['WorkerW']
 IGNORED_PROCESSES = ['SearchHost.exe']
-IGNORED_YASB_TITLES = [BAR_WM_TITLE]
+IGNORED_YASB_TITLES = [APP_BAR_TITLE]
 IGNORED_YASB_CLASSES = [
     'Qt620QWindowIcon',
     'Qt621QWindowIcon',
@@ -64,7 +64,6 @@ class ActiveWindowWidget(BaseWidget):
         self._ignore_window['titles'] += IGNORED_TITLES
 
         self.widget_layout.addWidget(self._window_title_text)
-        self.foreground_change.connect(self._on_focus_change_event)
         self.register_callback("toggle_label", self._toggle_title_text)
 
         if not callbacks:
@@ -78,6 +77,7 @@ class ActiveWindowWidget(BaseWidget):
         self.callback_right = callbacks['on_right']
         self.callback_middle = callbacks['on_middle']
 
+        self.foreground_change.connect(self._on_focus_change_event)
         self._event_service.register_event(WinEvent.EventSystemForeground, self.foreground_change)
         self._event_service.register_event(WinEvent.EventSystemMoveSizeEnd, self.foreground_change)
         self._event_service.register_event(WinEvent.EventSystemCaptureEnd, self.foreground_change)

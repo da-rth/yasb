@@ -6,7 +6,7 @@ from typing import Optional
 from cerberus import Validator
 from importlib import import_module
 from core.utils.alert_dialog import raise_info_alert
-from core.settings import DEFAULT_CONFIG_FILENAME
+from settings import DEFAULT_CONFIG_FILENAME
 
 
 class WidgetBuilder(QObject):

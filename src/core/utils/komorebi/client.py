@@ -116,7 +116,7 @@ class KomorebiClient:
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 shell=True
-             )
+            )
         except subprocess.SubprocessError:
             pass
 
