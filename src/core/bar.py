@@ -96,15 +96,24 @@ class Bar(QWidget):
         return int((self._padding['top'] + self._dimensions['height'] + self._padding['bottom']) * pixel_ratio)
 
     def position_bar(self, init=False) -> None:
-        v_padding = self._padding['left'] + self._padding['right']
-        h_padding = self._padding['top'] + self._padding['bottom']
         bar_w = self._calc_bar_width(self._dimensions['width'])
         bar_w = int(bar_w / self.screen().devicePixelRatio()) if init else bar_w
-        bar_h = self._dimensions['height'] + h_padding
-        bar_x, bar_y = self._calc_bar_pos(self._padding['left'], bar_w, bar_h)
+        bar_h = self._dimensions['height']
+        bar_x, bar_y = self._calc_bar_pos(bar_w, bar_h)
 
-        self.setGeometry(bar_x, bar_y, bar_w, bar_h)
-        self._bar_frame.setGeometry(0, self._padding['top'], bar_w - h_padding, bar_h - v_padding)
+        self.setGeometry(
+            bar_x,
+            bar_y,
+            bar_w,
+            bar_h + self._padding['top'] + self._padding['bottom']
+        )
+
+        self._bar_frame.setGeometry(
+            self._padding['left'],
+            self._padding['top'],
+            bar_w - self._padding['left'] - self._padding['right'],
+            bar_h
+        )
 
     def _calc_bar_width(self, width: Union[str, int]) -> int:
         if is_valid_percentage_str(str(width)):
@@ -112,13 +121,13 @@ class Bar(QWidget):
         else:
             return width
 
-    def _calc_bar_pos(self, x_padding: int, bar_w: int, bar_h: int) -> tuple[int, int]:
+    def _calc_bar_pos(self, bar_w: int, bar_h: int) -> tuple[int, int]:
         screen_x = self.screen().geometry().x()
         screen_y = self.screen().geometry().y()
         screen_w = self.screen().geometry().width()
         screen_h = self.screen().geometry().height()
 
-        x = screen_x + (screen_w / 2) - int(bar_w / 2) if self._alignment['center'] else screen_x + x_padding
+        x = screen_x + (screen_w / 2) - int(bar_w / 2) if self._alignment['center'] else screen_x
         y = screen_y + screen_h - bar_h if self._alignment['position'] == "bottom" else screen_y
 
         return int(x), int(y)
