@@ -74,16 +74,20 @@ class Win32AppBar:
         self.position_bar(app_bar_height, screen)
         self.set_position()
 
-    def position_bar(self, app_bar_height: int, screen: QScreen) -> None:
+    def position_bar(self, app_bar_height: int, screen: QScreen, apply_scaling: bool = False) -> None:
         self.app_bar_data.rc.left = screen.geometry().x()
         self.app_bar_data.rc.right = screen.geometry().x() + screen.geometry().width()
 
+        scale = screen.devicePixelRatio() if apply_scaling else 1
+
         if self.app_bar_data.uEdge == AppBarEdge.Top:
             self.app_bar_data.rc.top = screen.geometry().y()
-            self.app_bar_data.rc.bottom = screen.geometry().y() + app_bar_height
+            self.app_bar_data.rc.bottom = screen.geometry().y() + int(app_bar_height * scale)
         else:
-            self.app_bar_data.rc.top = screen.geometry().y() + screen.geometry().height() - app_bar_height
-            self.app_bar_data.rc.bottom = screen.geometry().y() + screen.geometry().height()
+            self.app_bar_data.rc.top = screen.geometry().y() + int((screen.geometry().height() - app_bar_height) * scale)
+            self.app_bar_data.rc.bottom = screen.geometry().y() + int(screen.geometry().height() * scale)
+
+        print(screen.name(), screen.devicePixelRatio(), screen.geometry().getRect(), self.app_bar_data.rc.top, self.app_bar_data.rc.left, self.app_bar_data.rc.bottom, self.app_bar_data.rc.right)
 
     def register_new(self):
         shell32.SHAppBarMessage(AppBarMessage.New, P_APPBAR_DATA(self.app_bar_data))

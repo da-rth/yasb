@@ -8,6 +8,7 @@ from core.utils.widget_builder import WidgetBuilder
 from core.event_service import EventService
 from core.config import get_stylesheet, get_config
 from copy import deepcopy
+from contextlib import suppress
 from ratelimit import limits
 
 
@@ -60,9 +61,11 @@ class BarManager(QObject):
     def on_screen_disconnect(self, screen: QScreen) -> None:
         logging.info(f"Screen disconnected: {screen.name()}")
         for bar_idx in self._get_bar_idxs_by_screen_name(screen.name()):
-            self.bars[bar_idx].close()
-            self.bars[bar_idx] = None
+            with suppress(IndexError):
+                bar = self.bars.pop(bar_idx)
+                bar.close()
 
+    @pyqtSlot(QScreen)
     def on_screen_connect(self, screen: QScreen) -> None:
         logging.info(f"Screen connected: {screen.name()}")
         for bar_name, bar_config in self.config['bars'].items():
@@ -91,6 +94,7 @@ class BarManager(QObject):
             self._threads.clear()
         except Exception as e:
             print(e)
+
     def close_all_bars(self):
         self.stop_listener_threads()
 

@@ -41,6 +41,9 @@ class Bar(QWidget):
         self._padding = padding
 
         self.screen_name = self.screen().name()
+        self.last_geometry = self.screen().geometry()
+        self.last_scale = self.screen().devicePixelRatio()
+
         self.app_bar_edge = app_bar.AppBarEdge.Top \
             if self._alignment['position'] == "top" \
             else app_bar.AppBarEdge.Bottom
@@ -66,34 +69,54 @@ class Bar(QWidget):
 
         self.position_bar(init=True)
         self.try_add_app_bar()
-        self.screen().geometryChanged.connect(self.on_screen_change, Qt.ConnectionType.QueuedConnection)
+        self.screen().geometryChanged.connect(self.on_geometry_changed, Qt.ConnectionType.UniqueConnection)
         self.show()
 
     @property
     def bar_id(self) -> str:
         return self._bar_id
 
-    def on_screen_change(self, geo: QRect) -> None:
+    def on_geometry_changed(self, geo: QRect) -> None:
+        apply_scaling = False
         logging.info(f"{self.bar_id} - screen geometry changed to {geo} (x{self.screen().devicePixelRatio()})")
         self.position_bar()
-        self.try_add_app_bar()
+
+        if self.app_bar_manager:
+            if self.last_scale == self.screen().devicePixelRatio():
+                curr_geo = self.screen().geometry()
+
+                if (self.last_geometry.width() > curr_geo.width()) or (self.last_geometry.height() > curr_geo.height()):
+                    logging.info("Resolution now has scaling applied, applying scaling to appbar if present.")
+                    apply_scaling = True
+
+        self.try_position_app_bar(apply_scaling)
+        self.last_geometry = self.screen().geometry()
+        self.last_scale = self.screen().devicePixelRatio()
 
     def try_add_app_bar(self) -> None:
         if self.app_bar_manager:
             self.app_bar_manager.create_appbar(
                 self.winId().__int__(),
                 self.app_bar_edge,
-                self.native_bar_height(),
+                self.bar_height(),
                 self.screen()
             )
+
+    def try_position_app_bar(self, apply_scaling=False) -> None:
+        if self.app_bar_manager:
+            self.app_bar_manager.position_bar(
+                self.bar_height(),
+                self.screen(),
+                apply_scaling
+            )
+            self.app_bar_manager.set_position()
 
     def try_remove_app_bar(self) -> None:
         if self.app_bar_manager:
             self.app_bar_manager.remove_appbar()
 
-    def native_bar_height(self) -> int:
-        pixel_ratio = self.screen().devicePixelRatio()
-        return int((self._padding['top'] + self._dimensions['height'] + self._padding['bottom']) * pixel_ratio)
+    def bar_height(self) -> int:
+        return self._padding['top'] + self._dimensions['height'] + self._padding['bottom']
 
     def position_bar(self, init=False) -> None:
         bar_w = self._calc_bar_width(self._dimensions['width'])
