@@ -4,7 +4,7 @@ import uuid
 import json
 import win32pipe
 import win32file
-from PyQt6.QtCore import QObject
+from PyQt6.QtCore import QThread
 from core.event_enums import KomorebiEvent
 from core.event_service import EventService
 from core.utils.komorebi.client import KomorebiClient
@@ -13,7 +13,7 @@ KOMOREBI_PIPE_BUFF_SIZE = 64 * 1024
 KOMOREBI_PIPE_NAME = "yasb"
 
 
-class KomorebiEventListener(QObject):
+class KomorebiEventListener(QThread):
 
     def __init__(
             self,
@@ -51,13 +51,18 @@ class KomorebiEventListener(QObject):
             security_attributes
         )
 
-    def start(self):
+    def run(self):
         self._create_pipe()
         self._wait_until_komorebi_online()
 
         try:
             while self._app_running:
-                result, data = win32file.ReadFile(self.pipe, self.buffer_size, None)
+                buffer, bytes_to_read, result = win32pipe.PeekNamedPipe(self.pipe, 1)
+
+                if not bytes_to_read:
+                    break
+
+                result, data = win32file.ReadFile(self.pipe, bytes_to_read, None)
 
                 if not data.strip():
                     continue
@@ -72,6 +77,7 @@ class KomorebiEventListener(QObject):
                 except (KeyError, ValueError):
                     logging.exception(f"Failed parse komorebi state. Received data: {data}")
             logging.info(f"Stopping {self.__str__()}")
+            return
         except (BaseException, Exception):
             logging.exception(f"Komorebi has disconnected from the named pipe {self.pipe_name}")
             win32file.CloseHandle(self.pipe)
@@ -79,8 +85,8 @@ class KomorebiEventListener(QObject):
             self.start()
 
     def stop(self):
+        logging.info("Exiting Komorebi event listener")
         self._app_running = False
-        self.deleteLater()
 
     def _emit_event(self, event: dict, state: dict) -> None:
         self.event_service.emit_event(KomorebiEvent.KomorebiUpdate, event, state)

@@ -1,13 +1,13 @@
 import ctypes
 import time
 import logging
-from PyQt6.QtCore import QObject
+from PyQt6.QtCore import QThread
 from win32gui import GetForegroundWindow
 from core.utils.win32.windows import WinEventProcType, WinEvent, user32, ole32, msg
 from core.event_service import EventService
 
 
-class SystemEventListener(QObject):
+class SystemEventListener(QThread):
 
     def __init__(self):
         super().__init__()
@@ -29,10 +29,9 @@ class SystemEventListener(QObject):
         _event_time
     ) -> None:
         if event in WinEvent:
+            event_type = WinEvent._value2member_map_[event]
             try:
-                if event in WinEvent:
-                    event_type = WinEvent._value2member_map_[event]
-                    self._event_service.emit_event(event_type, hwnd, event_type)
+                self._event_service.emit_event(event_type, hwnd, event_type)
             except Exception:
                 logging.exception(f"Failed to emit event {event_type} for {hwnd}")
 
@@ -54,7 +53,7 @@ class SystemEventListener(QObject):
         if foreground_window_hwnd:
             self._event_service.emit_event(foreground_event, foreground_window_hwnd, foreground_event)
 
-    def start(self):
+    def run(self):
         self._hook = self._build_event_hook()
 
         if self._hook == 0:

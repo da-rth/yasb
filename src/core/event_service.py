@@ -26,3 +26,6 @@ class EventService(QObject):
             except AttributeError:
                 logging.error(f"Failed to emit signal {event_signal.__str__()}. Removing link to {event_type}.")
                 event_signals.pop(event_signals.index(event_signal))
+
+    def clear(self):
+        self._registered_event_signals.clear()
