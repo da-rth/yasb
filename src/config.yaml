@@ -67,19 +67,22 @@
         # right: []
         # ^ A list of widget names to be placed on the right side of the bar. Accepts: list of strings (widget names / types)
 
+watch_stylesheet: true
+watch_config: true
+
 bars:
   yasb-bar:
     enabled: true
     screens: ['*']
     class_name: "yasb-bar"
     alignment:
-      position: "bottom"
+      position: "top"
       center: false
     window_flags:
       always_on_top: false
       windows_app_bar: true
     dimensions:
-      width: "100%"
+      width: "90%"
       height: 30
     padding:
       top: 0

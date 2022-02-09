@@ -15,16 +15,16 @@ def main():
 
     # Initialise bars and background event listeners
     manager = BarManager(config, stylesheet)
-    manager.initialize_bars(app_init=True)
-    manager.run_listeners_in_threads()
+    manager.initialize_bars(init=True)
 
     # Build system tray icon
     tray_icon = TrayIcon(manager)
     tray_icon.show()
 
     # Initialise file watcher
-    observer = create_observer(manager)
-    observer.start()
+    if config['watch_config'] or config['watch_stylesheet']:
+        observer = create_observer(manager)
+        observer.start()
 
     # Start Application
     exit_status = app.exec()

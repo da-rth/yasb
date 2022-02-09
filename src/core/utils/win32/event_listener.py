@@ -68,6 +68,5 @@ class SystemEventListener(QThread):
         user32.GetMessageW(ctypes.byref(msg), 0, 0, 0)
 
     def stop(self):
-        logging.info("Exiting Win32 event listener")
         user32.UnhookWinEvent(self._hook)
         ole32.CoUninitialize()

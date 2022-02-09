@@ -85,7 +85,6 @@ class KomorebiEventListener(QThread):
             self.start()
 
     def stop(self):
-        logging.info("Exiting Komorebi event listener")
         self._app_running = False
 
     def _emit_event(self, event: dict, state: dict) -> None:

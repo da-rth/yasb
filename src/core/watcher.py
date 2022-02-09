@@ -25,9 +25,9 @@ class FileModifiedEventHandler(PatternMatchingEventHandler):
     def on_modified(self, event: FileModifiedEvent):
         modified_file = basename(event.src_path)
 
-        if modified_file == self.styles_file:
+        if modified_file == self.styles_file and self.bar_manager.config['watch_stylesheet']:
             self.bar_manager.styles_modified.emit()
-        elif modified_file == self.config_file:
+        elif modified_file == self.config_file and self.bar_manager.config['watch_config']:
             self.bar_manager.config_modified.emit()
 
 

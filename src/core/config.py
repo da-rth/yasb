@@ -61,7 +61,6 @@ def get_config(show_error_dialog=False) -> Union[dict, None]:
     config_path = get_config_path()
 
     try:
-        logging.info(f"Reading {config_path}")
         with open(config_path) as yaml_stream:
             config = safe_load(yaml_stream)
 
@@ -89,7 +88,6 @@ def get_stylesheet(show_error_dialog=False) -> Union[str, None]:
     styles_path = get_stylesheet_path()
 
     try:
-        logging.info(f"Reading {styles_path}")
         parser = CSSParser(raiseExceptions=True)
         return parser.parseFile(styles_path).cssText.decode('utf-8')
     except SyntaxErr as e:
