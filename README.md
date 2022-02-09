@@ -35,6 +35,24 @@ For an example of the default bar configuration, see the image below:
   - [Komorebi WM](https://github.com/LGUG2Z/komorebi) Workspace Widget
   - and more...
 
+### TODO List
+- [ ] Documentation (Wiki is WIP)
+- [x] ~~Automatic bar creation/deletion for screen connect/disconnect events~~
+- [x] ~~New top, left, bottom, right padding setting~~
+- [ ] Config/stylesheet auto-loading (via file watcher)
+- [ ] Window Blur effect
+- [ ] SCSS stylesheet support
+- [ ] Tray options for toggling bars on/off
+- [ ] Improve default CSS stylesheet
+- [ ] Media Player Widget
+- [ ] Disk Space Widget
+- [ ] Keyboard State Widget
+- [ ] Bluetooth(?) Widget
+- [ ] Volume Widget
+- [ ] Backlight Widget
+- [ ] Calendar Pop-up for Clock Widget
+
+
 ### How do you run it?
 - Install [Python 3.9](https://www.python.org/doc/versions/) or above
 - Install required Python Modules:
