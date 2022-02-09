@@ -73,7 +73,7 @@ bars:
     screens: ['*']
     class_name: "yasb-bar"
     alignment:
-      position: "top"
+      position: "bottom"
       center: false
     window_flags:
       always_on_top: false
