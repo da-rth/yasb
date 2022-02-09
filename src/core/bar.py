@@ -1,7 +1,6 @@
 import logging
-from typing import Union
 from settings import APP_BAR_TITLE
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QGridLayout, QFrame
+from PyQt6.QtWidgets import QApplication, QWidget, QHBoxLayout, QGridLayout, QFrame
 from PyQt6.QtGui import QScreen
 from PyQt6.QtCore import Qt, QRect
 from core.utils.utilities import is_valid_percentage_str, percent_to_float
@@ -23,6 +22,7 @@ class Bar(QWidget):
             bar_screen: QScreen,
             stylesheet: str,
             widgets: dict[str, list],
+            init: bool = False,
             class_name: str = BAR_DEFAULTS['class_name'],
             alignment: dict = BAR_DEFAULTS['alignment'],
             window_flags: dict = BAR_DEFAULTS['window_flags'],
@@ -41,9 +41,6 @@ class Bar(QWidget):
         self._padding = padding
 
         self.screen_name = self.screen().name()
-        self.last_geometry = self.screen().geometry()
-        self.last_scale = self.screen().devicePixelRatio()
-
         self.app_bar_edge = app_bar.AppBarEdge.Top \
             if self._alignment['position'] == "top" \
             else app_bar.AppBarEdge.Bottom
@@ -66,10 +63,8 @@ class Bar(QWidget):
         self._bar_frame = QFrame(self)
         self._bar_frame.setProperty("class", f"bar {class_name}")
         self._add_widgets(widgets)
-
-        self.position_bar(init=True)
-        self.try_add_app_bar()
-        self.screen().geometryChanged.connect(self.on_geometry_changed, Qt.ConnectionType.UniqueConnection)
+        self.position_bar(init)
+        self.screen().geometryChanged.connect(self.on_geometry_changed, Qt.ConnectionType.QueuedConnection)
         self.show()
 
     @property
@@ -77,83 +72,64 @@ class Bar(QWidget):
         return self._bar_id
 
     def on_geometry_changed(self, geo: QRect) -> None:
-        apply_scaling = False
-        logging.info(f"{self.bar_id} - screen geometry changed to {geo} (x{self.screen().devicePixelRatio()})")
+        logging.info(f"Screen geometry changed. Updating position for bar ({self.bar_id})")
         self.position_bar()
 
-        if self.app_bar_manager:
-            if self.last_scale == self.screen().devicePixelRatio():
-                curr_geo = self.screen().geometry()
-
-                if (self.last_geometry.width() > curr_geo.width()) or (self.last_geometry.height() > curr_geo.height()):
-                    logging.info("Resolution now has scaling applied, applying scaling to appbar if present.")
-                    apply_scaling = True
-
-        self.try_position_app_bar(apply_scaling)
-        self.last_geometry = self.screen().geometry()
-        self.last_scale = self.screen().devicePixelRatio()
-
-    def try_add_app_bar(self) -> None:
+    def try_add_app_bar(self, scale_screen_height=False) -> None:
         if self.app_bar_manager:
             self.app_bar_manager.create_appbar(
                 self.winId().__int__(),
                 self.app_bar_edge,
-                self.bar_height(),
-                self.screen()
-            )
-
-    def try_position_app_bar(self, apply_scaling=False) -> None:
-        if self.app_bar_manager:
-            self.app_bar_manager.position_bar(
-                self.bar_height(),
+                self._dimensions['height'],
                 self.screen(),
-                apply_scaling
+                scale_screen_height
             )
-            self.app_bar_manager.set_position()
 
     def try_remove_app_bar(self) -> None:
         if self.app_bar_manager:
             self.app_bar_manager.remove_appbar()
 
-    def bar_height(self) -> int:
-        return self._padding['top'] + self._dimensions['height'] + self._padding['bottom']
+    def bar_pos(self, bar_w: int, bar_h: int, screen_w: int, screen_h: int) -> tuple[int, int]:
+        screen_x = self.screen().geometry().x()
+        screen_y = self.screen().geometry().y()
+        x = int(screen_x + (screen_w / 2) - (bar_w / 2))if self._alignment['center'] else screen_x
+        y = int(screen_y + screen_h - bar_h) if self._alignment['position'] == "bottom" else screen_y
+
+        return x, y
 
     def position_bar(self, init=False) -> None:
-        bar_w = self._calc_bar_width(self._dimensions['width'])
-        bar_w = int(bar_w / self.screen().devicePixelRatio()) if init else bar_w
-        bar_h = self._dimensions['height']
-        bar_x, bar_y = self._calc_bar_pos(bar_w, bar_h)
+        bar_width = self._dimensions['width']
+        bar_height = self._dimensions['height']
 
-        self.setGeometry(
-            bar_x,
-            bar_y,
-            bar_w,
-            bar_h + self._padding['top'] + self._padding['bottom']
+        screen_scale = self.screen().devicePixelRatio()
+        screen_width = self.screen().geometry().width()
+        screen_height = self.screen().geometry().height()
+
+        # Fix for non-primary display Windows OS scaling on app startup
+        should_downscale_screen_geometry = (
+            init and
+            len(QApplication.screens()) > 1 and
+            screen_scale >= 2.0 and
+            QApplication.primaryScreen() != self.screen()
         )
 
+        if should_downscale_screen_geometry:
+            screen_width = screen_width / screen_scale
+            screen_height = screen_height / screen_scale
+
+        if is_valid_percentage_str(str(self._dimensions['width'])):
+            bar_width = int(screen_width * percent_to_float(self._dimensions['width']))
+
+        bar_x, bar_y = self.bar_pos(bar_width, bar_height, screen_width, screen_height)
+        self.setGeometry(bar_x, bar_y, bar_width, bar_height)
         self._bar_frame.setGeometry(
             self._padding['left'],
             self._padding['top'],
-            bar_w - self._padding['left'] - self._padding['right'],
-            bar_h
+            bar_width - self._padding['left'] - self._padding['right'],
+            bar_height
         )
 
-    def _calc_bar_width(self, width: Union[str, int]) -> int:
-        if is_valid_percentage_str(str(width)):
-            return int(self.screen().geometry().width() * percent_to_float(width))
-        else:
-            return width
-
-    def _calc_bar_pos(self, bar_w: int, bar_h: int) -> tuple[int, int]:
-        screen_x = self.screen().geometry().x()
-        screen_y = self.screen().geometry().y()
-        screen_w = self.screen().geometry().width()
-        screen_h = self.screen().geometry().height()
-
-        x = screen_x + (screen_w / 2) - int(bar_w / 2) if self._alignment['center'] else screen_x
-        y = screen_y + screen_h - bar_h if self._alignment['position'] == "bottom" else screen_y
-
-        return int(x), int(y)
+        self.try_add_app_bar(scale_screen_height=not should_downscale_screen_geometry)
 
     def _add_widgets(self, widgets: dict[str, list] = None):
         bar_layout = QGridLayout()

@@ -65,29 +65,36 @@ class Win32AppBar:
     def __init__(self, ):
         self.app_bar_data = None
 
-    def create_appbar(self, hwnd: int, edge: AppBarEdge, app_bar_height: int, screen: QScreen):
+    def create_appbar(
+            self,
+            hwnd: int,
+            edge: AppBarEdge,
+            app_bar_height: int,
+            screen: QScreen,
+            scale_screen: bool = False
+    ):
         self.app_bar_data = AppBarData()
         self.app_bar_data.cbSize = wintypes.DWORD(sizeof(self.app_bar_data))
         self.app_bar_data.uEdge = edge
         self.app_bar_data.hWnd = hwnd
         self.register_new()
-        self.position_bar(app_bar_height, screen)
+        self.position_bar(app_bar_height, screen, scale_screen)
         self.set_position()
 
-    def position_bar(self, app_bar_height: int, screen: QScreen, apply_scaling: bool = False) -> None:
-        self.app_bar_data.rc.left = screen.geometry().x()
-        self.app_bar_data.rc.right = screen.geometry().x() + screen.geometry().width()
+    def position_bar(self, app_bar_height: int, screen: QScreen, scale_screen: bool = False) -> None:
+        geometry = screen.geometry()
+        bar_height = int(app_bar_height * screen.devicePixelRatio())
+        screen_height = int(geometry.y() * screen.devicePixelRatio() if scale_screen else geometry.y())
 
-        scale = screen.devicePixelRatio() if apply_scaling else 1
+        self.app_bar_data.rc.left = geometry.x()
+        self.app_bar_data.rc.right = geometry.x() + bar_height
 
         if self.app_bar_data.uEdge == AppBarEdge.Top:
             self.app_bar_data.rc.top = screen.geometry().y()
-            self.app_bar_data.rc.bottom = screen.geometry().y() + int(app_bar_height * scale)
+            self.app_bar_data.rc.bottom = screen.geometry().y() + bar_height
         else:
-            self.app_bar_data.rc.top = screen.geometry().y() + int((screen.geometry().height() - app_bar_height) * scale)
-            self.app_bar_data.rc.bottom = screen.geometry().y() + int(screen.geometry().height() * scale)
-
-        print(screen.name(), screen.devicePixelRatio(), screen.geometry().getRect(), self.app_bar_data.rc.top, self.app_bar_data.rc.left, self.app_bar_data.rc.bottom, self.app_bar_data.rc.right)
+            self.app_bar_data.rc.top = screen.geometry().y() + screen_height - bar_height
+            self.app_bar_data.rc.bottom = screen.geometry().y() + screen_height
 
     def register_new(self):
         shell32.SHAppBarMessage(AppBarMessage.New, P_APPBAR_DATA(self.app_bar_data))

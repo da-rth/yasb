@@ -61,6 +61,7 @@ def get_config(show_error_dialog=False) -> Union[dict, None]:
     config_path = get_config_path()
 
     try:
+        logging.info(f"Reading {config_path}")
         with open(config_path) as yaml_stream:
             config = safe_load(yaml_stream)
 
@@ -71,7 +72,7 @@ def get_config(show_error_dialog=False) -> Union[dict, None]:
             logging.error(f"The config file '{config_path}' contains validation errors. Please fix:\n{pretty_errors}")
             if show_error_dialog:
                 raise_info_alert(
-                    title=f"Failed to load recently updated stylesheet file.",
+                    title="Failed to load recently updated stylesheet file.",
                     msg=f"The file '{config_path}' contains syntax error(s) and has not been loaded.",
                     informative_msg="For more information, click 'Show Details'.",
                     additional_details=pretty_errors
@@ -88,13 +89,14 @@ def get_stylesheet(show_error_dialog=False) -> Union[str, None]:
     styles_path = get_stylesheet_path()
 
     try:
+        logging.info(f"Reading {styles_path}")
         parser = CSSParser(raiseExceptions=True)
         return parser.parseFile(styles_path).cssText.decode('utf-8')
     except SyntaxErr as e:
         logging.error(f"The file '{styles_path}' contains Syntax Error(s). Please fix:\n{str(e)}")
         if show_error_dialog:
             raise_info_alert(
-                title=f"Failed to load recently updated stylesheet file.",
+                title="Failed to load recently updated stylesheet file.",
                 msg=f"The file '{styles_path}' contains syntax error(s) and has not been loaded.",
                 informative_msg="For more information, click 'Show Details'.",
                 additional_details=str(e)

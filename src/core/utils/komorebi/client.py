@@ -136,8 +136,7 @@ class KomorebiClient:
         stdout, stderr = proc.communicate()
 
         if stderr:
-            logging.warning(f"Failed to subscribe komorebi to named pipe: {stderr.decode('utf-8')}")
-            logging.info("Named pipe waiting indefinitely for komorebi to re-subscribe...")
+            logging.warning(f"Komorebi failed to subscribe named pipe. Waiting indefinitely for subscription: {stderr.decode('utf-8')}")
 
         while proc.returncode != 0:
             time.sleep(2)

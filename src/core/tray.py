@@ -38,7 +38,7 @@ class TrayIcon(QSystemTrayIcon):
         self.setContextMenu(menu)
 
     def _exit_application(self):
-        self._bar_manager.close_all_bars()
+        self._bar_manager.close_bars()
         logging.info("Tray Exit Button selected. Exiting Application...")
         QCoreApplication.exit(0)
 

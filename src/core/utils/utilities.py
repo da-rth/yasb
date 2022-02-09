@@ -1,4 +1,8 @@
-from typing import Callable
+from PyQt6.QtWidgets import QApplication
+from PyQt6.QtGui import QScreen
+
+
+# General Utility Methods
 
 
 def percent_to_float(percent: str) -> float:
@@ -9,10 +13,5 @@ def is_valid_percentage_str(s: str) -> bool:
     return s.endswith("%") and len(s) <= 4 and s[:-1].isdigit()
 
 
-def run_once(func: Callable) -> Callable:
-    def wrapper(*args, **kwargs):
-        if not wrapper.has_run:
-            wrapper.has_run = True
-            return func(*args, **kwargs)
-    wrapper.has_run = False
-    return wrapper
+def get_screen_by_name(screen_name: str) -> QScreen:
+    return next(filter(lambda scr: screen_name in scr.name(), QApplication.screens()), None)
