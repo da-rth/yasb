@@ -76,7 +76,7 @@ bars:
     screens: ['*']
     class_name: "yasb-bar"
     alignment:
-      position: "bottom"
+      position: "top"
       center: false
     blur_effect:
       enabled: false
