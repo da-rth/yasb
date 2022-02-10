@@ -40,7 +40,7 @@ For an example of the default bar configuration, see the image below:
 - [x] ~~Automatic bar creation/deletion for screen connect/disconnect events~~
 - [x] ~~New top, left, bottom, right padding setting~~
 - [x] ~~Config/stylesheet auto-loading (via file watcher)~~
-- [ ] Window Blur effect
+- [x] ~~Window Blur effect~~
 - [ ] SCSS stylesheet support
 - [ ] Tray options for toggling bars on/off
 - [ ] Improve default CSS stylesheet
