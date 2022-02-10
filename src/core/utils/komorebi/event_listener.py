@@ -1,7 +1,7 @@
 import logging
 import time
-import uuid
 import json
+import uuid
 import win32pipe
 import win32file
 from PyQt6.QtCore import QThread
@@ -60,9 +60,9 @@ class KomorebiEventListener(QThread):
                 buffer, bytes_to_read, result = win32pipe.PeekNamedPipe(self.pipe, 1)
 
                 if not bytes_to_read:
-                    break
+                    continue
 
-                result, data = win32file.ReadFile(self.pipe, bytes_to_read, None)
+                result, data = win32file.ReadFile(self.pipe, self.buffer_size, None)
 
                 if not data.strip():
                     continue
@@ -76,8 +76,6 @@ class KomorebiEventListener(QThread):
                         self._emit_event(event, state)
                 except (KeyError, ValueError):
                     logging.exception(f"Failed parse komorebi state. Received data: {data}")
-            logging.info(f"Stopping {self.__str__()}")
-            return
         except (BaseException, Exception):
             logging.exception(f"Komorebi has disconnected from the named pipe {self.pipe_name}")
             win32file.CloseHandle(self.pipe)
