@@ -1,5 +1,5 @@
 from contextlib import suppress
-with suppress(ImportError):
+with suppress(RuntimeError, ModuleNotFoundError, ImportError):
     import winrt # noqa
 
 from sys import argv, exit
