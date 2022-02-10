@@ -84,6 +84,7 @@ class KomorebiEventListener(QThread):
 
     def stop(self):
         self._app_running = False
+        win32file.CloseHandle(self.pipe)
 
     def _emit_event(self, event: dict, state: dict) -> None:
         self.event_service.emit_event(KomorebiEvent.KomorebiUpdate, event, state)
