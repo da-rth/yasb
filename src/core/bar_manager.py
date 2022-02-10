@@ -50,7 +50,7 @@ class BarManager(QObject):
 
         if config and (config != self.config):
 
-            if config['bars'] != self.config['bars']:
+            if config['bars'] != self.config['bars'] or config['widgets'] != self.config['widgets']:
                 self.config = config
                 self.close_bars()
                 self.initialize_bars()
