@@ -25,11 +25,16 @@ def main():
     if config['watch_config'] or config['watch_stylesheet']:
         observer = create_observer(manager)
         observer.start()
+    else:
+        observer = None
 
     # Start Application
     exit_status = app.exec()
-    observer.stop()
-    observer.join()
+
+    # Before Application Exit
+    if observer:
+        observer.stop()
+        observer.join()
     exit(exit_status)
 
 

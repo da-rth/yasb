@@ -71,8 +71,8 @@ def get_config(show_error_dialog=False) -> Union[dict, None]:
             logging.error(f"The config file '{config_path}' contains validation errors. Please fix:\n{pretty_errors}")
             if show_error_dialog:
                 raise_info_alert(
-                    title="Failed to load recently updated stylesheet file.",
-                    msg=f"The file '{config_path}' contains syntax error(s) and has not been loaded.",
+                    title="Failed to load recently updated config file.",
+                    msg=f"The file '{config_path}' contains validation error(s) and has not been loaded.",
                     informative_msg="For more information, click 'Show Details'.",
                     additional_details=pretty_errors
                 )

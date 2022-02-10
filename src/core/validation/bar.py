@@ -3,6 +3,7 @@ BAR_DEFAULTS = {
     'screens': ['*'],
     'class_name': 'yasb-bar',
     'alignment': {'position': 'top', 'center': False},
+    'blur_effect': {'enabled': False, 'dark': False, 'acrylic': False},
     'window_flags': {'always_on_top': False, 'windows_app_bar': False},
     'dimensions': {'width': '100%', 'height': 30},
     'padding': {'top': 0, 'left': 0, 'bottom': 0, 'right': 0},
@@ -43,6 +44,24 @@ BAR_SCHEMA = {
                 }
             },
             'default': BAR_DEFAULTS['alignment']
+        },
+        'blur_effect': {
+            'type': 'dict',
+            'schema': {
+                'enabled': {
+                    'type': 'boolean',
+                    'default': BAR_DEFAULTS['blur_effect']['enabled']
+                },
+                'dark': {
+                    'type': 'boolean',
+                    'default': BAR_DEFAULTS['blur_effect']['enabled']
+                },
+                'acrylic': {
+                    'type': 'boolean',
+                    'default': BAR_DEFAULTS['blur_effect']['enabled']
+                }
+            },
+            'default': BAR_DEFAULTS['blur_effect']
         },
         'window_flags': {
             'type': 'dict',

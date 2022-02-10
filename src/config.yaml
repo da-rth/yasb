@@ -76,8 +76,12 @@ bars:
     screens: ['*']
     class_name: "yasb-bar"
     alignment:
-      position: "top"
+      position: "bottom"
       center: false
+    blur_effect:
+      enabled: false
+      acrylic: false
+      dark: false
     window_flags:
       always_on_top: false
       windows_app_bar: true

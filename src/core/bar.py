@@ -5,7 +5,7 @@ from PyQt6.QtGui import QScreen
 from PyQt6.QtCore import Qt, QRect
 from core.utils.utilities import is_valid_percentage_str, percent_to_float
 from core.validation.bar import BAR_DEFAULTS
-
+from BlurWindow.blurWindow import GlobalBlur
 
 try:
     from core.utils.win32 import app_bar
@@ -25,6 +25,7 @@ class Bar(QWidget):
             init: bool = False,
             class_name: str = BAR_DEFAULTS['class_name'],
             alignment: dict = BAR_DEFAULTS['alignment'],
+            blur_effect: dict = BAR_DEFAULTS['blur_effect'],
             window_flags: dict = BAR_DEFAULTS['window_flags'],
             dimensions: dict = BAR_DEFAULTS['dimensions'],
             padding: dict = BAR_DEFAULTS['padding']
@@ -64,6 +65,15 @@ class Bar(QWidget):
         self._bar_frame.setProperty("class", f"bar {class_name}")
         self._add_widgets(widgets)
         self.position_bar(init)
+
+        if blur_effect['enabled']:
+            GlobalBlur(
+                self.winId(),
+                Acrylic=blur_effect['acrylic'],
+                Dark=blur_effect['dark'],
+                QWidget=self
+            )
+
         self.screen().geometryChanged.connect(self.on_geometry_changed, Qt.ConnectionType.QueuedConnection)
         self.show()
 
