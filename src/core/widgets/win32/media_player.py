@@ -1,7 +1,7 @@
 import asyncio
 from itertools import cycle, islice
 from core.widgets.base import BaseWidget
-# from core.validation.widgets.example import EXAMPLE_VALIDATION_SCHEMA
+from core.validation.widgets.win32.media_player import VALIDATION_SCHEMA
 from core.utils.win32 import media_control
 from PyQt6.QtWidgets import QLabel, QPushButton
 from PyQt6.QtCore import Qt
@@ -29,31 +29,20 @@ async def call_async_callback(callback, *args):
 
 
 class MediaWidget(BaseWidget):
-    validation_schema = {}
+    validation_schema = VALIDATION_SCHEMA
 
     def __init__(
             self,
-            label: str = "{media[title]} - {media[artist]}",
-            label_alt: str = "Album: {media[album_title]}",
-            update_interval: int = 1000,
-            keep_thumbnail_aspect_ratio=False,
-            hide_paused_after_ms=5 * 1000,
-            icons = {
-                "shuffle": "\uf074",
-                "play": "\uf04b",
-                "pause": "\uf04c",
-                "repeat_off": "\uf2f9",
-                "repeat_track": "\uf2f9 (T)",
-                "repeat_list": "\uf2f9 (L)",
-                "next": "\uf051",
-                "prev": "\uf048"
-            }
+            label: str,
+            label_alt: str,
+            update_interval: int,
+            keep_thumbnail_aspect_ratio: bool,
+            layout: list[str],
+            icons: dict[str, str]
     ):
         super().__init__(update_interval, class_name="media-widget")
         self._icons = icons
         self._update_interval = update_interval
-        self._hidden_ms_count = 0
-        self._hide_paused_after_ms = hide_paused_after_ms
         self._keep_thumbnail_aspect_ratio = keep_thumbnail_aspect_ratio
         self._show_alt_label = False
         self._label_content = label
@@ -67,18 +56,25 @@ class MediaWidget(BaseWidget):
             media_control.WindowsMediaRepeat.List
         ])
 
-        media_layout = ["thumbnail", "label", "prev", "play_pause", "next", "shuffle", "repeat"]
+        self._play_pause_btn = None
+        self._repeat_btn = None
+        self._shuffle_btn = None
+        self._next_btn = None
+        self._prev_btn = None
+        self._close_btn = None
+
         media_component_builders = {
             "label": self._build_label,
             "next": self._build_next_btn,
             "prev": self._build_prev_btn,
+            "close": self._build_close_btn,
             "thumbnail": self._build_thumbnail,
             "shuffle": self._build_shuffle_btn,
             "repeat": self._build_repeat_btn,
             "play_pause": self._build_play_pause_btn
         }
 
-        for media_component_type in media_layout:
+        for media_component_type in layout:
             media_component_builders[media_component_type]()
 
         self.register_callback("update_label", self._update_label)
@@ -116,25 +112,12 @@ class MediaWidget(BaseWidget):
 
         playback_controls = playback_info['controls']
         is_play_enabled = playback_controls.get('is_play_enabled', False)
-        is_pause_enabled = playback_controls.get('is_pause_enabled', False)
-        # is_stop_enabled = playback_controls.get('is_stop_enabled', False)
-
-        # if is_pause_enabled and not is_play_enabled:
-        #     if self._hidden_ms_count < self._hide_paused_after_ms:
-        #         self._hidden_ms_count += self._update_interval
-        #     else:
-        #         if self.isVisible():
-        #             self.hide()
-        #         return
-        # else:
-        #     if self.isHidden():
-        #         self.show()
-        #         self._hidden_ms_count = 0
 
         if self._playing_media != title_artist and self.bar:
             if self._thumbnail:
                 asyncio.run(self._update_thumbnail(media_info['thumbnail']))
             self._playing_media = title_artist
+            self.show()
 
         if self._play_pause_btn:
             if is_play_enabled:
@@ -148,6 +131,7 @@ class MediaWidget(BaseWidget):
 
         if self._repeat_btn:
             repeat_cycle_mode = playback_info.get('auto_repeat_mode', 0)
+            repeat_cycle_mode = repeat_cycle_mode if repeat_cycle_mode else 0
             islice(self._repeat_options, repeat_cycle_mode, None)
             self._repeat = media_control.WindowsMediaRepeat(repeat_cycle_mode)
             self._update_repeat_btn_label()
@@ -195,7 +179,7 @@ class MediaWidget(BaseWidget):
 
             x_pos = cursor.pos().x()
             y_pos = self.screen().geometry().y() + self.bar.dimensions['height'] \
-                if self.bar._alignment['position'] == "top" \
+                if self.bar.alignment['position'] == "top" \
                 else (self.screen().geometry().y() +
                       self.screen().geometry().height() -
                       self._thumbnail_preview.height() -
@@ -224,6 +208,11 @@ class MediaWidget(BaseWidget):
             if self._keep_thumbnail_aspect_ratio \
             else Qt.AspectRatioMode.IgnoreAspectRatio
         self.widget_layout.addWidget(self._thumbnail)
+
+    def _build_close_btn(self):
+        self._close_btn = MediaWidgetButton("close", self._icons["close"])
+        self._close_btn.clicked.connect(lambda: self._handle_btn_press("close"))
+        self.widget_layout.addWidget(self._close_btn)
 
     def _build_prev_btn(self):
         self._prev_btn = MediaWidgetButton("prev", self._icons["prev"])
@@ -260,7 +249,9 @@ class MediaWidget(BaseWidget):
             "repeat": session.try_change_auto_repeat_mode_async
         }
 
-        if btn_name == "shuffle":
+        if btn_name == "close":
+            self.hide()
+        elif btn_name == "shuffle":
             self._shuffle = not self._shuffle
             self._update_shuffle_btn_label()
             asyncio.run(call_async_callback(callbacks[btn_name], self._shuffle))
