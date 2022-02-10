@@ -1,7 +1,6 @@
 import subprocess
 import logging
 import json
-import time
 from contextlib import suppress
 from typing import Optional
 
@@ -133,17 +132,6 @@ class KomorebiClient:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
-        stdout, stderr = proc.communicate()
+        _stdout, stderr = proc.communicate()
 
-        if stderr:
-            logging.warning(f"Komorebi failed to subscribe named pipe. Waiting indefinitely for subscription: {stderr.decode('utf-8')}")
-
-        while proc.returncode != 0:
-            time.sleep(2)
-            proc = subprocess.Popen(
-                [self._komorebic_path, "subscribe", pipe_name],
-                shell=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
-            )
-            proc.communicate()
+        return stderr, proc

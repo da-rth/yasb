@@ -23,7 +23,7 @@ class KomorebiEventListener(QThread):
         super().__init__()
         self._komorebic = KomorebiClient()
         self._app_running = True
-        self.pipe_name = pipe_name
+        self.pipe_name = f"{pipe_name}-{uuid.uuid1()}"
         self.buffer_size = buffer_size
         self.event_service = EventService()
         self.pipe = None
@@ -32,7 +32,6 @@ class KomorebiEventListener(QThread):
         return "Komorebi Event Listener"
 
     def _create_pipe(self) -> None:
-        pipe_name_full = f"\\\\.\\pipe\\{self.pipe_name}-{uuid.uuid1()}"
         open_mode = win32pipe.PIPE_ACCESS_DUPLEX
         pipe_mode = win32pipe.PIPE_TYPE_MESSAGE | win32pipe.PIPE_READMODE_MESSAGE | win32pipe.PIPE_WAIT
         max_instances = 1
@@ -41,7 +40,7 @@ class KomorebiEventListener(QThread):
         default_timeout_ms = 0
         security_attributes = None
         self.pipe = win32pipe.CreateNamedPipe(
-            pipe_name_full,
+            f"\\\\.\\pipe\\{self.pipe_name}",
             open_mode,
             pipe_mode,
             max_instances,
@@ -50,6 +49,7 @@ class KomorebiEventListener(QThread):
             default_timeout_ms,
             security_attributes
         )
+        logging.info(f"Created named pipe {self.pipe_name}")
 
     def run(self):
         self._create_pipe()
@@ -95,7 +95,14 @@ class KomorebiEventListener(QThread):
 
     def _wait_until_komorebi_online(self):
         logging.info(f"Waiting for Komorebi to subscribe to named pipe {self.pipe_name}")
-        self._komorebic.wait_until_subscribed_to_pipe(self.pipe_name)
+        stderr, proc = self._komorebic.wait_until_subscribed_to_pipe(self.pipe_name)
+
+        if stderr:
+            logging.warning(f"Komorebi failed to subscribe named pipe. Waiting for subscription: {stderr.decode('utf-8')}")
+
+        while self._app_running and proc.returncode != 0:
+            time.sleep(1)
+            stderr, proc = self._komorebic.wait_until_subscribed_to_pipe(self.pipe_name)
 
         win32pipe.ConnectNamedPipe(self.pipe, None)
         logging.info(f"Komorebi connected to named pipe: {self.pipe_name}")
