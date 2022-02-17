@@ -60,6 +60,7 @@ class KomorebiEventListener(QThread):
                 buffer, bytes_to_read, result = win32pipe.PeekNamedPipe(self.pipe, 1)
 
                 if not bytes_to_read:
+                    time.sleep(0.05)
                     continue
 
                 result, data = win32file.ReadFile(self.pipe, bytes_to_read, None)
