@@ -95,7 +95,7 @@ bars:
       right: 0
     widgets:
       left:   ["komorebi_workspaces", "komorebi_active_layout", "active_window"]
-      center: ["clock"]
+      center: ["windows_media"]
       right:  ["explorer_button", "ip_info", "cpu", "memory", "battery"]
 
 # widgets:
@@ -482,3 +482,22 @@ widgets:
         # run every hour
         run_interval: 3600000
         return_format: "json"
+
+  windows_media:
+    type: "win32.media_player.MediaWidget"
+    options:
+      label: "{media[title]} - {media[artist]}"
+      label_alt: "{media[title]} - {media[artist]}"
+      update_interval: 1000
+      keep_thumbnail_aspect_ratio: false
+      layout: ["thumbnail", "label"]
+      icons:
+        shuffle: "\uf074"
+        play: "\uf04b"
+        pause: "\uf04c"
+        next: "\uf051"
+        prev: "\uf048"
+        close: "\uf00d"
+        repeat_off: "\uf2f9"
+        repeat_track: "\uf2f9 (T)"
+        repeat_list: "\uf2f9 (L)"

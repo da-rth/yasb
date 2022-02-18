@@ -10,7 +10,7 @@ LOG_DATETIME = "%Y-%m-%d %H:%M:%S"
 
 def init_logger():
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=logging.INFO,
         filename=join(get_config_dir(), DEFAULT_LOG_FILENAME),
         format=LOG_FORMAT,
         datefmt=LOG_DATETIME,

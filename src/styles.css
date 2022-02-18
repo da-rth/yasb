@@ -9,7 +9,7 @@
 .bar {
     background: rgba(29, 32, 33, 0.3);
     border: 1px solid #504945;
-    padding: 0 5px;
+    padding: 0 3px;
 }
 
 .container-right .widget {
@@ -131,5 +131,25 @@
 .komorebi-active-layout .label {
   color: #fbf1c7;
   margin: -4px 2px 2px 8px;
-  font-family: Hack;
+  font-family: 'Courier New';
+}
+
+.media-widget .thumbnail,
+.media-widget .label,
+.media-widget .media-btn {
+  margin: 0 5px;
+}
+
+.media-btn {
+  padding: 0;
+  background: transparent;
+  font-size: 12px;
+}
+
+.media-btn:hover {
+  color: cyan;
+}
+
+.media-btn.shuffle.active {
+  color: cyan;
 }

@@ -7,6 +7,7 @@ from core.utils.utilities import is_valid_percentage_str, percent_to_float
 from core.validation.bar import BAR_DEFAULTS
 from BlurWindow.blurWindow import GlobalBlur
 
+
 try:
     from core.utils.win32 import app_bar
     IMPORT_APP_BAR_MANAGER_SUCCESSFUL = True
@@ -80,6 +81,18 @@ class Bar(QWidget):
     @property
     def bar_id(self) -> str:
         return self._bar_id
+
+    @property
+    def dimensions(self):
+        return self._dimensions
+
+    @property
+    def alignment(self):
+        return self._alignment
+
+    @property
+    def name(self):
+        return self._bar_name
 
     def on_geometry_changed(self, geo: QRect) -> None:
         logging.info(f"Screen geometry changed. Updating position for bar ({self.bar_id})")
@@ -159,7 +172,7 @@ class Bar(QWidget):
             for widget in widgets[layout_type]:
                 widget.setFixedHeight(self._bar_frame.geometry().height())
                 widget.parent_layout_type = layout_type
-                widget.bar_id = self.bar_id
+                widget.bar = self
                 layout.addWidget(widget, 0)
 
             if layout_type in ["left", "center"]:
