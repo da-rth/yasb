@@ -54,8 +54,7 @@ For an example of the default bar configuration, see the image below:
 
 
 ### How do you run it?
-- Install [Python 3.9](https://www.python.org/doc/versions/)
-  - Some modules, such as [winrt](https://pypi.org/project/winrt/), do not support Python 3.10 yet.
+- Install [Python 3.10](https://www.python.org/doc/versions/)
 - Install required Python Modules:
   - pip install -r [requirements.txt](requirements.txt)
 - Create the directory `C:/Users/{username}/.yasb/` and copy [styles.css](src/styles.css) and [config.yaml](src/config.yaml) into folder.

@@ -1,5 +1,5 @@
-from winrt.windows.media.control import GlobalSystemMediaTransportControlsSessionManager
-from winrt.windows.storage.streams import DataReader, Buffer, InputStreamOptions
+from winsdk.windows.media.control import GlobalSystemMediaTransportControlsSessionManager
+from winsdk.windows.storage.streams import DataReader, Buffer, InputStreamOptions
 
 
 async def get_current_session():
