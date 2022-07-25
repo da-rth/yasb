@@ -18,6 +18,7 @@ tauri-build = { version = "1.0.4", features = [] }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.0.5", features = ["api-all"] }
+anyhow = "1.0"
 
 [features]
 # by default Tauri runs in production mode
@@ -27,5 +28,13 @@ default = [ "custom-protocol" ]
 # DO NOT remove this
 custom-protocol = [ "tauri/custom-protocol" ]
 
-[target."cfg(windows)".dependencies]
-winapi = { version = "0.3.9", features = [ "shellscalingapi" ] }
+[dependencies.windows]
+version = "0.39.0"
+features = [
+    "Data_Xml_Dom",
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_System_Threading",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_UI_HiDpi",
+]
