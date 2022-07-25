@@ -4,9 +4,12 @@
 )]
 
 mod setup;
+mod windows;
 
 fn main() {
-  setup::setup_dpi_awareness_context().map_err(|err| println!("{:?}", err)).ok();
+  windows::setup_dpi_awareness_context()
+    .map_err(|err| println!("{:?}", err))
+    .ok();
 
   tauri::Builder::default()
     .setup(|app| {

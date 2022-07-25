@@ -1,27 +1,7 @@
-use windows::Win32::UI::HiDpi::SetProcessDpiAwarenessContext;
-use windows::Win32::UI::HiDpi::DPI_AWARENESS_CONTEXT_SYSTEM_AWARE;
-use windows::core::Result as WindowsCrateResult;
 use anyhow::Result;
 
 const APP_INDEX: &str = "index.html";
 const BAR_HEIGHT: u32 = 64;
-
-trait ProcessWindowsCrateResult<T> {
-  fn process(self) -> Result<T>;
-}
-
-impl<T> ProcessWindowsCrateResult<T> for WindowsCrateResult<T> {
-  fn process(self) -> Result<T> {
-    match self {
-      Ok(value) => Ok(value),
-      Err(error) => Err(error.into()),
-    }
-  }
-}
-
-pub fn setup_dpi_awareness_context() -> Result<()> {
-  unsafe { SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE) }.ok().process()
-}
 
 fn create_window(app: &mut tauri::App, label: String) -> Result<tauri::Window, tauri::Error> {
   let mut window = tauri::WindowBuilder::new(app, label, tauri::WindowUrl::App(APP_INDEX.into()));
