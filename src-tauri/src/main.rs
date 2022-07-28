@@ -3,44 +3,23 @@
   windows_subsystem = "windows"
 )]
 
-mod bars;
-mod windows;
-mod config;
-mod tray;
-pub mod app_bar;
+mod core;
+mod win32;
 
-// TODO implement state for bars and their widgets
-// Example: https://github.com/tauri-apps/tauri/discussions/1336#discussioncomment-1936664
-
-fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
-  let _config = config::get_config_path();
-  println!("Config found at {}", std::fs::canonicalize(&_config)?.display());
-
-  let bars = match bars::create_bars(app) {
-    Ok(created_bars) => created_bars,
-    Err(e) => {
-      eprintln!("Error - Failed to create bars: {:#?}", e);
-      std::process::exit(1)
-    }
-  };
-
-  for bar_window in bars {
-    bar_window.show()?;
-  }
-
-  Ok(())
-}
+use crate::win32::utils;
+use crate::core::constants::APPLICATION_NAME;
+use crate::core::setup;
 
 fn main() {
-  windows::setup_dpi_awareness_context();
+  utils::setup_dpi_awareness_context();
 
-  let app_tray = tray::build_tray();
+  let app_tray = core::tray::build_tray();
   
-  let app = tauri::Builder::default()
+  let app_builder = tauri::Builder::default()
     .system_tray(app_tray)
-    .on_system_tray_event(tray::tray_event_handler)
-    .setup(init);
+    .on_system_tray_event(core::tray::tray_event_handler)
+    .setup(setup::init);
 
-  app.run(tauri::generate_context!())
-    .expect("error while running yasb");
+  app_builder.run(tauri::generate_context!())
+    .expect(format!("Error while running {}", APPLICATION_NAME).as_str());
 }

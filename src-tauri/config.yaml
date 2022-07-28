@@ -1,1 +1,16 @@
-test: "hehe"
+bars:
+  - label: "yasb_bar"               # required, takes: snake_case string e.g. "my_awesome_bar"
+    thickness: 64                   # default: 64 (pixels)
+    edge: "top"                     # default: top, options: top|left|bottom|right
+    screens: [] # default: None (all screens), takes: list of screen names to show bar on
+    # win_app_bar: true             # default: false, registers bar as a Windows Application Desktop Toolbar (e.g. a custom taskbar)
+    # widgets:                      # default: see commented out widgets below
+    #  - left: ['CustomTextWidget']
+    #  - middle: []
+    #  - right: []
+
+# widgets:
+#  - name: "CustomTextWidget"
+#    type: "TextWidget"
+#    options:
+#      - text: "Text from Custom Widget"
