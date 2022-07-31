@@ -1,5 +1,6 @@
 use anyhow::{Result, Context};
 use tauri::{PhysicalSize, PhysicalPosition};
+use windows::Win32::UI::WindowsAndMessaging::{GWL_STYLE, WS_POPUP, SetWindowLongW};
 use super::config::{BarConfig, BarEdge};
 use super::constants::{DEFAULT_BAR_EDGE, DEFAULT_BAR_THICKNESS};
 use crate::win32::app_bar;
@@ -11,13 +12,13 @@ fn create_window(app: &mut tauri::App, label: String) -> Result<tauri::Window> {
     app,
     label.clone(),
     tauri::WindowUrl::App(APP_INDEX.into())
-  ).visible(false);
+  ).min_inner_size(10.0, 10.0).visible(false).transparent(true);
 
   window_builder.build().context(format!("Failed to build window for bar '{}'", label))
 }
 
-fn create_bar(app: &mut tauri::App, bar_index: usize, monitor: &tauri::Monitor, bar_config: &BarConfig) -> Result<tauri::Window> {
-  let label = format!("{}_{}", bar_config.label, bar_index+1);
+fn create_bar(app: &mut tauri::App, bar_index: usize, monitor: &tauri::Monitor, bar_label: &String, bar_config: &BarConfig) -> Result<tauri::Window> {
+  let label = format!("{}_{}", bar_label, bar_index+1);
   let window = create_window(app, label.clone())?;
   let bar_thickness = bar_config.thickness.unwrap_or(DEFAULT_BAR_THICKNESS);
   let bar_edge = bar_config.edge.clone().unwrap_or(DEFAULT_BAR_EDGE);
@@ -42,15 +43,30 @@ fn create_bar(app: &mut tauri::App, bar_index: usize, monitor: &tauri::Monitor, 
     },
     _ => {}
   }
-
+  
   let monitor_name = monitor.name().context(format!("Monitor for bar '{}' has NO NAME.", label));
   
   window.hide()?;
   window.set_decorations(false)?;
   window.set_size(bar_size)?;
-  window.set_position(bar_position)?;
   window.set_skip_taskbar(true)?;
-  window.show().unwrap();
+  window.set_resizable(false)?;
+
+  // Minimum window height fix
+  let hwnd = window.hwnd().unwrap().clone();
+  unsafe {
+    SetWindowLongW(hwnd, 
+      GWL_STYLE, 
+      WS_POPUP.0 as i32
+    );
+  }
+
+  // TODO set max width (or height) based on edge
+
+  window.set_position(bar_position)?;
+
+  window.show()?;
+  window.set_always_on_top(bar_config.always_on_top.clone().unwrap_or(false))?;
 
   print!(
     "[Setup] Created Bar '{}' on display '{}' at {},{}\n",
@@ -63,7 +79,7 @@ fn create_bar(app: &mut tauri::App, bar_index: usize, monitor: &tauri::Monitor, 
   Ok(window)
 }
 
-pub fn create_bars(app: &mut tauri::App, bar_config: &BarConfig) -> Result<Vec<tauri::Window>> {
+pub fn create_bars(app: &mut tauri::App, bar_label: &String, bar_config: &BarConfig) -> Result<Vec<tauri::Window>> {
   let mut bars: Vec<tauri::Window> = Vec::new();
   let setup_window = create_window(app, "setup_window".to_string()).unwrap();
   let monitors = setup_window.available_monitors().unwrap();
@@ -73,16 +89,16 @@ pub fn create_bars(app: &mut tauri::App, bar_config: &BarConfig) -> Result<Vec<t
   for (idx, monitor) in monitors.iter().enumerate() {
     if let Some(ref screen_names) = bar_config.screens.clone() {
       if screen_names.is_empty() {
-        bars.push(create_bar(app, idx, &monitor, &bar_config)?);
+        bars.push(create_bar(app, idx, &monitor, &bar_label, &bar_config)?);
       } else {
         for screen_name in screen_names {
           if screen_name == monitor.name().unwrap_or(&"".to_string()) {
-            bars.push(create_bar(app, idx, &monitor, &bar_config)?);
+            bars.push(create_bar(app, idx, &monitor, &bar_label, &bar_config)?);
           }
         }
       }
     } else {
-      bars.push(create_bar(app, idx, &monitor, &bar_config)?);
+      bars.push(create_bar(app, idx, &monitor, &bar_label, &bar_config)?);
     }
   }
 
@@ -91,8 +107,7 @@ pub fn create_bars(app: &mut tauri::App, bar_config: &BarConfig) -> Result<Vec<t
   Ok(bars)
 }
 
-pub fn register_win32_app_bar(bar_window: tauri::Window, bar_config: &BarConfig) -> () {
-  let bar_label = bar_window.label().clone().to_owned();
+pub fn register_win32_app_bar(bar_window: tauri::Window, bar_label: &str, bar_config: &BarConfig) -> () {
   app_bar::ab_register_and_position(&bar_window, bar_config.edge.clone()).unwrap();
 
   // Unregister Win32 App Bar if KeyboardInterrupt is detected

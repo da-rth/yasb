@@ -2,7 +2,8 @@
 const props = defineProps({
   text: {
     type: String,
-    required: false
+    required: false,
+    default: 'Text'
   },
   href: {
       type: String,
@@ -12,8 +13,8 @@ const props = defineProps({
 </script>
 
 <template>
-  <span v-if="props.href"><a _target="_blank" :href="props.href">{{props.text}}</a></span>
-  <span v-else>{{props.text}}</span>
+  <span class="text" v-if="props.href"><a _target="_blank" :href="props.href">{{props.text}}</a></span>
+  <span class="text" v-else>{{props.text}}</span>
 </template>
 
 <style scoped>

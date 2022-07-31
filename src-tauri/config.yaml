@@ -1,16 +1,29 @@
 bars:
-  - label: "yasb_bar"               # required, takes: snake_case string e.g. "my_awesome_bar"
-    thickness: 64                   # default: 64 (pixels)
-    edge: "top"                     # default: top, options: top|left|bottom|right
-    screens: [] # default: None (all screens), takes: list of screen names to show bar on
-    # win_app_bar: true             # default: false, registers bar as a Windows Application Desktop Toolbar (e.g. a custom taskbar)
-    # widgets:                      # default: see commented out widgets below
-    #  - left: ['CustomTextWidget']
-    #  - middle: []
-    #  - right: []
+  yasb_bar:                   # label must be in snake_case string e.g. "my_awesome_bar"
+    thickness: 84             # optional, default: 64, the width (or height) of the bar in pixels
+    edge: "left"              # optional, default: top, options: top|left|bottom|right
+    screens: []               # optional, default: [] (all screens), takes: list of screen names to show bar on
+    win_app_bar: false        # optional, default: false, registers bar as a Windows Application Desktop Toolbar (e.g. a custom taskbar)
+    always_on_top: true       # optional, default: false, ensures bar is always at TOPMOST window level
+    widgets:                  # provide a list of widgets for left, middle and right bar columns
+      left: [ left_txt ]
+      middle: [ center_txt ]
+      right: [ right_txt, sep, DateTimeWidget ]
 
-# widgets:
-#  - name: "CustomTextWidget"
-#    type: "TextWidget"
-#    options:
-#      - text: "Text from Custom Widget"
+widgets:
+  left_txt:
+    kind: TextWidget
+    text: "left"
+  
+  right_txt:
+    kind: TextWidget
+    text: "right"
+  
+  center_txt:
+    kind: TextWidget
+    text: "middle"
+
+  sep:
+    kind: TextWidget
+    text: "|"
+    class: separator
