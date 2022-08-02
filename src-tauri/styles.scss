@@ -1,5 +1,4 @@
-/* body {
-  display: flex;
+body {
   overflow: hidden;
   margin: 0;
   font-family: 'Courier New', Courier, monospace;
@@ -40,6 +39,8 @@
   writing-mode: vertical-lr;
 }
 
+
+
 .bar-left {
   text-align: left;
 }
@@ -63,9 +64,5 @@
 }
 
 .separator {
-  background: black;
+  background: red;
 }
-
-.loading {
-  background: red !important;
-} */

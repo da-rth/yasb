@@ -18,12 +18,16 @@ tauri-build = { version = "1.0.4", features = [] }
 anyhow = "1.0"
 home = "0.5.3"
 serde_json = "1.0"
-serde_yaml = "0.8.26"
+serde_yaml = "0.9.2"
 Inflector = "0.11.4"
-either = "1.7.0"
+hotwatch = "0.4.6"
+rsass = "0.25.2"
+notify = "4.0.16"
+strum_macros = "0.24.2"
 serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.0.5", features = ["api-all", "system-tray"] }
 ctrlc = { version = "3.2.2", features = ["termination"] }
+tokio = { version = "1.20.1", features = ["full" ] }
 
 [features]
 # by default Tauri runs in production mode

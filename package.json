@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "cross-env TAURI_DEV_WATCHER_IGNORE_FILE=.tauriignore tauri"
   },
   "dependencies": {
     "@tauri-apps/api": "^1.0.2",
@@ -17,6 +17,7 @@
   "devDependencies": {
     "@tauri-apps/cli": "^1.0.5",
     "@vitejs/plugin-vue": "^3.0.0",
+    "cross-env": "^7.0.3",
     "typescript": "^4.6.4",
     "vite": "^3.0.0",
     "vue-tsc": "^0.38.4"

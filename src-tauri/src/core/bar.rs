@@ -1,17 +1,16 @@
 use anyhow::{Result, Context};
 use tauri::{PhysicalSize, PhysicalPosition};
 use windows::Win32::UI::WindowsAndMessaging::{GWL_STYLE, WS_POPUP, SetWindowLongW};
-use super::config::{BarConfig, BarEdge};
-use super::constants::{DEFAULT_BAR_EDGE, DEFAULT_BAR_THICKNESS};
+use super::configuration::{BarConfig, BarEdge};
+use super::constants::{DEFAULT_BAR_EDGE, DEFAULT_BAR_THICKNESS, FRONTEND_INDEX};
 use crate::win32::app_bar;
 
-const APP_INDEX: &str = "index.html";
 
 fn create_window(app: &mut tauri::App, label: String) -> Result<tauri::Window> {
   let window_builder = tauri::WindowBuilder::new(
     app,
     label.clone(),
-    tauri::WindowUrl::App(APP_INDEX.into())
+    tauri::WindowUrl::App(FRONTEND_INDEX.into())
   ).min_inner_size(10.0, 10.0).visible(false).transparent(true);
 
   window_builder.build().context(format!("Failed to build window for bar '{}'", label))
@@ -64,9 +63,6 @@ fn create_bar(app: &mut tauri::App, bar_index: usize, monitor: &tauri::Monitor, 
   // TODO set max width (or height) based on edge
 
   window.set_position(bar_position)?;
-
-  window.show()?;
-  window.set_always_on_top(bar_config.always_on_top.clone().unwrap_or(false))?;
 
   print!(
     "[Setup] Created Bar '{}' on display '{}' at {},{}\n",

@@ -8,17 +8,15 @@ mod win32;
 mod widgets;
 
 use crate::win32::utils;
-use crate::core::constants::APPLICATION_NAME;
+use crate::core::constants::{APPLICATION_NAME};
 use crate::core::setup;
-use crate::core::config;
+use crate::core::tray;
 
 fn main() {
   utils::setup_dpi_awareness_context();
-  let cfg = core::config::get_config();
-  let app_tray = core::tray::build_tray();
-  
+
+  let app_tray = tray::build_tray();
   let app_builder = tauri::Builder::default()
-    .manage(config::Config(cfg))
     .system_tray(app_tray)
     .on_system_tray_event(core::tray::tray_event_handler)
     .setup(setup::init);

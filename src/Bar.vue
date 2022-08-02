@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import { computed, onMounted, Ref, ref } from "vue";
+import { computed, onMounted, Ref, ref, onBeforeMount, onBeforeUnmount } from "vue";
 import { appWindow } from "@tauri-apps/api/window";
-import { availableWidgets, WidgetKind, Widgets, Widget } from "./widgets";
+import { listen, Event as TauriEvent } from '@tauri-apps/api/event'
+import { availableWidgets, Widgets } from "./widgets";
 import { invoke } from '@tauri-apps/api/tauri';
 import UnknownWidget from "./widgets/UnknownWidget.vue";
 import { IBarConfig } from ".";
+import { ForNode } from "@vue/compiler-core";
+
+let stylesEventUnListener;
+
+let stylesheetElement: HTMLElement | undefined;
 let config: Ref<IBarConfig> = ref({});
 let widgets: Ref<Widgets> = ref({
   left: [],
@@ -17,17 +23,34 @@ const barLabel = appWindow.label.slice(0, appWindow.label.lastIndexOf('_'));
 const edgeClass = computed(() => config.value.edge ? `edge-${config.value.edge}` : '');
 
 onMounted(async () => {
-  let bar_config: IBarConfig = await invoke('retrieve_config', {barLabel});
-  config.value = bar_config;
+  let bar_styles: string = await invoke('retrieve_styles');
+  stylesheetElement = document.createElement('style');
+  stylesheetElement.setAttribute("type", "text/css");
+  stylesheetElement.textContent = bar_styles;
+  document.head.appendChild(stylesheetElement);
+
   let bar_widgets: any = await invoke('retrieve_widgets', {barLabel});
   widgets.value.left = Array.from(bar_widgets.left.map((w: any) => Object.values(w)).flat());
   widgets.value.middle = Array.from(bar_widgets.middle.map((w: any) => Object.values(w)).flat());
   widgets.value.right = Array.from(bar_widgets.right.map((w: any) => Object.values(w)).flat());
-  let bar_styles: string = await invoke('retrieve_styles');
-  document.head.insertAdjacentHTML("beforeend", `<style>${bar_styles}</style>`);
-  console.log("styles", bar_styles);
-  console.log(bar_widgets);
-  console.log(bar_config);
+
+  let bar_config: IBarConfig = await invoke('retrieve_config', {barLabel});
+  config.value = bar_config;
+
+  console.log("registering");
+
+  await listen('StylesChangedEvent', (event) => {
+    console.log(barLabel, 'styles changed!!', event);
+  });
+
+  appWindow.show();
+  appWindow.setAlwaysOnTop(bar_config.always_on_top ?? false);
+});
+
+onBeforeUnmount(async () => {
+  if (stylesheetElement) {
+    document.head.removeChild(stylesheetElement)
+  }
 });
 </script>
 
@@ -46,7 +69,7 @@ onMounted(async () => {
         <UnknownWidget :kind="widget.kind" v-else/>
       </template>
     </div>
-    
+
     <div class="widgets-container bar-middle">
       <template v-for="(widget, _idx) in widgets.middle" :key="`m_${widget.kind}_${_idx}`">
         <component

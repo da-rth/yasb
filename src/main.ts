@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
 import './style.css'
-import YasbBar from './YasbBar.vue'
+import Bar from './Bar.vue'
 
-createApp(YasbBar).mount('#YasbBar')
+createApp(Bar).mount('#YasbBar')

@@ -10,9 +10,10 @@ use windows::Win32::UI::Shell::{
 use windows::Win32::UI::WindowsAndMessaging::{MoveWindow, WM_USER};
 use anyhow::Result;
 use std::mem;
-use crate::core::config::BarEdge;
+use crate::core::configuration::BarEdge;
 use crate::core::constants::DEFAULT_BAR_EDGE;
 use crate::utils;
+// use windows::Win32::UI::WindowsAndMessaging::{SWP_FRAMECHANGED, SWP_NOSIZE, HWND_TOP, GWL_STYLE, WS_POPUP, SetWindowLongW, SetWindowPos};
 
 pub fn abm_new(pabd: *mut APPBARDATA) -> () {
   unsafe {
@@ -99,20 +100,25 @@ pub fn abd_set_pos(pabd: &mut APPBARDATA, window_rect: RECT, edge: u32) -> Resul
 
 pub fn ab_register_and_position(window: &tauri::Window, bar_edge: Option<BarEdge>) -> Result<APPBARDATA> {
   let mut abd = abd_create(window.hwnd()?.clone())?;
-  let mut win_rect = RECT::default();
+  let win_rect = RECT::default();
   let win_pos = window.outer_position()?.clone();
   let win_size = window.outer_size()?.clone();
   let edge = edge_to_abe(bar_edge.unwrap_or(DEFAULT_BAR_EDGE));
   
-  win_rect.top = win_pos.x;
-  win_rect.left = win_pos.y;
-  win_rect.bottom = win_rect.top + win_size.height as i32;
-  win_rect.right = win_rect.left + win_size.width as i32;
+  abd.uEdge = edge;
+  abd.rc.top = win_pos.x.clone();
+  abd.rc.left = win_pos.y.clone();
+  abd.rc.bottom = (win_rect.top + win_size.height as i32).clone();
+  abd.rc.right = (win_rect.left + win_size.width as i32).clone();
 
   abm_new(&mut abd);
   abd_set_pos(&mut abd, win_rect, edge)?;
   abm_set_pos(&mut abd);
   abd_move_win(abd);
+
+  // unsafe {
+  //   SetWindowPos(abd.hWnd, HWND_TOP, win_pos.x, win_pos.y, win_size.width as i32, win_size.height as i32, SWP_FRAMECHANGED | SWP_NOSIZE);
+  // }
 
   println!(
     "[Setup] Created Win32AppBar for '{}' at {},{} {}x{}",
