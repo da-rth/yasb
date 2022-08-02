@@ -63,6 +63,7 @@ typings/
 .idea
 debug.log
 package-lock.json
+.vscode
 .vscode/settings.json
 */.vscode/
 proptest-regressions/
