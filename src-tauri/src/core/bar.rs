@@ -2,15 +2,15 @@ use anyhow::{Result, Context};
 use tauri::{PhysicalSize, PhysicalPosition};
 use windows::Win32::UI::WindowsAndMessaging::{GWL_STYLE, WS_POPUP, SetWindowLongW};
 use super::configuration::{BarConfig, BarEdge};
-use super::constants::{DEFAULT_BAR_EDGE, DEFAULT_BAR_THICKNESS, FRONTEND_INDEX};
+use super::constants::{DEFAULT_BAR_EDGE, DEFAULT_BAR_THICKNESS, FRONTEND_INDEX, FRONTEND_SETUP};
 use crate::win32::app_bar;
 
 
-fn create_window(app: &mut tauri::App, label: String) -> Result<tauri::Window> {
+fn create_window(app: &mut tauri::App, label: String, url: &str) -> Result<tauri::Window> {
   let window_builder = tauri::WindowBuilder::new(
     app,
     label.clone(),
-    tauri::WindowUrl::App(FRONTEND_INDEX.into())
+    tauri::WindowUrl::App(url.into())
   ).min_inner_size(10.0, 10.0).visible(false).transparent(true);
 
   window_builder.build().context(format!("Failed to build window for bar '{}'", label))
@@ -18,7 +18,7 @@ fn create_window(app: &mut tauri::App, label: String) -> Result<tauri::Window> {
 
 fn create_bar(app: &mut tauri::App, bar_index: usize, monitor: &tauri::Monitor, bar_label: &String, bar_config: &BarConfig) -> Result<tauri::Window> {
   let label = format!("{}_{}", bar_label, bar_index+1);
-  let window = create_window(app, label.clone())?;
+  let window = create_window(app, label.clone(), FRONTEND_INDEX)?;
   let bar_thickness = bar_config.thickness.unwrap_or(DEFAULT_BAR_THICKNESS);
   let bar_edge = bar_config.edge.clone().unwrap_or(DEFAULT_BAR_EDGE);
 
@@ -77,7 +77,7 @@ fn create_bar(app: &mut tauri::App, bar_index: usize, monitor: &tauri::Monitor, 
 
 pub fn create_bars(app: &mut tauri::App, bar_label: &String, bar_config: &BarConfig) -> Result<Vec<tauri::Window>> {
   let mut bars: Vec<tauri::Window> = Vec::new();
-  let setup_window = create_window(app, "setup_window".to_string()).unwrap();
+  let setup_window = create_window(app, "setup_window".to_string(), FRONTEND_SETUP).unwrap();
   let monitors = setup_window.available_monitors().unwrap();
 
   // Create bars for screens defined in bar_config.screens

@@ -1,7 +1,8 @@
 use super::configuration::BarEdge;
 use strum_macros;
 
-pub const FRONTEND_INDEX: &str = "src/index.html";
+pub const FRONTEND_SETUP: &str = "setup.html";
+pub const FRONTEND_INDEX: &str = "index.html";
 pub const APPLICATION_NAME: &str = "Yasb";
 pub const CONFIG_DIR_NAME: &str = ".yasb";
 pub const CONFIG_FILENAME: &str = "config.yaml";

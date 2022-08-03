@@ -33,7 +33,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.github.yasb",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -42,7 +42,10 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [],
+      "resources": [
+        "config.yaml",
+        "styles.scss"
+      ],
       "shortDescription": "",
       "targets": "all",
       "windows": {

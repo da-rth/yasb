@@ -13,6 +13,8 @@ use crate::core::setup;
 use crate::core::tray;
 
 fn main() {
+  println!("[Setup] Initialising {}", APPLICATION_NAME);
+
   utils::setup_dpi_awareness_context();
 
   let app_tray = tray::build_tray();

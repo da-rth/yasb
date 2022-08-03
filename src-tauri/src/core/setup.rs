@@ -34,11 +34,12 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
       std::process::exit(1);
     }
   }
-
+  
   // Enable tray hide all option
   app.tray_handle().get_item(TRAY_HIDE_ALL).set_enabled(true)?;
   let app_handle: AppHandle = app.app_handle();
   
+  println!("[Setup] Initalizing async runtime");
   tauri::async_runtime::spawn(async move {
     let _hotwatch = watcher::spawn_watchers(
       &app_handle,

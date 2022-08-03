@@ -9,6 +9,7 @@ bars:
       left: [ left_txt ]
       middle: [ center_txt ]
       right: [ right_txt, sep, DateTimeWidget ]
+
 widgets:
   left_txt:
     kind: TextWidget
@@ -24,5 +25,5 @@ widgets:
 
   sep:
     kind: TextWidget
-    text: "||"
+    text: "|"
     class: separator
