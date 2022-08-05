@@ -8,6 +8,7 @@ use crate::win32::app_bar;
 pub fn create_bars_from_config(app_handle: &AppHandle, config: YasbConfig) -> () {
   // Close any existing windows
   for (_, window) in app_handle.windows() {
+    let _ = app_bar::ab_remove(&window);
     let _ = window.close();
   }
 
