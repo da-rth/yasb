@@ -1,3 +1,4 @@
+use tauri::Window;
 use windows::Win32::Foundation::{HWND, RECT};
 use windows::Win32::UI::Shell::{
   ABE_BOTTOM,
@@ -9,6 +10,7 @@ use windows::Win32::UI::Shell::{
 };
 use windows::Win32::UI::WindowsAndMessaging::{MoveWindow, WM_USER};
 use anyhow::Result;
+use std::collections::HashMap;
 use std::mem;
 use crate::core::configuration::BarEdge;
 use crate::core::constants::DEFAULT_BAR_EDGE;
@@ -120,8 +122,8 @@ pub fn ab_register_and_position(window: &tauri::Window, bar_edge: Option<BarEdge
   //   SetWindowPos(abd.hWnd, HWND_TOP, win_pos.x, win_pos.y, win_size.width as i32, win_size.height as i32, SWP_FRAMECHANGED | SWP_NOSIZE);
   // }
 
-  println!(
-    "[Setup] Created Win32AppBar for '{}' at {},{} {}x{}",
+  log::info!(
+    "Created Win32AppBar for '{}' at {},{} {}x{}",
     &window.label(),
     abd.rc.top,
     abd.rc.left,
@@ -135,6 +137,13 @@ pub fn ab_register_and_position(window: &tauri::Window, bar_edge: Option<BarEdge
 pub fn ab_remove(window: &tauri::Window) -> Result<()> {
   let mut abd = abd_create(window.hwnd()?)?;
   abm_remove(&mut abd);
+  Ok(())
+}
+
+pub fn ab_remove_all(window_list: &HashMap<String, Window>) -> Result<()> {
+  for (_, window) in window_list {
+    ab_remove(&window)?;
+  }
   Ok(())
 }
 

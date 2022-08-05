@@ -7,13 +7,29 @@ mod core;
 mod win32;
 mod widgets;
 
+use std::fs::File;
+
+use simplelog::{
+  CombinedLogger,
+  TermLogger,
+  WriteLogger,
+  Config,
+  LevelFilter, TerminalMode, ColorChoice
+};
+
 use crate::win32::utils;
-use crate::core::constants::{APPLICATION_NAME};
+use crate::core::constants::{APPLICATION_NAME, APPLICATION_LOG_FILENAME};
 use crate::core::setup;
 use crate::core::tray;
 
 fn main() {
-  println!("[Setup] Initialising {}", APPLICATION_NAME);
+  
+  CombinedLogger::init(
+    vec![
+        TermLogger::new(LevelFilter::Info, Config::default(), TerminalMode::Mixed, ColorChoice::Auto),
+        WriteLogger::new(LevelFilter::Info, Config::default(), File::create(APPLICATION_LOG_FILENAME).unwrap())
+    ]
+  ).expect("Failed to initialise logger");
 
   utils::setup_dpi_awareness_context();
 

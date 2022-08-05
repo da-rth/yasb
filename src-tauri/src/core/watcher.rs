@@ -17,35 +17,37 @@ use crate::core::constants::{
 
 use super::constants::CONFIG_FILENAME;
 
+// TODO replace error notifications with popup dialog?
+// TODO add linting or validation to scss stylesheets?
 
 fn send_event_payload<S: Serialize + Clone>(app_handle: &AppHandle, event: Event, payload: S) -> () {
   let event_str = &event.to_string();
 
   match app_handle.emit_all(event_str, payload) {
     Ok(_) => {
-      println!("[Watcher] Emitted event '{}' to bar(s).", event_str);
+      log::info!("Watcher - emitted event '{}' to bar(s).", event_str);
     },
     Err(e) => {
-      eprintln!("Failed to emit event '{}': {}", event_str, e);
+      log::error!("Watcher - failed to emit event '{}': {}", event_str, e);
     }
   }
 }
 
 fn notify_update_failure(path: String, error: Error) -> () {
-  let msg = format!("Failed to update bars due to error.\n\nPlease check {} for details.", APPLICATION_LOG_FILENAME);
+  let msg = format!("Failed to update bars due to error. Please check {} for details.", APPLICATION_LOG_FILENAME);
   
   if let Err(e) = Notification::new(APPLICATION_IDENTIFIER).body(msg).show() {
-    eprintln!("Failed to show update failure notification for {}: {}", path.clone(), e);
+    log::error!("Watcher - failed to show update failure notification for {}: {}", path.clone(), e);
   }
 
-  eprintln!("Failed to load file '{}':\n\n{}", path, error);
+  log::error!("Watcher - failed to load file '{}': {}", path, error);
 }
 
 fn notify_update_success(path: String, filename: &str) -> () {
   let title = format!("Successfully updated bar(s) with {}", filename);
 
   if let Err(e) = Notification::new(APPLICATION_IDENTIFIER).title(title).body(path.clone()).show() {
-      eprintln!("Failed to show update success notification for {}: {}", path, e);
+      log::error!("Watcher - failed to show update success notification for {}: {}", path, e);
   }
 }
 

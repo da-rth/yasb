@@ -8,16 +8,16 @@ use tauri::{
     SystemTrayMenuItem, Manager
 };
 use anyhow::Result;
-use crate::win32::app_bar;
+use crate::win32;
 
 pub const TRAY_QUIT: &str = "quit";
-pub const TRAY_RELOAD: &str = "reload";
+pub const TRAY_RESTART: &str = "restart";
 pub const TRAY_HIDE_ALL: &str = "hide_all";
 pub const TRAY_SHOW_ALL: &str = "show_all";
 
 pub fn build_tray() -> SystemTray {
     let quit = CustomMenuItem::new(TRAY_QUIT, "Quit");
-    let reload = CustomMenuItem::new(TRAY_RELOAD, "Reload");
+    let restart = CustomMenuItem::new(TRAY_RESTART, "Restart");
     let mut hide = CustomMenuItem::new(TRAY_HIDE_ALL, "Hide All");
     let mut show = CustomMenuItem::new(TRAY_SHOW_ALL, "Show All");
 
@@ -27,8 +27,8 @@ pub fn build_tray() -> SystemTray {
     let tray_menu = SystemTrayMenu::new()
         .add_item(hide)
         .add_item(show)
+        .add_item(restart)
         .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(reload)
         .add_item(quit);
     
     SystemTray::new().with_menu(tray_menu)
@@ -37,48 +37,43 @@ pub fn build_tray() -> SystemTray {
 pub fn tray_event_handler(app: &AppHandle, event: SystemTrayEvent) -> () {
     match event {
         SystemTrayEvent::MenuItemClick { id, .. } => {
-            println!("[Tray] Menu Item '{}' clicked.", id.as_str());
+            log::info!("Tray - handling click for menu item '{}'.", id.as_str());
 
             if let Err(error) = handle_menu_item_click(id.clone(), app) {
-                println!("[Tray] Error handling click for Menu Item '{}': {:?}", id.as_str(), error);
+                log::error!("Tray - failed handling click for menu item '{}': {:?}", id.as_str(), error);
             }
         }
         _ => {}
     }
 }
 
-fn handle_menu_item_click(menu_id: String, app: &AppHandle) -> Result<()> {
-    let windows = app.windows();
-    let tray_handle = app.tray_handle();
+fn handle_menu_item_click(menu_id: String, app_handle: &AppHandle) -> Result<()> {
+    let windows = app_handle.windows();
+    let tray_handle = app_handle.tray_handle();
 
     match menu_id.as_str() {
         TRAY_QUIT => {
-            for (_label, window) in windows {
-                app_bar::ab_remove(&window)?;
-            }
-
-            println!("\nExiting yasb. Goodbye :)");
-            app.exit(0);
+            log::info!("Exiting yasb. Goodbye :)");
+            win32::app_bar::ab_remove_all(&windows)?;
+            app_handle.exit(0);
         },
 
-        TRAY_RELOAD => {
-            app.restart();
+        TRAY_RESTART => {
+            log::info!("Restarting yasb...");
+            win32::app_bar::ab_remove_all(&windows)?;
+            app_handle.restart();
         }
 
         TRAY_HIDE_ALL => {
-            for (_label, window) in windows {
-                window.hide()?;
-            }
-
+            log::info!("Hiding all windows...");
+            for (_label, window) in windows { window.hide()?; }
             tray_handle.get_item(TRAY_HIDE_ALL).set_enabled(false)?;
             tray_handle.get_item(TRAY_SHOW_ALL).set_enabled(true)?;
         },
 
         TRAY_SHOW_ALL => {
-            for (_label, window) in windows {
-                window.show()?;
-            }
-
+            log::info!("Showing all windows...");
+            for (_label, window) in windows { window.show()?; }
             tray_handle.get_item(TRAY_SHOW_ALL).set_enabled(false)?;
             tray_handle.get_item(TRAY_HIDE_ALL).set_enabled(true)?;
         }

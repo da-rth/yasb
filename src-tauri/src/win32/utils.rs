@@ -29,7 +29,7 @@ pub fn setup_dpi_awareness_context() -> () {
   unsafe { SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE) }
     .ok()
     .process()
-    .map_err(|err| println!("{:?}", err))
+    .map_err(|err| log::error!("Failed to setup DPI awareness context: {:?}", err))
     .ok();
 }
 

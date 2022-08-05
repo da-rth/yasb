@@ -16,7 +16,7 @@ pub fn create_bars_from_config(app_handle: &AppHandle, config: YasbConfig) -> ()
     validate_bar_label(&label.as_str());
 
     if let Err(e) = create_bars(app_handle, &label, &config) {
-      eprintln!("Failed to create bar(s) for bar config '{}': {:#?}", label, e);
+      log::error!("Failed to create bar(s) for bar config '{}': {:#?}", label, e);
       app_handle.exit(1);
     }
   }
@@ -76,12 +76,10 @@ fn create_bar(app_handle: &AppHandle, bar_index: usize, monitor: &tauri::Monitor
     );
   }
 
-  // TODO set max width (or height) based on edge
-
   window.set_position(bar_position)?;
 
-  print!(
-    "[Setup] Created Bar '{}' on display '{}' at {},{}\n",
+  log::info!(
+    "Created {} on {} at {},{}",
     label,
     monitor_name?,
     bar_position.x,

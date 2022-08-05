@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use tauri::{Manager, State, AppHandle};
 use tokio::time::sleep;
+use std::fs::canonicalize;
 use crate::widgets::BarWidget;
 use crate::widgets::ConfiguredWidget;
 use super::constants::{CONFIG_FILENAME, STYLES_FILENAME};
@@ -15,11 +16,16 @@ use super::configuration;
 pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
   let app_handle = app.app_handle().clone();
 
+  let app_name = app.config().package.product_name.clone().unwrap();
+  let app_version = app.config().package.version.clone().unwrap();
+
+  log::info!("Initialising {} v{}", app_name, app_version);
+
   let config_path = configuration::get_configuration_file(CONFIG_FILENAME);
-  println!("[Setup] Found config: {}", config_path.display());
+  log::info!("Found config at: {}", canonicalize(config_path.clone())?.display().to_string().replace("\\\\?\\", ""));
 
   let styles_path = configuration::get_configuration_file(STYLES_FILENAME);
-  println!("[Setup] Found stylesheet: {}", styles_path.display());
+  log::info!("Found stylesheet at: {}", canonicalize(styles_path.clone())?.display().to_string().replace("\\\\?\\", ""));
 
   let (config, styles) = get_config_and_styles(&app_handle, &config_path, &styles_path);
   
@@ -39,10 +45,9 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
       app_handle.clone(),
       config_path.clone(),
       styles_path.clone()
-    ).expect("[Error] Hotwatch failed to initialize!");
+    ).expect("Hotwatch failed to initialize!");
     
     loop {
-        // println!("Background task keeping stuff alive");
         sleep(std::time::Duration::from_secs(1)).await;
     }
   });
@@ -54,7 +59,7 @@ fn get_config_and_styles(app_handle: &AppHandle, config_path: &PathBuf, styles_p
   let config = match configuration::get_config(&config_path) {
     Ok(cfg) => cfg,
     Err(e) => {
-      eprintln!("Error loading config: {}", e);
+      log::error!("Failed to load config: {}", e);
       app_handle.exit(1);
       std::process::exit(1);
     }
@@ -63,7 +68,7 @@ fn get_config_and_styles(app_handle: &AppHandle, config_path: &PathBuf, styles_p
   let styles = match configuration::get_styles(&styles_path) {
     Ok(styles) => styles,
     Err(e) => {
-      eprintln!("Error loading stylesheet: {}", e);
+      log::error!("Failed to load stylesheet: {}", e);
       app_handle.exit(1);
       std::process::exit(1);
     }

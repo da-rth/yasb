@@ -59,7 +59,7 @@ pub fn get_configuration_file(filename: &str) -> PathBuf {
       return home_file_path;
     }
   } else {
-    println!("[Setup] Could not find user HOME directory. Searching src directory instead.");
+    log::warn!("Could not find user HOME directory. Searching src directory instead.");
   }
 
   let src_file_path = PathBuf::from(filename);
@@ -68,7 +68,7 @@ pub fn get_configuration_file(filename: &str) -> PathBuf {
     let mut absolute_path = std::env::current_dir().unwrap();
     absolute_path.push(src_file_path.clone());
 
-    eprintln!("Failed to load '{}' at: {}.\n\nPlease create and configure a valid '{}' file and try again.", filename, absolute_path.display(), filename);
+    log::error!("Failed to load '{}' at: {}. Please create and configure a valid '{}' file and try again.", filename, absolute_path.display(), filename);
     std::process::exit(1)
   }
 
@@ -78,7 +78,7 @@ pub fn get_configuration_file(filename: &str) -> PathBuf {
 pub fn validate_bar_label(bar_label: &str) -> () {
   if !is_snake_case(bar_label) {
     let snake_cased_label = to_snake_case(bar_label);
-    eprintln!("Failed to initialise bar '{}':\n\nThe bar label '{}' must be written in snake_case e.g. '{}'\n\nPlease fix and try again.",
+    log::error!("Failed to initialise bar with label '{}'. The label '{}' must be in snake_case e.g. '{}'. Please fix and try again.",
       bar_label,
       bar_label,
       snake_cased_label
