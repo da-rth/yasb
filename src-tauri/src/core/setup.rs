@@ -17,7 +17,6 @@ use crate::widgets::BarWidget;
 use crate::widgets::ConfiguredWidget;
 use crate::win32::app_bar;
 use super::constants::{CONFIG_FILENAME, STYLES_FILENAME};
-use super::tray::TRAY_HIDE_ALL;
 use super::watcher;
 use super::bar;
 use super::configuration;
@@ -41,15 +40,11 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
   log::info!("Found stylesheet at: {}", canonicalize(styles_path.clone())?.display().to_string().replace("\\\\?\\", ""));
 
   let (config, styles) = init_config_paths(&app_handle, &config_path, &styles_path);
-  
   app_handle.manage(configuration::Config(Arc::new(Mutex::new(config.clone()))));
   app_handle.manage(configuration::Styles(Arc::new(Mutex::new(styles.clone()))));
   
-  // Create bars from config
+  // Create the bars based on given config. Styles are set later...
   bar::create_bars_from_config(&app_handle, config);
-
-  // Enable tray hide all option
-  app.tray_handle().get_item(TRAY_HIDE_ALL).set_enabled(true)?;
 
   // Spawn background task
   tauri::async_runtime::spawn(async move {
@@ -58,7 +53,7 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
       app_handle.clone(),
       config_path.clone(),
       styles_path.clone()
-    ).expect("Hotwatch failed to initialise!");
+    ).expect("File watcher failed to initialise!");
     
     loop {
         sleep(std::time::Duration::from_secs(1)).await;

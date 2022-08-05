@@ -2,8 +2,8 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::Mutex;
-use inflector::cases::snakecase::is_snake_case;
-use inflector::cases::snakecase::to_snake_case;
+use inflector::cases::classcase::{is_class_case, to_class_case};
+use inflector::cases::snakecase::{is_snake_case, to_snake_case};
 use serde::Deserialize;
 use serde::Serialize;
 use home::home_dir;
@@ -76,12 +76,13 @@ pub fn get_configuration_file(filename: &str) -> PathBuf {
 }
 
 pub fn validate_bar_label(bar_label: &str) -> () {
-  if !is_snake_case(bar_label) {
+  if !is_snake_case(bar_label) && !is_class_case(bar_label) {
     let snake_cased_label = to_snake_case(bar_label);
-    log::error!("Failed to initialise bar with label '{}'. The label '{}' must be in snake_case e.g. '{}'. Please fix and try again.",
+    let class_cased_label = to_class_case(bar_label);
+    log::error!("Failed to init bar(s) with label '{}'.\n\nPlease use snake_case or ClassCase for bar labels e.g. '{}' or '{}'.",
       bar_label,
-      bar_label,
-      snake_cased_label
+      snake_cased_label,
+      class_cased_label
     );
     std::process::exit(1);
   }

@@ -3,6 +3,7 @@ use tauri::{PhysicalSize, PhysicalPosition, Manager, AppHandle};
 use windows::Win32::UI::WindowsAndMessaging::{GWL_STYLE, WS_POPUP, SetWindowLongW};
 use super::configuration::{BarConfig, BarEdge, YasbConfig, validate_bar_label};
 use super::constants::{DEFAULT_BAR_EDGE, DEFAULT_BAR_THICKNESS, FRONTEND_INDEX, FRONTEND_SETUP};
+use super::tray::TRAY_HIDE_ALL;
 use crate::win32::app_bar;
 
 pub fn create_bars_from_config(app_handle: &AppHandle, config: YasbConfig) -> () {
@@ -21,6 +22,12 @@ pub fn create_bars_from_config(app_handle: &AppHandle, config: YasbConfig) -> ()
       app_handle.exit(1);
     }
   }
+
+  // Once bars are created, allow them to be hidden
+  app_handle.tray_handle()
+    .get_item(TRAY_HIDE_ALL)
+    .set_enabled(true)
+    .expect("Failed to enable tray 'hide all' menu item");
 }
 
 fn create_window(app_handle: &AppHandle, label: String, url: &str) -> Result<tauri::Window> {

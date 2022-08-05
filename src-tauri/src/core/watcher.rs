@@ -109,6 +109,7 @@ pub fn spawn_watchers(app_handle: AppHandle, config_path: PathBuf, styles_path: 
       handle_styles_changed(event, app_handle.clone())
     })?;
   };
-    
+  
+  log::info!("Watching files for changes.");
   Ok(hotwatch)
 }
