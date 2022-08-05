@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use tauri::{Manager, State, AppHandle};
 use tokio::time::sleep;
@@ -6,54 +7,69 @@ use crate::widgets::BarWidget;
 use crate::widgets::ConfiguredWidget;
 use super::constants::{CONFIG_FILENAME, STYLES_FILENAME};
 use super::tray::TRAY_HIDE_ALL;
+use super::watcher;
 use super::bar;
 use super::configuration;
-use super::watcher;
 
 
 pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
-  let config_path = configuration::get_config_file_path(CONFIG_FILENAME);
-  let styles_path = configuration::get_config_file_path(STYLES_FILENAME);
+  let app_handle = app.app_handle().clone();
 
+  let config_path = configuration::get_configuration_file(CONFIG_FILENAME);
   println!("[Setup] Found config: {}", config_path.display());
-  println!("[Setup] Found styles: {}", styles_path.display());
 
-  let config =  Arc::new(Mutex::new(configuration::get_config(config_path.clone())));
-  let styles =  Arc::new(Mutex::new(configuration::get_styles(styles_path.clone())));
+  let styles_path = configuration::get_configuration_file(STYLES_FILENAME);
+  println!("[Setup] Found stylesheet: {}", styles_path.display());
 
-  app.manage(configuration::Config(config.clone()));
-  app.manage(configuration::Styles(styles.clone()));
-
-  let bars = config.lock().unwrap().bars.clone();
+  let (config, styles) = get_config_and_styles(&app_handle, &config_path, &styles_path);
   
-  for (bar_label, bar_config) in bars.clone() {
-    configuration::validate_bar_label(&bar_label.as_str());
-
-    if let Err(e) = bar::create_bars(app, &bar_label, &bar_config) {
-      eprintln!("Failed to create bar(s) for bar config '{}': {:#?}", bar_label, e);
-      std::process::exit(1);
-    }
-  }
+  app_handle.manage(configuration::Config(Arc::new(Mutex::new(config.clone()))));
+  app_handle.manage(configuration::Styles(Arc::new(Mutex::new(styles.clone()))));
   
+  // Create bars from config
+  bar::create_bars_from_config(&app_handle, config);
+
   // Enable tray hide all option
   app.tray_handle().get_item(TRAY_HIDE_ALL).set_enabled(true)?;
-  let app_handle: AppHandle = app.app_handle();
-  
-  println!("[Setup] Initalizing async runtime");
-  tauri::async_runtime::spawn(async move {
-    let _hotwatch = watcher::spawn_watchers(
-      &app_handle,
-      &config_path,
-      &styles_path
-    ).expect("[Error] Hotwatch failed to initialize!");
 
+  // Spawn background task
+  tauri::async_runtime::spawn(async move {
+    // Spawn file watchers for config and styles
+    let _hotwatch = watcher::spawn_watchers(
+      app_handle.clone(),
+      config_path.clone(),
+      styles_path.clone()
+    ).expect("[Error] Hotwatch failed to initialize!");
+    
     loop {
-      // println!("Background task keeping stuff alive");
-      sleep(std::time::Duration::from_secs(1)).await;
+        // println!("Background task keeping stuff alive");
+        sleep(std::time::Duration::from_secs(1)).await;
     }
   });
 
   Ok(())
+}
+
+fn get_config_and_styles(app_handle: &AppHandle, config_path: &PathBuf, styles_path: &PathBuf) -> (configuration::YasbConfig, String) {
+  let config = match configuration::get_config(&config_path) {
+    Ok(cfg) => cfg,
+    Err(e) => {
+      eprintln!("Error loading config: {}", e);
+      app_handle.exit(1);
+      std::process::exit(1);
+    }
+  };
+
+  let styles = match configuration::get_styles(&styles_path) {
+    Ok(styles) => styles,
+    Err(e) => {
+      eprintln!("Error loading stylesheet: {}", e);
+      app_handle.exit(1);
+      std::process::exit(1);
+    }
+  };
+
+  (config, styles)
 }
 
 fn get_config_from_state(config: &State<configuration::Config>, bar_label: &str) -> configuration::BarConfig {
@@ -112,10 +128,6 @@ pub fn retrieve_widgets(bar_label: String, config_state: State<configuration::Co
       }
     }
   }
-
-  // if bar_config.win_app_bar.unwrap_or(false) {
-  //   super::bar::register_win32_app_bar(bar_window, &bar_label, &bar_config);
-  // }
 
   widgets_to_render
 }

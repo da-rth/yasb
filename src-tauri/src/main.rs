@@ -23,12 +23,21 @@ fn main() {
     .on_system_tray_event(core::tray::tray_event_handler)
     .setup(setup::init);
   
-  app_builder
+  let app = app_builder
     .invoke_handler(tauri::generate_handler![
       setup::retrieve_widgets,
       setup::retrieve_config,
       setup::retrieve_styles
     ])
-    .run(tauri::generate_context!())
+    .build(tauri::generate_context!())
     .expect(format!("Error while running {}", APPLICATION_NAME).as_str());
+
+  // Prevent exit when all windows are closed. Exit via SysTray or termianted process
+  app.run(|_app_handle, event| match event {
+    tauri::RunEvent::ExitRequested { api, .. } => {
+      api.prevent_exit();
+    }
+    _ => {}
+  });
+    
 }

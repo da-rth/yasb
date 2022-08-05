@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import { computed, onMounted, Ref, ref, onBeforeMount, onBeforeUnmount } from "vue";
+import { computed, onMounted, Ref, ref, onBeforeUnmount } from "vue";
 import { appWindow } from "@tauri-apps/api/window";
-import { listen, Event as TauriEvent } from '@tauri-apps/api/event'
+import { listen, Event as TauriEvent, UnlistenFn } from '@tauri-apps/api/event'
 import { availableWidgets, Widgets } from "./widgets";
 import { invoke } from '@tauri-apps/api/tauri';
 import UnknownWidget from "./widgets/UnknownWidget.vue";
 import { IBarConfig } from ".";
-import { ForNode } from "@vue/compiler-core";
 
-let stylesEventUnListener;
-
+let stylesEventUnlistener: UnlistenFn | undefined;
 let stylesheetElement: HTMLElement | undefined;
 let config: Ref<IBarConfig> = ref({});
 let widgets: Ref<Widgets> = ref({
@@ -21,6 +19,14 @@ let widgets: Ref<Widgets> = ref({
 // const barIndex = parseInt(appWindow.label.slice(appWindow.label.lastIndexOf('_') + 1)) -1;
 const barLabel = appWindow.label.slice(0, appWindow.label.lastIndexOf('_'));
 const edgeClass = computed(() => config.value.edge ? `edge-${config.value.edge}` : '');
+
+const onStylesChanged = (event: TauriEvent<string>) => {
+  console.log(barLabel, 'styles changed!', event);
+
+  if (stylesheetElement && event.payload) {
+    stylesheetElement.textContent = event.payload as string;
+  }
+}
 
 onMounted(async () => {
   let bar_styles: string = await invoke('retrieve_styles');
@@ -37,20 +43,15 @@ onMounted(async () => {
   let bar_config: IBarConfig = await invoke('retrieve_config', {barLabel});
   config.value = bar_config;
 
-  console.log("registering");
-
-  await listen('StylesChangedEvent', (event) => {
-    console.log(barLabel, 'styles changed!!', event);
-  });
+  stylesEventUnlistener = await listen("StylesChangedEvent", onStylesChanged);
 
   appWindow.show();
   appWindow.setAlwaysOnTop(bar_config.always_on_top ?? false);
 });
 
 onBeforeUnmount(async () => {
-  if (stylesheetElement) {
-    document.head.removeChild(stylesheetElement)
-  }
+  stylesheetElement && document.head.removeChild(stylesheetElement);
+  stylesEventUnlistener && stylesEventUnlistener();
 });
 </script>
 

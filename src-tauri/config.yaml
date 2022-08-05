@@ -1,7 +1,7 @@
 bars:
   yasb_bar:                   # label must be in snake_case string e.g. "my_awesome_bar"
     thickness: 84             # optional, default: 64, the width (or height) of the bar in pixels
-    edge: "left"              # optional, default: top, options: top|left|bottom|right
+    edge: "top"               # optional, default: top, options: top|left|bottom|right
     screens: []               # optional, default: [] (all screens), takes: list of screen names to show bar on
     win_app_bar: false        # optional, default: false, registers bar as a Windows Application Desktop Toolbar (e.g. a custom taskbar)
     always_on_top: true       # optional, default: false, ensures bar is always at TOPMOST window level

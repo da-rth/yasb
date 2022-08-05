@@ -11,11 +11,13 @@ use anyhow::Result;
 use crate::win32::app_bar;
 
 pub const TRAY_QUIT: &str = "quit";
+pub const TRAY_RELOAD: &str = "reload";
 pub const TRAY_HIDE_ALL: &str = "hide_all";
 pub const TRAY_SHOW_ALL: &str = "show_all";
 
 pub fn build_tray() -> SystemTray {
     let quit = CustomMenuItem::new(TRAY_QUIT, "Quit");
+    let reload = CustomMenuItem::new(TRAY_RELOAD, "Reload");
     let mut hide = CustomMenuItem::new(TRAY_HIDE_ALL, "Hide All");
     let mut show = CustomMenuItem::new(TRAY_SHOW_ALL, "Show All");
 
@@ -26,6 +28,7 @@ pub fn build_tray() -> SystemTray {
         .add_item(hide)
         .add_item(show)
         .add_native_item(SystemTrayMenuItem::Separator)
+        .add_item(reload)
         .add_item(quit);
     
     SystemTray::new().with_menu(tray_menu)
@@ -55,7 +58,11 @@ fn handle_menu_item_click(menu_id: String, app: &AppHandle) -> Result<()> {
             }
 
             println!("\nExiting yasb. Goodbye :)");
-            std::process::exit(0);
+            app.exit(0);
+        },
+
+        TRAY_RELOAD => {
+            app.restart();
         }
 
         TRAY_HIDE_ALL => {
