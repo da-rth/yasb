@@ -16,9 +16,6 @@ use crate::core::constants::{
 
 use super::constants::CONFIG_FILENAME;
 
-// TODO replace error notifications with popup dialog?
-// TODO add linting or validation to scss stylesheets?
-
 fn send_event_payload<S: Serialize + Clone>(app_handle: &AppHandle, event: Event, payload: S) -> () {
   let event_str = &event.to_string();
 

@@ -1,5 +1,5 @@
 bars:
-  yasb_bar:                   # Required, label MUST be in snake_case or ClassCase e.g. "foo_bar" or "FooBar"
+  yasb bar:                   # Required, label MUST be in snake_case or ClassCase e.g. "foo_bar" or "FooBar"
     thickness: 84             # Optional, default: 64, the width (or height) of the bar in pixels
     edge: "top"               # Optional, default: top, options: top|left|bottom|right
     screens: []               # Optional, default: [] (all screens), takes: list of screen names to show bar on

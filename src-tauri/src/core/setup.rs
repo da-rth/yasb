@@ -21,7 +21,6 @@ use super::watcher;
 use super::bar;
 use super::configuration;
 
-
 pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
   let app_handle = app.app_handle().clone();
   let app_name = app.config().package.product_name.clone().unwrap();

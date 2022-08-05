@@ -9,6 +9,8 @@ use serde::Serialize;
 use home::home_dir;
 use rsass::{compile_scss_path, output};
 use anyhow::{Result, Error};
+use tauri::api::dialog;
+use crate::core::constants::CONFIG_FILENAME;
 use crate::widgets::ConfiguredWidget;
 use super::constants::CONFIG_DIR_NAME;
 
@@ -79,11 +81,22 @@ pub fn validate_bar_label(bar_label: &str) -> () {
   if !is_snake_case(bar_label) && !is_class_case(bar_label) {
     let snake_cased_label = to_snake_case(bar_label);
     let class_cased_label = to_class_case(bar_label);
-    log::error!("Failed to init bar(s) with label '{}'.\n\nPlease use snake_case or ClassCase for bar labels e.g. '{}' or '{}'.",
+
+    let title = format!("{} - Whoops! Something's wrong", CONFIG_FILENAME);
+    let message = format!(
+      "Failed to initialise bar(s) with the label \"{}\". \
+      \n\nPlease use snake_case or ClassCase for bar labels. \
+      \n\nFor example, change the label to \"{}\" or \"{}\".",
       bar_label,
       snake_cased_label,
       class_cased_label
     );
+
+    log::error!("{}", message);
+    dialog::blocking::MessageDialogBuilder::new(title, message)
+      .kind(dialog::MessageDialogKind::Error)
+      .buttons(dialog::MessageDialogButtons::Ok)
+      .show();
     std::process::exit(1);
   }
 }
