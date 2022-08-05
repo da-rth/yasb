@@ -1,11 +1,21 @@
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{PathBuf};
 use std::sync::{Arc, Mutex};
 use tauri::{Manager, State, AppHandle};
 use tokio::time::sleep;
 use std::fs::canonicalize;
+use std::fs::File;
+use simplelog::{
+  CombinedLogger,
+  TermLogger,
+  WriteLogger,
+  Config,
+  LevelFilter, TerminalMode, ColorChoice
+};
+use crate::core::constants::APP_LOG_FILENAME;
 use crate::widgets::BarWidget;
 use crate::widgets::ConfiguredWidget;
+use crate::win32::app_bar;
 use super::constants::{CONFIG_FILENAME, STYLES_FILENAME};
 use super::tray::TRAY_HIDE_ALL;
 use super::watcher;
@@ -15,11 +25,14 @@ use super::configuration;
 
 pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
   let app_handle = app.app_handle().clone();
-
   let app_name = app.config().package.product_name.clone().unwrap();
   let app_version = app.config().package.version.clone().unwrap();
+  let log_path = init_logger();
 
   log::info!("Initialising {} v{}", app_name, app_version);
+  log::info!("Logging to: {}", canonicalize(log_path)?.display().to_string().replace("\\\\?\\", ""));
+
+  init_ctrlc_handler(app_handle.clone());
 
   let config_path = configuration::get_configuration_file(CONFIG_FILENAME);
   log::info!("Found config at: {}", canonicalize(config_path.clone())?.display().to_string().replace("\\\\?\\", ""));
@@ -27,7 +40,7 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
   let styles_path = configuration::get_configuration_file(STYLES_FILENAME);
   log::info!("Found stylesheet at: {}", canonicalize(styles_path.clone())?.display().to_string().replace("\\\\?\\", ""));
 
-  let (config, styles) = get_config_and_styles(&app_handle, &config_path, &styles_path);
+  let (config, styles) = init_config_paths(&app_handle, &config_path, &styles_path);
   
   app_handle.manage(configuration::Config(Arc::new(Mutex::new(config.clone()))));
   app_handle.manage(configuration::Styles(Arc::new(Mutex::new(styles.clone()))));
@@ -45,7 +58,7 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
       app_handle.clone(),
       config_path.clone(),
       styles_path.clone()
-    ).expect("Hotwatch failed to initialize!");
+    ).expect("Hotwatch failed to initialise!");
     
     loop {
         sleep(std::time::Duration::from_secs(1)).await;
@@ -55,7 +68,38 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
   Ok(())
 }
 
-fn get_config_and_styles(app_handle: &AppHandle, config_path: &PathBuf, styles_path: &PathBuf) -> (configuration::YasbConfig, String) {
+fn init_logger() -> PathBuf {
+  let log_path = PathBuf::from(APP_LOG_FILENAME);
+
+  CombinedLogger::init(
+    vec![
+      TermLogger::new(
+        LevelFilter::Info,
+        Config::default(),
+        TerminalMode::Mixed,
+        ColorChoice::Auto
+      ),
+      WriteLogger::new(
+        LevelFilter::Info,
+        Config::default(),
+        File::create(log_path.clone()).unwrap()
+      )
+    ]
+  ).expect("Failed to initialise logger");
+
+  log_path
+}
+
+fn init_ctrlc_handler(app_handle: AppHandle) -> () {
+  ctrlc::set_handler(move || {
+    log::info!("Ctrl+C detected. Cleaning up.");
+    let _ = app_bar::ab_remove_all(&app_handle.windows());
+    log::info!("Exiting {}. Goodbye :)", app_handle.config().package.product_name.clone().unwrap());
+    app_handle.exit(0);
+  }).expect("Error setting Ctrl-C handler")
+}
+
+fn init_config_paths(app_handle: &AppHandle, config_path: &PathBuf, styles_path: &PathBuf) -> (configuration::YasbConfig, String) {
   let config = match configuration::get_config(&config_path) {
     Ok(cfg) => cfg,
     Err(e) => {
@@ -92,7 +136,7 @@ pub fn retrieve_config(bar_label: String, bar_window: tauri::Window, config_stat
   let bar_config = get_config_from_state(&config_state, &bar_label.as_str());
   
   if bar_config.win_app_bar.unwrap_or(false) {
-    super::bar::register_win32_app_bar(bar_window, &bar_label, &bar_config);
+    super::bar::register_win32_app_bar(bar_window, &bar_config);
   }
   
   bar_config

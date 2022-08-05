@@ -50,16 +50,17 @@ pub fn tray_event_handler(app: &AppHandle, event: SystemTrayEvent) -> () {
 fn handle_menu_item_click(menu_id: String, app_handle: &AppHandle) -> Result<()> {
     let windows = app_handle.windows();
     let tray_handle = app_handle.tray_handle();
+    let app_name = app_handle.config().package.product_name.clone().unwrap();
 
     match menu_id.as_str() {
         TRAY_QUIT => {
-            log::info!("Exiting yasb. Goodbye :)");
+            log::info!("Exiting {}. Goodbye :)", app_name);
             win32::app_bar::ab_remove_all(&windows)?;
             app_handle.exit(0);
         },
 
         TRAY_RESTART => {
-            log::info!("Restarting yasb...");
+            log::info!("Restarting {}...", app_name);
             win32::app_bar::ab_remove_all(&windows)?;
             app_handle.restart();
         }

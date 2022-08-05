@@ -10,8 +10,7 @@ use crate::core::bar;
 use crate::core::configuration;
 use crate::core::constants::{
   Event,
-  APPLICATION_IDENTIFIER,
-  APPLICATION_LOG_FILENAME,
+  APP_LOG_FILENAME,
   STYLES_FILENAME
 };
 
@@ -33,20 +32,20 @@ fn send_event_payload<S: Serialize + Clone>(app_handle: &AppHandle, event: Event
   }
 }
 
-fn notify_update_failure(path: String, error: Error) -> () {
-  let msg = format!("Failed to update bars due to error. Please check {} for details.", APPLICATION_LOG_FILENAME);
+fn notify_update_failure(identifier: String, path: String, error: Error) -> () {
+  let msg = format!("Failed to update bars due to error. Please check {} for details.", APP_LOG_FILENAME);
   
-  if let Err(e) = Notification::new(APPLICATION_IDENTIFIER).body(msg).show() {
+  if let Err(e) = Notification::new(identifier).body(msg).show() {
     log::error!("Watcher - failed to show update failure notification for {}: {}", path.clone(), e);
   }
 
   log::error!("Watcher - failed to load file '{}': {}", path, error);
 }
 
-fn notify_update_success(path: String, filename: &str) -> () {
+fn notify_update_success(identifier: String, path: String, filename: &str) -> () {
   let title = format!("Successfully updated bar(s) with {}", filename);
 
-  if let Err(e) = Notification::new(APPLICATION_IDENTIFIER).title(title).body(path.clone()).show() {
+  if let Err(e) = Notification::new(identifier).title(title).body(path.clone()).show() {
       log::error!("Watcher - failed to show update success notification for {}: {}", path, e);
   }
 }
@@ -55,6 +54,7 @@ fn handle_config_changed(event: DebouncedEvent, app_handle: AppHandle) -> () {
   match event {
     DebouncedEvent::Write(path)  | DebouncedEvent::Remove(path) => {
       let path_str = path.clone().display().to_string().replace("\\\\?\\", "");
+      let identifier = app_handle.config().tauri.bundle.identifier.clone();
 
       match configuration::get_config(&path) {
         Ok(cfg) => {
@@ -63,9 +63,9 @@ fn handle_config_changed(event: DebouncedEvent, app_handle: AppHandle) -> () {
 
           bar::create_bars_from_config(&app_handle, cfg);
 
-          notify_update_success(path_str, CONFIG_FILENAME);
+          notify_update_success(identifier, path_str, CONFIG_FILENAME);
         },
-        Err(e) => notify_update_failure(path_str, e)
+        Err(e) => notify_update_failure(identifier, path_str, e)
       }
     },
     _ => {}
@@ -76,6 +76,7 @@ fn handle_styles_changed(event: DebouncedEvent, app_handle: AppHandle) -> () {
   match event {
     DebouncedEvent::Write(path)  | DebouncedEvent::Remove(path) => {
       let path_str = path.clone().display().to_string().replace("\\\\?\\", "");
+      let identifier = app_handle.config().tauri.bundle.identifier.clone();
 
       match configuration::get_styles(&path) {
         Ok(css) => {
@@ -83,9 +84,9 @@ fn handle_styles_changed(event: DebouncedEvent, app_handle: AppHandle) -> () {
           *styles_state.0.lock().unwrap() = css.clone();
 
           send_event_payload(&app_handle, Event::StylesChangedEvent, css);
-          notify_update_success(path_str, STYLES_FILENAME);
+          notify_update_success(identifier, path_str, STYLES_FILENAME);
         },
-        Err(e) => notify_update_failure(path_str, e)
+        Err(e) => notify_update_failure(identifier, path_str, e)
       }
     },
     _ => {}

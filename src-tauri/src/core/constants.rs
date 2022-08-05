@@ -4,10 +4,7 @@ use strum_macros;
 pub const FRONTEND_SETUP: &str = "setup.html";
 pub const FRONTEND_INDEX: &str = "index.html";
 
-pub const APPLICATION_LOG_FILENAME: &str = "yasb.log";
-pub const APPLICATION_NAME: &str = "Yasb";
-pub const APPLICATION_IDENTIFIER: &str = "com.github.denbot.yasb";
-
+pub const APP_LOG_FILENAME: &str = "yasb.log";
 pub const CONFIG_DIR_NAME: &str = ".yasb";
 pub const CONFIG_FILENAME: &str = "config.yaml";
 pub const STYLES_FILENAME: &str = "styles.scss";

@@ -25,11 +25,13 @@ impl<T> ProcessWindowsCrateResult<T> for WindowsCrateResult<T> {
   }
 }
 
-pub fn setup_dpi_awareness_context() -> () {
+pub fn init_dpi_awareness_context() -> () {
   unsafe { SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE) }
     .ok()
     .process()
-    .map_err(|err| log::error!("Failed to setup DPI awareness context: {:?}", err))
+    .map_err(|err| {
+      eprintln!("Error setting DPI awareness context: {:?}", err)
+    })
     .ok();
 }
 

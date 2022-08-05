@@ -117,12 +117,6 @@ fn create_bars(app_handle: &AppHandle, bar_label: &String, bar_config: &BarConfi
   Ok(bars)
 }
 
-pub fn register_win32_app_bar(bar_window: tauri::Window, bar_label: &str, bar_config: &BarConfig) -> () {
+pub fn register_win32_app_bar(bar_window: tauri::Window, bar_config: &BarConfig) -> () {
   app_bar::ab_register_and_position(&bar_window, bar_config.edge.clone()).unwrap();
-
-  // Unregister Win32 App Bar if KeyboardInterrupt is detected
-  ctrlc::set_handler(move || {
-    app_bar::ab_remove(&bar_window).unwrap();
-    let _ = bar_window.close().unwrap();
-  }).expect(format!("Failed to set ctrlc handler for bar '{}'", bar_label).as_str());
 }
