@@ -2,15 +2,14 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::Mutex;
-use inflector::cases::classcase::{is_class_case, to_class_case};
+use inflector::cases::classcase::{is_class_case};
+use inflector::cases::kebabcase::is_kebab_case;
 use inflector::cases::snakecase::{is_snake_case, to_snake_case};
 use serde::Deserialize;
 use serde::Serialize;
 use home::home_dir;
 use rsass::{compile_scss_path, output};
 use anyhow::{Result, Error};
-use tauri::api::dialog;
-use crate::core::constants::CONFIG_FILENAME;
 use crate::widgets::ConfiguredWidget;
 use super::constants::CONFIG_DIR_NAME;
 
@@ -77,27 +76,13 @@ pub fn get_configuration_file(filename: &str) -> PathBuf {
   return src_file_path;
 }
 
-pub fn validate_bar_label(bar_label: &str) -> () {
-  if !is_snake_case(bar_label) && !is_class_case(bar_label) {
+pub fn validate_bar_label(bar_label: &str) -> String {
+  if !is_snake_case(bar_label) && !is_class_case(bar_label) &&!is_kebab_case(bar_label) {
     let snake_cased_label = to_snake_case(bar_label);
-    let class_cased_label = to_class_case(bar_label);
-
-    let title = format!("{} - Whoops! Something's wrong", CONFIG_FILENAME);
-    let message = format!(
-      "Failed to initialise bar(s) with the label \"{}\". \
-      \n\nPlease use snake_case or ClassCase for bar labels. \
-      \n\nFor example, change the label to \"{}\" or \"{}\".",
-      bar_label,
-      snake_cased_label,
-      class_cased_label
-    );
-
-    log::error!("{}", message);
-    dialog::blocking::MessageDialogBuilder::new(title, message)
-      .kind(dialog::MessageDialogKind::Error)
-      .buttons(dialog::MessageDialogButtons::Ok)
-      .show();
-    std::process::exit(1);
+    log::warn!("Invalid bar label '{}' provided. Converted to camel_case: '{}'", bar_label, snake_cased_label);
+    snake_cased_label
+  } else {
+    bar_label.to_string()
   }
 }
 

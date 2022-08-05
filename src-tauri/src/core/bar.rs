@@ -14,8 +14,8 @@ pub fn create_bars_from_config(app_handle: &AppHandle, config: YasbConfig) -> ()
   }
 
   // Create bar windows from config
-  for (label, config) in config.clone().bars {
-    validate_bar_label(&label.as_str());
+  for (mut label, config) in config.clone().bars {
+    label = validate_bar_label(&label.as_str());
 
     if let Err(e) = create_bars(app_handle, &label, &config) {
       log::error!("Failed to create bar(s) for bar config '{}': {:#?}", label, e);
