@@ -4,3 +4,4 @@ pub mod constants;
 pub mod setup;
 pub mod tray;
 pub mod watcher;
+pub mod cli;

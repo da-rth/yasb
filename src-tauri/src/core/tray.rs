@@ -37,10 +37,10 @@ pub fn build_tray() -> SystemTray {
 pub fn tray_event_handler(app: &AppHandle, event: SystemTrayEvent) -> () {
     match event {
         SystemTrayEvent::MenuItemClick { id, .. } => {
-            log::info!("Tray - handling click for menu item '{}'.", id.as_str());
+            log::info!("Tray: handling click for menu item '{}'.", id.as_str());
 
             if let Err(error) = handle_menu_item_click(id.clone(), app) {
-                log::error!("Tray - failed handling click for menu item '{}': {:?}", id.as_str(), error);
+                log::error!("Tray: failed handling click for menu item '{}': {:?}", id.as_str(), error);
             }
         }
         _ => {}

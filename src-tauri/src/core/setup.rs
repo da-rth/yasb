@@ -20,23 +20,48 @@ use super::constants::{CONFIG_FILENAME, STYLES_FILENAME};
 use super::watcher;
 use super::bar;
 use super::configuration;
+use super::cli;
 
 pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
   let app_handle = app.app_handle().clone();
   let app_name = app.config().package.product_name.clone().unwrap();
   let app_version = app.config().package.version.clone().unwrap();
-  let log_path = init_logger();
+  let config_path;
+  let styles_path;
+
+  let (
+    arg_verbose,
+    arg_config_path,
+    arg_styles_path
+  ) = cli::parse_cmd_args(app);
+
+  let log_path = init_logger(arg_verbose);
 
   log::info!("Initialising {} v{}", app_name, app_version);
   log::info!("Logging to: {}", canonicalize(log_path)?.display().to_string().replace("\\\\?\\", ""));
 
-  init_ctrlc_handler(app_handle.clone());
+  config_path = if arg_config_path.is_some() && arg_config_path.clone().unwrap().exists() {
+    arg_config_path.unwrap()
+  } else {
+    if arg_config_path.is_some() {
+      log::warn!("Configuration at path '{}' does not exist. Ignoring.", arg_config_path.unwrap().display());
+    }
+    configuration::get_configuration_file(CONFIG_FILENAME)
+  };
 
-  let config_path = configuration::get_configuration_file(CONFIG_FILENAME);
+  styles_path = if arg_styles_path.is_some() && arg_styles_path.clone().unwrap().exists() {
+    arg_styles_path.unwrap()
+  } else {
+    if arg_styles_path.is_some() {
+      log::warn!("Stylesheet at path '{}' does not exist. Ignoring.", arg_styles_path.unwrap().display());
+    }
+    configuration::get_configuration_file(STYLES_FILENAME)
+  };
+
   log::info!("Found config at: {}", canonicalize(config_path.clone())?.display().to_string().replace("\\\\?\\", ""));
-
-  let styles_path = configuration::get_configuration_file(STYLES_FILENAME);
   log::info!("Found stylesheet at: {}", canonicalize(styles_path.clone())?.display().to_string().replace("\\\\?\\", ""));
+  
+  init_ctrlc_handler(app_handle.clone());
 
   let (config, styles) = init_config_paths(&app_handle, &config_path, &styles_path);
   app_handle.manage(configuration::Config(Arc::new(Mutex::new(config.clone()))));
@@ -62,8 +87,13 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
   Ok(())
 }
 
-fn init_logger() -> PathBuf {
-  let log_path = PathBuf::from(APP_LOG_FILENAME);
+
+fn init_logger(verbose: bool) -> PathBuf {
+  let exe_path = std::env::current_exe().expect("Failed to get current exe path");
+
+  let mut log_path = exe_path.clone();
+  log_path.pop();
+  log_path.push(APP_LOG_FILENAME);
 
   CombinedLogger::init(
     vec![
@@ -71,7 +101,7 @@ fn init_logger() -> PathBuf {
         LevelFilter::Info,
         Config::default(),
         TerminalMode::Mixed,
-        ColorChoice::Auto
+        if verbose { ColorChoice::Never } else { ColorChoice::Auto }
       ),
       WriteLogger::new(
         LevelFilter::Info,

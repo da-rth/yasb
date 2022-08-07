@@ -59,6 +59,30 @@
     },
     "updater": {
       "active": false
+    },
+    "cli": {
+      "description": "A highly configurable status bar for Windows.",
+      "beforeHelp": "Yet Another Status Bar",
+      "args": [
+        {
+          "name": "config",
+          "short": "c",
+          "takesValue": true,
+          "description": "The path to a configuration file"
+        },
+        {
+          "name": "styles",
+          "short": "s",
+          "takesValue": true,
+          "description": "The path to a SCSS stylehseet"
+        },
+        {
+          "name": "verbose",
+          "short": "v",
+          "takesValue": false,
+          "description": "Show verbose logging information"
+        }
+      ]
     }
   }
 }

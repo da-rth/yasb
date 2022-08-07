@@ -13,8 +13,23 @@ use anyhow::{Result, Error};
 use crate::widgets::ConfiguredWidget;
 use super::constants::CONFIG_DIR_NAME;
 
-pub struct Config(pub Arc<Mutex<YasbConfig>>);
-pub struct Styles(pub Arc<Mutex<String>>);
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, strum_macros::Display)]
+#[serde(rename_all = "lowercase")]
+pub enum BlurEffect {
+  Blur,
+  Acrylic,
+  Mica
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum BarEdge {
+    Top,
+    Left,
+    Bottom,
+    Right
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct YasbConfig {
@@ -29,7 +44,8 @@ pub struct BarConfig {
   pub screens: Option<Vec<String>>,
   pub widgets: ColumnBarWidgets,
   pub win_app_bar: Option<bool>,
-  pub always_on_top: Option<bool>
+  pub always_on_top: Option<bool>,
+  pub blur_effect: Option<BlurEffect>
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -39,14 +55,10 @@ pub struct ColumnBarWidgets {
   pub right: Option<Vec<String>>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum BarEdge {
-    Top,
-    Left,
-    Bottom,
-    Right
-}
+pub struct Config(pub Arc<Mutex<YasbConfig>>);
+
+pub struct Styles(pub Arc<Mutex<String>>);
+
 
 pub fn get_configuration_file(filename: &str) -> PathBuf {
   let home_path = home_dir();
@@ -63,7 +75,17 @@ pub fn get_configuration_file(filename: &str) -> PathBuf {
     log::warn!("Could not find user HOME directory. Searching src directory instead.");
   }
 
-  let src_file_path = PathBuf::from(filename);
+  let exe_path = match std::env::current_exe() {
+    Ok(exe_path) => exe_path,
+    Err(e) => {
+      log::error!("Failed to get current exe path: {}", e);
+      std::process::exit(1);
+    },
+  };
+
+  let mut src_file_path = exe_path.clone();
+  src_file_path.pop();
+  src_file_path.push(filename);
   
   if !src_file_path.exists() {
     let mut absolute_path = std::env::current_dir().unwrap();

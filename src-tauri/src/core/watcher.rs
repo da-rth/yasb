@@ -9,22 +9,27 @@ use tauri::api::notification::Notification;
 use crate::core::bar;
 use crate::core::configuration;
 use crate::core::constants::{
-  Event,
   APP_LOG_FILENAME,
-  STYLES_FILENAME
+  STYLES_FILENAME,
+  CONFIG_FILENAME
 };
 
-use super::constants::CONFIG_FILENAME;
+
+#[derive(strum_macros::Display)]
+enum Event {
+  StylesChangedEvent
+}
+
 
 fn send_event_payload<S: Serialize + Clone>(app_handle: &AppHandle, event: Event, payload: S) -> () {
   let event_str = &event.to_string();
 
   match app_handle.emit_all(event_str, payload) {
     Ok(_) => {
-      log::info!("Watcher - emitted event '{}' to bar(s).", event_str);
+      log::info!("Watcher: file updated, emitting {}.", event_str);
     },
     Err(e) => {
-      log::error!("Watcher - failed to emit event '{}': {}", event_str, e);
+      log::error!("Watcher: failed to emit {}: {}", event_str, e);
     }
   }
 }
@@ -33,17 +38,17 @@ fn notify_update_failure(identifier: String, path: String, error: Error) -> () {
   let msg = format!("Failed to update bars due to error. Please check {} for details.", APP_LOG_FILENAME);
   
   if let Err(e) = Notification::new(identifier).body(msg).show() {
-    log::error!("Watcher - failed to show update failure notification for {}: {}", path.clone(), e);
+    log::error!("Watcher: failed to show update failure notification for {}: {}", path.clone(), e);
   }
 
-  log::error!("Watcher - failed to load file '{}': {}", path, error);
+  log::error!("Watcher: failed to load file '{}': {}", path, error);
 }
 
 fn notify_update_success(identifier: String, path: String, filename: &str) -> () {
   let title = format!("Successfully updated bar(s) with {}", filename);
 
   if let Err(e) = Notification::new(identifier).title(title).body(path.clone()).show() {
-      log::error!("Watcher - failed to show update success notification for {}: {}", path, e);
+      log::error!("Watcher: failed to show update success notification for {}: {}", path, e);
   }
 }
 

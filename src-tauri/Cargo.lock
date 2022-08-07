@@ -64,29 +64,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bb07d2053ccdbe10e2af2995a2f116c1330396493dc1269f6a91d0ae82e19704"
 
 [[package]]
-name = "app"
-version = "0.1.0"
-dependencies = [
- "Inflector",
- "anyhow",
- "ctrlc",
- "home",
- "hotwatch",
- "log",
- "notify",
- "rsass",
- "serde",
- "serde_json",
- "serde_yaml",
- "simplelog",
- "strum_macros 0.24.2",
- "tauri",
- "tauri-build",
- "tokio",
- "windows 0.37.0",
-]
-
-[[package]]
 name = "atk"
 version = "0.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -126,6 +103,17 @@ dependencies = [
  "serde_urlencoded",
  "url",
  "wildmatch",
+]
+
+[[package]]
+name = "atty"
+version = "0.2.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d9b39be18770d11421cdb1b9947a45dd3f37e93092cbf377614828a319d5fee8"
+dependencies = [
+ "hermit-abi",
+ "libc",
+ "winapi 0.3.9",
 ]
 
 [[package]]
@@ -307,6 +295,30 @@ name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
+
+[[package]]
+name = "clap"
+version = "3.2.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a3dbbb6653e7c55cc8595ad3e1f7be8f32aba4eb7ff7f0fd1163d4f3d137c0a9"
+dependencies = [
+ "atty",
+ "bitflags",
+ "clap_lex",
+ "indexmap",
+ "strsim",
+ "termcolor",
+ "textwrap",
+]
+
+[[package]]
+name = "clap_lex"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2850f2f5a82cbf437dd5af4d49848fbdfc27c157c3d010345776f952765261c5"
+dependencies = [
+ "os_str_bytes",
+]
 
 [[package]]
 name = "cocoa"
@@ -2064,6 +2076,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "os_str_bytes"
+version = "6.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "648001efe5d5c0102d8cea768e348da85d90af8ba91f0bea908f157951493cd4"
+
+[[package]]
 name = "pango"
 version = "0.15.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3107,6 +3125,7 @@ checksum = "e1a56a8b125069c2682bd31610109b4436c050c74447bee1078217a0325c1add"
 dependencies = [
  "anyhow",
  "attohttpc",
+ "clap",
  "cocoa",
  "dirs-next",
  "embed_plist",
@@ -3308,6 +3327,12 @@ checksum = "bab24d30b911b2376f3a13cc2cd443142f0c81dda04c118693e35b3835757755"
 dependencies = [
  "winapi-util",
 ]
+
+[[package]]
+name = "textwrap"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1141d4d61095b28419e22cb0bbf02755f5e54e0526f97f1e3d1d160e60885fb"
 
 [[package]]
 name = "thin-slice"
@@ -3857,6 +3882,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 
 [[package]]
+name = "window-vibrancy"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b66a7f578d164c3f53425ecb73241246ed56a7c3383a15e741684c949a88c86"
+dependencies = [
+ "cocoa",
+ "objc",
+ "raw-window-handle",
+ "windows-sys",
+]
+
+[[package]]
 name = "windows"
 version = "0.24.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4160,3 +4197,27 @@ name = "xml-rs"
 version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2d7d3948613f75c98fd9328cfdcc45acc4d360655289d0a7d4ec931392200a3"
+
+[[package]]
+name = "yasb"
+version = "0.1.0"
+dependencies = [
+ "Inflector",
+ "anyhow",
+ "ctrlc",
+ "home",
+ "hotwatch",
+ "log",
+ "notify",
+ "rsass",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "simplelog",
+ "strum_macros 0.24.2",
+ "tauri",
+ "tauri-build",
+ "tokio",
+ "window-vibrancy",
+ "windows 0.37.0",
+]
