@@ -1,7 +1,8 @@
 use anyhow::{Result, Context};
 use tauri::{PhysicalSize, PhysicalPosition, Manager, AppHandle};
+use window_vibrancy::{apply_blur, apply_acrylic, apply_mica};
 use windows::Win32::UI::WindowsAndMessaging::{GWL_STYLE, WS_POPUP, SetWindowLongW};
-use super::configuration::{BarConfig, BarEdge, YasbConfig, validate_bar_label};
+use super::configuration::{BlurEffect, BarConfig, BarEdge, YasbConfig, validate_bar_label};
 use super::constants::{DEFAULT_BAR_EDGE, DEFAULT_BAR_THICKNESS, FRONTEND_INDEX, FRONTEND_SETUP};
 use super::tray::TRAY_HIDE_ALL;
 use crate::win32::app_bar;
@@ -68,6 +69,27 @@ fn create_bar(app_handle: &AppHandle, bar_index: usize, monitor: &tauri::Monitor
   }
   
   let monitor_name = monitor.name().context(format!("Monitor for bar '{}' has NO NAME.", label));
+  
+  if let Some(blur_effect) = &bar_config.blur_effect {
+    match blur_effect {
+      BlurEffect::Blur => {
+        if let Err(e) = apply_blur(&window, None) {
+          log::error!("Failed to apply window effect 'acrylic' on bar '{}': Acrylic is only supported on Windows 10 or above. {}", label, e);
+        }
+      }
+      BlurEffect::Acrylic => {
+        if let Err(e) = apply_acrylic(&window, None) {
+          log::error!("Failed to apply window effect 'acrylic' on bar '{}': Acrylic is only supported on Windows 10 or above. {}", label, e)
+        }
+      },
+      BlurEffect::Mica => {
+        if let Err(e) = apply_mica(&window) {
+          log::error!("Failed to apply window effect 'mica' on bar '{}': Mica is only supported on Windows 11. {}", label, e)
+        }
+      }
+    }
+  }
+  
   
   window.hide()?;
   window.set_decorations(false)?;

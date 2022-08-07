@@ -1,5 +1,4 @@
 use super::configuration::BarEdge;
-use strum_macros;
 
 pub const FRONTEND_SETUP: &str = "setup.html";
 pub const FRONTEND_INDEX: &str = "index.html";
@@ -12,7 +11,3 @@ pub const STYLES_FILENAME: &str = "styles.scss";
 pub const DEFAULT_BAR_THICKNESS: u32 = 64;
 pub const DEFAULT_BAR_EDGE: BarEdge = BarEdge::Top;
 
-#[derive(strum_macros::Display)]
-pub enum Event {
-  StylesChangedEvent
-}

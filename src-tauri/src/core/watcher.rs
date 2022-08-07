@@ -9,12 +9,17 @@ use tauri::api::notification::Notification;
 use crate::core::bar;
 use crate::core::configuration;
 use crate::core::constants::{
-  Event,
   APP_LOG_FILENAME,
-  STYLES_FILENAME
+  STYLES_FILENAME,
+  CONFIG_FILENAME
 };
 
-use super::constants::CONFIG_FILENAME;
+
+#[derive(strum_macros::Display)]
+enum Event {
+  StylesChangedEvent
+}
+
 
 fn send_event_payload<S: Serialize + Clone>(app_handle: &AppHandle, event: Event, payload: S) -> () {
   let event_str = &event.to_string();
