@@ -1,11 +1,11 @@
-
 use tauri::{
     AppHandle,
     CustomMenuItem,
     SystemTray,
     SystemTrayEvent,
     SystemTrayMenu,
-    SystemTrayMenuItem, Manager
+    SystemTrayMenuItem,
+    Manager
 };
 use anyhow::Result;
 use crate::win32;
@@ -14,6 +14,12 @@ pub const TRAY_QUIT: &str = "quit";
 pub const TRAY_RESTART: &str = "restart";
 pub const TRAY_HIDE_ALL: &str = "hide_all";
 pub const TRAY_SHOW_ALL: &str = "show_all";
+
+#[derive(strum_macros::Display)]
+enum TrayEvent {
+  HideAllWindowsEvent,
+  ShowAllWindowsEvent
+}
 
 pub fn build_tray() -> SystemTray {
     let quit = CustomMenuItem::new(TRAY_QUIT, "Quit");
@@ -67,14 +73,14 @@ fn handle_menu_item_click(menu_id: String, app_handle: &AppHandle) -> Result<()>
 
         TRAY_HIDE_ALL => {
             log::info!("Hiding all windows...");
-            for (_label, window) in windows { window.hide()?; }
+            app_handle.emit_all(TrayEvent::HideAllWindowsEvent.to_string().as_str(), true)?;
             tray_handle.get_item(TRAY_HIDE_ALL).set_enabled(false)?;
             tray_handle.get_item(TRAY_SHOW_ALL).set_enabled(true)?;
         },
 
         TRAY_SHOW_ALL => {
             log::info!("Showing all windows...");
-            for (_label, window) in windows { window.show()?; }
+            app_handle.emit_all(TrayEvent::ShowAllWindowsEvent.to_string().as_str(), false)?;
             tray_handle.get_item(TRAY_SHOW_ALL).set_enabled(false)?;
             tray_handle.get_item(TRAY_HIDE_ALL).set_enabled(true)?;
         }

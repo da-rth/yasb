@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use tauri::{Manager, AppHandle};
 use tokio::time::sleep;
-use crate::win32::app_bar;
+use crate::win32;
 use crate::core::constants::{CONFIG_FILENAME, STYLES_FILENAME};
 use crate::core::{
   logger,
@@ -12,6 +12,7 @@ use crate::core::{
   configuration,
   watcher
 };
+
 
 pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
   let app_handle = app.app_handle().clone();
@@ -59,7 +60,7 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
   app_handle.manage(configuration::Styles(Arc::new(Mutex::new(styles.clone()))));
   
   // Create the bars based on given config. Styles are set later...
-  bar::create_bars_from_config(&app_handle, config);
+  bar::create_bars_from_config(&app_handle, config.clone());
 
   // Spawn background task
   tauri::async_runtime::spawn(async move {
@@ -70,8 +71,14 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
       styles_path.clone()
     ).expect("File watcher failed to initialise!");
     
+    // If any bar(s) have always_on_top enabled, watch and hide whenever fullscreen is active
+    if config.bars.into_iter().any(|(_, bar_config)| bar_config.always_on_top.unwrap_or(false)) {
+      log::info!("Always on top bar detected. Window will be hidden when fullscreen is detected.");
+      win32::utils::watch_fullscreen(app_handle.clone());
+    }
+
     loop {
-        sleep(std::time::Duration::from_secs(1)).await;
+      sleep(std::time::Duration::from_millis(500)).await;
     }
   });
 
@@ -82,7 +89,7 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
 fn init_ctrlc_handler(app_handle: AppHandle) -> () {
   ctrlc::set_handler(move || {
     log::info!("Ctrl+C detected. Cleaning up.");
-    let _ = app_bar::ab_remove_all(&app_handle.windows());
+    let _ = win32::app_bar::ab_remove_all(&app_handle.windows());
     log::info!("Exiting {}. Goodbye :)", app_handle.config().package.product_name.clone().unwrap());
     app_handle.exit(0);
   }).expect("Error setting Ctrl-C handler")

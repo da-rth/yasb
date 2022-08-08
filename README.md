@@ -20,7 +20,7 @@
 
 ### A highly configurable status bar written in Rust for Windows.
 
-Yasb aims to bring a feature-rich configurable status bar to Windows. Inspired by [waybar](https://github.com/Alexays/Waybar) and [polybar](https://github.com/polybar/polybar), yasb enables users to build advanced user interfaces for a real linux ricing experience.
+Yasb aims to bring a feature-rich configurable status bar replacement to Windows. Inspired by [waybar](https://github.com/Alexays/Waybar) and [polybar](https://github.com/polybar/polybar), yasb enables users to build advanced user interfaces for a linux-like experience.
 
 ----
 ## Configuration

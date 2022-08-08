@@ -7,7 +7,9 @@ import { invoke } from '@tauri-apps/api/tauri';
 import UnknownWidget from "./widgets/UnknownWidget.vue";
 import { IBarConfig } from ".";
 
-let stylesEventUnlistener: UnlistenFn | undefined;
+
+let windowHiddenByuser = false;
+let eventUnlistenFunctions: UnlistenFn[] = [];
 let stylesheetElement: HTMLElement | undefined;
 let config: Ref<IBarConfig> = ref({});
 let widgets: Ref<Widgets> = ref({
@@ -21,12 +23,33 @@ const barLabel = appWindow.label.slice(0, appWindow.label.lastIndexOf('_'));
 const edgeClass = computed(() => config.value.edge ? `edge-${config.value.edge}` : '');
 
 const onStylesChanged = (event: TauriEvent<string>) => {
-  console.log(barLabel, 'styles changed!', event);
-
   if (stylesheetElement && event.payload) {
     stylesheetElement.textContent = event.payload as string;
   }
 }
+
+const onHideAllWindows = (event: TauriEvent<boolean>) => {
+  windowHiddenByuser = true;
+  appWindow.hide();
+}
+
+const onShowAllWindows = (event: TauriEvent<boolean>) => {
+  windowHiddenByuser = false;
+  appWindow.show();
+}
+
+const onFullscreenChange = (event: TauriEvent<boolean>) => {
+  let isFullscreen = event.payload as boolean;
+
+  // Don't hide or show windows explicitly hidden by the user
+  if (config.value.always_on_top && !windowHiddenByuser) {
+    if (isFullscreen) {
+      appWindow.hide();
+    } else {
+      appWindow.show();
+    }
+  }
+};
 
 onMounted(async () => {
   let bar_styles: string = await invoke('retrieve_styles');
@@ -34,6 +57,10 @@ onMounted(async () => {
   stylesheetElement.setAttribute("type", "text/css");
   stylesheetElement.textContent = bar_styles;
   document.head.appendChild(stylesheetElement);
+
+  const unlisten = await appWindow.onFocusChanged(({ payload: focused }) => {
+     console.log('Focus changed, window is focused? ' + focused);
+  });
 
   let bar_widgets: any = await invoke('retrieve_widgets', {barLabel});
   widgets.value.left = Array.from(bar_widgets.left.map((w: any) => Object.values(w)).flat());
@@ -43,7 +70,10 @@ onMounted(async () => {
   let bar_config: IBarConfig = await invoke('retrieve_config', {barLabel});
   config.value = bar_config;
 
-  stylesEventUnlistener = await listen("StylesChangedEvent", onStylesChanged);
+  eventUnlistenFunctions.push(await listen("StylesChangedEvent", onStylesChanged));
+  eventUnlistenFunctions.push(await listen("HideAllWindowsEvent", onHideAllWindows));
+  eventUnlistenFunctions.push(await listen("ShowAllWindowsEvent", onShowAllWindows));
+  eventUnlistenFunctions.push(await listen("FullscreenChangeEvent", onFullscreenChange));
 
   appWindow.show();
   appWindow.setAlwaysOnTop(bar_config.always_on_top ?? false);
@@ -51,7 +81,10 @@ onMounted(async () => {
 
 onBeforeUnmount(async () => {
   stylesheetElement && document.head.removeChild(stylesheetElement);
-  stylesEventUnlistener && stylesEventUnlistener();
+
+  for (let unlistener of eventUnlistenFunctions) {
+    unlistener();
+  }
 });
 </script>
 
