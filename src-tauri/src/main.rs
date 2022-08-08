@@ -11,6 +11,7 @@ use win32::utils::init_dpi_awareness_context;
 use crate::win32::utils;
 use crate::core::setup;
 use crate::core::tray;
+use crate::core::commands;
 
 fn main() {
   init_dpi_awareness_context();
@@ -23,9 +24,9 @@ fn main() {
   
   let app = app_builder
     .invoke_handler(tauri::generate_handler![
-      setup::retrieve_widgets,
-      setup::retrieve_config,
-      setup::retrieve_styles
+      commands::retrieve_widgets,
+      commands::retrieve_config,
+      commands::retrieve_styles
     ])
     .build(tauri::generate_context!())
     .expect(format!("Error while running application.").as_str());

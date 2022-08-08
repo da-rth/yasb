@@ -5,3 +5,5 @@ pub mod setup;
 pub mod tray;
 pub mod watcher;
 pub mod cli;
+pub mod logger;
+pub mod commands;

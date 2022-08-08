@@ -1,26 +1,17 @@
-use std::collections::HashMap;
-use std::path::{PathBuf};
-use std::sync::{Arc, Mutex};
-use tauri::{Manager, State, AppHandle};
-use tokio::time::sleep;
 use std::fs::canonicalize;
-use std::fs::File;
-use simplelog::{
-  CombinedLogger,
-  TermLogger,
-  WriteLogger,
-  Config,
-  LevelFilter, TerminalMode, ColorChoice
-};
-use crate::core::constants::APP_LOG_FILENAME;
-use crate::widgets::BarWidget;
-use crate::widgets::ConfiguredWidget;
+use std::path::PathBuf;
+use std::sync::{Arc, Mutex};
+use tauri::{Manager, AppHandle};
+use tokio::time::sleep;
 use crate::win32::app_bar;
-use super::constants::{CONFIG_FILENAME, STYLES_FILENAME};
-use super::watcher;
-use super::bar;
-use super::configuration;
-use super::cli;
+use crate::core::constants::{CONFIG_FILENAME, STYLES_FILENAME};
+use crate::core::{
+  logger,
+  bar,
+  cli,
+  configuration,
+  watcher
+};
 
 pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
   let app_handle = app.app_handle().clone();
@@ -35,7 +26,7 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
     arg_styles_path
   ) = cli::parse_cmd_args(app);
 
-  let log_path = init_logger(arg_verbose);
+  let log_path = logger::init_logger(arg_verbose);
 
   log::info!("Initialising {} v{}", app_name, app_version);
   log::info!("Logging to: {}", canonicalize(log_path)?.display().to_string().replace("\\\\?\\", ""));
@@ -88,32 +79,6 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
 }
 
 
-fn init_logger(verbose: bool) -> PathBuf {
-  let exe_path = std::env::current_exe().expect("Failed to get current exe path");
-
-  let mut log_path = exe_path.clone();
-  log_path.pop();
-  log_path.push(APP_LOG_FILENAME);
-
-  CombinedLogger::init(
-    vec![
-      TermLogger::new(
-        LevelFilter::Info,
-        Config::default(),
-        TerminalMode::Mixed,
-        if verbose { ColorChoice::Never } else { ColorChoice::Auto }
-      ),
-      WriteLogger::new(
-        LevelFilter::Info,
-        Config::default(),
-        File::create(log_path.clone()).unwrap()
-      )
-    ]
-  ).expect("Failed to initialise logger");
-
-  log_path
-}
-
 fn init_ctrlc_handler(app_handle: AppHandle) -> () {
   ctrlc::set_handler(move || {
     log::info!("Ctrl+C detected. Cleaning up.");
@@ -143,64 +108,4 @@ fn init_config_paths(app_handle: &AppHandle, config_path: &PathBuf, styles_path:
   };
 
   (config, styles)
-}
-
-fn get_config_from_state(config: &State<configuration::Config>, bar_label: &str) -> configuration::BarConfig {
-  let locked_config = config.0.lock().unwrap();
-  locked_config.bars.get(bar_label).unwrap().clone()
-}
-
-fn get_configured_widgets_from_state(config: &State<configuration::Config>) -> HashMap<String, ConfiguredWidget> {
-  let locked_config = config.0.lock().unwrap();
-  locked_config.widgets.as_ref().unwrap().clone()
-}
-
-#[tauri::command]
-pub fn retrieve_config(bar_label: String, bar_window: tauri::Window, config_state: State<configuration::Config>) -> configuration::BarConfig {
-  let bar_config = get_config_from_state(&config_state, &bar_label.as_str());
-  
-  if bar_config.win_app_bar.unwrap_or(false) {
-    super::bar::register_win32_app_bar(bar_window, &bar_config);
-  }
-  
-  bar_config
-}
-
-#[tauri::command]
-pub fn retrieve_styles(styles_state: State<configuration::Styles>) -> String {
-  styles_state.0.lock().unwrap().to_string()
-}
-
-#[tauri::command]
-pub fn retrieve_widgets(bar_label: String, config_state: State<configuration::Config>) -> HashMap<String, Vec<BarWidget>> {
-  let bar_config = get_config_from_state(&config_state, &bar_label.as_str());
-  let configured_widgets = get_configured_widgets_from_state(&config_state);
-
-  let bar_widgets: HashMap<String, Option<&Vec<String>>> = HashMap::from([
-    ("left".to_string(), bar_config.widgets.left.as_ref()),
-    ("middle".to_string(), bar_config.widgets.middle.as_ref()),
-    ("right".to_string(), bar_config.widgets.right.as_ref())
-  ]);
-
-  let mut widgets_to_render: HashMap<String, Vec<BarWidget>> = HashMap::from([
-    ("left".to_string(), Vec::new()),
-    ("middle".to_string(), Vec::new()),
-    ("right".to_string(), Vec::new())
-  ]);
-  
-  for (bar_column, column_widgets) in bar_widgets {
-    let column_to_render = widgets_to_render.get_mut(&bar_column).unwrap();
-
-    if column_widgets.is_some() {
-      for col_widget_name in column_widgets.unwrap() {
-        if configured_widgets.contains_key(col_widget_name) {
-          column_to_render.push(BarWidget::Configured(configured_widgets.get(col_widget_name).unwrap().clone()));
-        } else {
-          column_to_render.push(BarWidget::Default { kind: col_widget_name.to_string() });
-        }
-      }
-    }
-  }
-
-  widgets_to_render
 }
