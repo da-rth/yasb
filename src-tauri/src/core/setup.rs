@@ -73,7 +73,7 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
     
     // If any bar(s) have always_on_top enabled, watch and hide whenever fullscreen is active
     if config.bars.into_iter().any(|(_, bar_config)| bar_config.always_on_top.unwrap_or(false)) {
-      log::info!("Always on top bar detected. Window will be hidden when fullscreen is detected.");
+      log::info!("Always on top detected. Window(s) will be automatically hidden when fullscreen is detected.");
       win32::utils::watch_fullscreen(app_handle.clone());
     }
 

@@ -7,6 +7,7 @@ use windows::Win32::Graphics::Gdi::{
   MONITOR_DEFAULTTONEAREST,
   MonitorFromWindow
 };
+use windows::Win32::System::Console::{AttachConsole, ATTACH_PARENT_PROCESS};
 use windows::Win32::UI::HiDpi::{
   SetProcessDpiAwarenessContext,
   DPI_AWARENESS_CONTEXT_SYSTEM_AWARE
@@ -96,4 +97,9 @@ pub fn watch_fullscreen(app_handle: AppHandle) -> () {
       }
     }
   });
+}
+
+pub fn attach_console() -> () {
+  unsafe { AttachConsole(ATTACH_PARENT_PROCESS); }
+  std::thread::sleep(std::time::Duration::from_millis(250));
 }

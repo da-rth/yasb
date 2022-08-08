@@ -1,7 +1,13 @@
 use std::path::PathBuf;
 use tauri::Manager;
-use windows::Win32::System::Console::{AttachConsole, ATTACH_PARENT_PROCESS};
-use crate::core::constants::{CLI_ARG_VERSION, CLI_ARG_CONFIG, CLI_ARG_STYLES, CLI_ARG_VERBOSE, CLI_ARG_HELP};
+use crate::win32;
+use crate::core::constants::{
+  CLI_ARG_VERSION,
+  CLI_ARG_CONFIG,
+  CLI_ARG_STYLES,
+  CLI_ARG_VERBOSE,
+  CLI_ARG_HELP
+};
 
 
 pub fn parse_cmd_args(app: &mut tauri::App) -> (bool, Option<PathBuf>, Option<PathBuf>) {
@@ -26,15 +32,17 @@ pub fn parse_cmd_args(app: &mut tauri::App) -> (bool, Option<PathBuf>, Option<Pa
             arg_styles_path = Some(PathBuf::from(styles_path_str));
           },
           CLI_ARG_VERBOSE => {
-            unsafe { AttachConsole(ATTACH_PARENT_PROCESS); }
+            win32::utils::attach_console();
             arg_verbose = true;
           },
           CLI_ARG_HELP => {
+            win32::utils::attach_console();
             let str_val: String = serde_json::from_value(arg_data.value).unwrap();
             println!("{}", str_val);
             app.app_handle().exit(0);
           },
           CLI_ARG_VERSION => {
+            win32::utils::attach_console();
             println!("{}", app.package_info().version.to_string());
             app.app_handle().exit(0);
           }
