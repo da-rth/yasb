@@ -77,6 +77,8 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
       win32::utils::watch_fullscreen(app_handle.clone());
     }
 
+    win32::winproc::listen(app_handle.clone());
+
     loop {
       sleep(std::time::Duration::from_millis(500)).await;
     }

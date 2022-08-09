@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { computed, onMounted, Ref, ref, onBeforeUnmount } from "vue";
-import { appWindow } from "@tauri-apps/api/window";
+import { appWindow, currentMonitor, LogicalPosition, PhysicalPosition, PhysicalSize } from "@tauri-apps/api/window";
 import { listen, Event as TauriEvent, UnlistenFn } from '@tauri-apps/api/event'
 import { availableWidgets, Widgets } from "./widgets";
 import { invoke } from '@tauri-apps/api/tauri';
 import UnknownWidget from "./widgets/UnknownWidget.vue";
-import { IBarConfig } from ".";
+import { BarEdge, IBarConfig } from ".";
+import { def } from "@vue/shared";
 
+let DEFAULT_BAR_THICKNESS = 64;
+let DEFAULT_BAR_EDGE = BarEdge.Top;
 
 let windowHiddenByuser = false;
 let eventUnlistenFunctions: UnlistenFn[] = [];
@@ -51,16 +54,44 @@ const onFullscreenChange = (event: TauriEvent<boolean>) => {
   }
 };
 
+const positionAndSizeWindow = async () => {
+    // Default bar size and position is for top edge
+    let monitor = await currentMonitor();
+
+    if (monitor) {
+      appWindow.setPosition(new LogicalPosition(50, 50));
+      let bar_position = new PhysicalPosition(monitor.position.x, monitor.position.y);
+      let bar_thickness = config.value.thickness ?? DEFAULT_BAR_THICKNESS;
+      let bar_size = new PhysicalSize(monitor.size.width, bar_thickness);
+
+      switch (config.value.edge) {
+        case BarEdge.Bottom:
+          bar_position.y = monitor.position.y + monitor.size.height - bar_thickness;
+          break;
+        case BarEdge.Left:
+          bar_size.width = bar_thickness;
+          bar_size.height = monitor.size.height;
+          break;
+        case BarEdge.Right:
+          bar_position.x = monitor.position.x + monitor.size.width - bar_thickness;
+          bar_size.width = bar_thickness;
+          bar_size.height = monitor.size.height;
+          break;
+        default:
+          break;
+      }
+
+      appWindow.setPosition(bar_position);
+      appWindow.setSize(bar_size);
+    }
+}
+
 onMounted(async () => {
   let bar_styles: string = await invoke('retrieve_styles');
   stylesheetElement = document.createElement('style');
   stylesheetElement.setAttribute("type", "text/css");
   stylesheetElement.textContent = bar_styles;
   document.head.appendChild(stylesheetElement);
-
-  const unlisten = await appWindow.onFocusChanged(({ payload: focused }) => {
-     console.log('Focus changed, window is focused? ' + focused);
-  });
 
   let bar_widgets: any = await invoke('retrieve_widgets', {barLabel});
   widgets.value.left = Array.from(bar_widgets.left.map((w: any) => Object.values(w)).flat());
@@ -74,7 +105,9 @@ onMounted(async () => {
   eventUnlistenFunctions.push(await listen("HideAllWindowsEvent", onHideAllWindows));
   eventUnlistenFunctions.push(await listen("ShowAllWindowsEvent", onShowAllWindows));
   eventUnlistenFunctions.push(await listen("FullscreenChangeEvent", onFullscreenChange));
+  eventUnlistenFunctions.push(await listen("ResolutionChangeEvent", positionAndSizeWindow))
 
+  await positionAndSizeWindow();
   appWindow.show();
   appWindow.setAlwaysOnTop(bar_config.always_on_top ?? false);
 });
