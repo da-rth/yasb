@@ -65,9 +65,7 @@ fn create_bar(app_handle: &AppHandle, bar_index: usize, monitor: &tauri::Monitor
       }
     }
   }
-  
-  
-  window.hide()?;
+
   window.set_decorations(false)?;
   window.set_skip_taskbar(true)?;
   window.set_resizable(false)?;

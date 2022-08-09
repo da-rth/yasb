@@ -2,7 +2,6 @@ use std::fs::canonicalize;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use tauri::{Manager, AppHandle};
-use tokio::time::sleep;
 use crate::win32;
 use crate::core::constants::{CONFIG_FILENAME, STYLES_FILENAME};
 use crate::core::{
@@ -62,27 +61,21 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
   // Create the bars based on given config. Styles are set later...
   bar::create_bars_from_config(&app_handle, config.clone());
 
-  // Spawn background task
-  tauri::async_runtime::spawn(async move {
-    // Spawn file watchers for config and styles
-    let _hotwatch = watcher::spawn_watchers(
-      app_handle.clone(),
-      config_path.clone(),
-      styles_path.clone()
-    ).expect("File watcher failed to initialise!");
-    
-    // If any bar(s) have always_on_top enabled, watch and hide whenever fullscreen is active
-    if config.bars.into_iter().any(|(_, bar_config)| bar_config.always_on_top.unwrap_or(false)) {
-      log::info!("Always on top detected. Window(s) will be automatically hidden when fullscreen is detected.");
-      win32::utils::watch_fullscreen(app_handle.clone());
-    }
+  // If any bar(s) have always_on_top enabled, watch and hide whenever fullscreen is active
+  if config.bars.into_iter().any(|(_, bar_config)| bar_config.always_on_top.unwrap_or(false)) {
+    log::info!("Always on top detected. Window(s) will be automatically hidden when fullscreen is detected.");
+    win32::fullscreen::hide_on_fullscreen(app_handle.clone());
+  }
 
-    win32::winproc::listen(app_handle.clone());
+  win32::winproc::listen(app_handle.clone());
 
-    loop {
-      sleep(std::time::Duration::from_millis(500)).await;
-    }
-  });
+  let hotwatch = watcher::spawn_watchers(
+    app_handle.clone(),
+    config_path.clone(),
+    styles_path.clone()
+  ).expect("File watcher failed to initialise!");
+
+  std::mem::forget(hotwatch);
 
   Ok(())
 }

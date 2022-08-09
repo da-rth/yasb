@@ -4,9 +4,8 @@ import { appWindow, currentMonitor, LogicalPosition, PhysicalPosition, PhysicalS
 import { listen, Event as TauriEvent, UnlistenFn } from '@tauri-apps/api/event'
 import { availableWidgets, Widgets } from "./widgets";
 import { invoke } from '@tauri-apps/api/tauri';
-import UnknownWidget from "./widgets/UnknownWidget.vue";
 import { BarEdge, IBarConfig } from ".";
-import { def } from "@vue/shared";
+import UnknownWidget from "./widgets/UnknownWidget.vue";
 
 let DEFAULT_BAR_THICKNESS = 64;
 let DEFAULT_BAR_EDGE = BarEdge.Top;
@@ -41,18 +40,20 @@ const onShowAllWindows = (event: TauriEvent<boolean>) => {
   appWindow.show();
 }
 
-const onFullscreenChange = (event: TauriEvent<boolean>) => {
-  let isFullscreen = event.payload as boolean;
-
+const onFullscreenHide = () => {
   // Don't hide or show windows explicitly hidden by the user
   if (config.value.always_on_top && !windowHiddenByuser) {
-    if (isFullscreen) {
-      appWindow.hide();
-    } else {
-      appWindow.show();
-    }
+    appWindow.hide();
   }
 };
+
+const onFullscreenShow = () => {
+  // Don't hide or show windows explicitly hidden by the user
+  if (config.value.always_on_top && !windowHiddenByuser) {
+    appWindow.show();
+  }
+};
+
 
 const positionAndSizeWindow = async () => {
     // Default bar size and position is for top edge
@@ -104,7 +105,8 @@ onMounted(async () => {
   eventUnlistenFunctions.push(await listen("StylesChangedEvent", onStylesChanged));
   eventUnlistenFunctions.push(await listen("HideAllWindowsEvent", onHideAllWindows));
   eventUnlistenFunctions.push(await listen("ShowAllWindowsEvent", onShowAllWindows));
-  eventUnlistenFunctions.push(await listen("FullscreenChangeEvent", onFullscreenChange));
+  eventUnlistenFunctions.push(await listen("FullscreenHideWindow", onFullscreenHide));
+  eventUnlistenFunctions.push(await listen("FullscreenShowWindow", onFullscreenShow));
   eventUnlistenFunctions.push(await listen("ResolutionChangeEvent", positionAndSizeWindow))
 
   await positionAndSizeWindow();

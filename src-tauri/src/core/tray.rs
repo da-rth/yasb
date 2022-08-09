@@ -11,7 +11,6 @@ use anyhow::Result;
 use crate::win32;
 
 pub const TRAY_QUIT: &str = "quit";
-pub const TRAY_RESTART: &str = "restart";
 pub const TRAY_HIDE_ALL: &str = "hide_all";
 pub const TRAY_SHOW_ALL: &str = "show_all";
 
@@ -23,7 +22,6 @@ enum TrayEvent {
 
 pub fn build_tray() -> SystemTray {
     let quit = CustomMenuItem::new(TRAY_QUIT, "Quit");
-    let restart = CustomMenuItem::new(TRAY_RESTART, "Restart");
     let mut hide = CustomMenuItem::new(TRAY_HIDE_ALL, "Hide All");
     let mut show = CustomMenuItem::new(TRAY_SHOW_ALL, "Show All");
 
@@ -33,7 +31,6 @@ pub fn build_tray() -> SystemTray {
     let tray_menu = SystemTrayMenu::new()
         .add_item(hide)
         .add_item(show)
-        .add_item(restart)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(quit);
     
@@ -64,12 +61,6 @@ fn handle_menu_item_click(menu_id: String, app_handle: &AppHandle) -> Result<()>
             win32::app_bar::ab_remove_all(&windows)?;
             app_handle.exit(0);
         },
-
-        TRAY_RESTART => {
-            log::info!("Restarting {}...", app_name);
-            win32::app_bar::ab_remove_all(&windows)?;
-            app_handle.restart();
-        }
 
         TRAY_HIDE_ALL => {
             log::info!("Hiding all windows...");

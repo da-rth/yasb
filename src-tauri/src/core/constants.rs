@@ -16,3 +16,9 @@ pub const CLI_ARG_STYLES: &str = "styles";
 pub const CLI_ARG_VERBOSE: &str = "verbose";
 pub const CLI_ARG_VERSION: &str = "version";
 pub const CLI_ARG_HELP: &str = "help";
+
+pub const IGNORED_FULLSCREEN_CLASSES: &'static [&'static str] = &[
+  "SHELLDLL_DefView",
+  "WorkerW",
+  "XamlExplorerHostIslandWindow"
+];
