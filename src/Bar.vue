@@ -72,8 +72,8 @@ onMounted(async () => {
   eventUnlistenFunctions.push(await listen("FullscreenHideWindow", onFullscreenHide));
   eventUnlistenFunctions.push(await listen("FullscreenShowWindow", onFullscreenShow));
 
-  appWindow.show();
-  appWindow.setAlwaysOnTop(bar_config.always_on_top ?? false);
+  await appWindow.show();
+  await appWindow.setAlwaysOnTop(bar_config?.always_on_top ?? false);
 });
 
 onBeforeUnmount(async () => {

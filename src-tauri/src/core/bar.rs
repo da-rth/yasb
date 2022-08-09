@@ -44,34 +44,40 @@ fn create_window(app_handle: &AppHandle, label: String, url: &str) -> Result<tau
   window_builder.build().context(format!("Failed to build window for bar '{}'", label))
 }
 
-fn create_bar(app_handle: &AppHandle, _bar_index: usize, monitor: &tauri::Monitor, bar_label: &String, bar_config: &BarConfig) -> Result<tauri::Window> {
+fn create_bar(app_handle: &AppHandle, monitor: &tauri::Monitor, bar_label: &String, bar_config: &BarConfig) -> Result<tauri::Window> {
   let uuid = Uuid::new_v4().as_simple().to_string();
-  let label = format!("{}_{}", bar_label, uuid);
+  let label = format!("{}_{}", bar_label, &uuid[0..16]);
+  let bar_thickness = bar_config.thickness.unwrap_or(DEFAULT_BAR_THICKNESS);
+  let bar_edge = bar_config.edge.clone().unwrap_or(DEFAULT_BAR_EDGE);
   let window = create_window(app_handle, label.clone(), FRONTEND_INDEX)?;
+  
+  if bar_config.win_app_bar.unwrap_or(false) {
+    if let Err(e) = win32::app_bar::ab_register_and_position(window.clone(), bar_edge.clone(), bar_thickness.clone()) {
+      log::error!("Failed to create Win32 App Bar for {}: {}", label.clone(), e);
+    }
+  }
+
   let monitor_name = monitor.name().context(format!("Monitor for bar '{}' has NO NAME.", label));
   
   if let Some(blur_effect) = &bar_config.blur_effect {
     match blur_effect {
       BlurEffect::Blur => {
         if let Err(e) = apply_blur(&window, None) {
-          log::error!("Failed to apply window effect 'acrylic' on bar '{}': Acrylic is only supported on Windows 10 or above. {}", label, e);
+          log::error!("Failed to apply window effect 'acrylic' on '{}': Acrylic is only supported on Windows 10 or above. {}", label, e);
         }
       }
       BlurEffect::Acrylic => {
         if let Err(e) = apply_acrylic(&window, None) {
-          log::error!("Failed to apply window effect 'acrylic' on bar '{}': Acrylic is only supported on Windows 10 or above. {}", label, e)
+          log::error!("Failed to apply window effect 'acrylic' on '{}': Acrylic is only supported on Windows 10 or above. {}", label, e)
         }
       },
       BlurEffect::Mica => {
         if let Err(e) = apply_mica(&window) {
-          log::error!("Failed to apply window effect 'mica' on bar '{}': Mica is only supported on Windows 11. {}", label, e)
+          log::error!("Failed to apply window effect 'mica' on '{}': Mica is only supported on Windows 11. {}", label, e)
         }
       }
     }
   }
-
-  let bar_thickness = bar_config.thickness.unwrap_or(DEFAULT_BAR_THICKNESS);
-  let bar_edge = bar_config.edge.clone().unwrap_or(DEFAULT_BAR_EDGE);
 
   // Default bar size and position is for top edge
   let mut bar_position = PhysicalPosition::new(monitor.position().x, monitor.position().y);
@@ -99,9 +105,7 @@ fn create_bar(app_handle: &AppHandle, _bar_index: usize, monitor: &tauri::Monito
   window.set_skip_taskbar(true)?;
   window.set_resizable(false)?;
 
-  // Minimum window height fix
-  let hwnd = window.hwnd().unwrap().clone();
-  win32::utils::mark_window_as_popup(hwnd);
+  win32::utils::mark_window_as_popup(window.hwnd().unwrap().clone());
   window.set_position(bar_position)?;
 
   log::info!(
@@ -116,29 +120,25 @@ fn create_bar(app_handle: &AppHandle, _bar_index: usize, monitor: &tauri::Monito
 
 fn create_bars(app_handle: &AppHandle, bar_label: &String, bar_config: &BarConfig) -> Result<Vec<tauri::Window>> {
   let mut bars: Vec<tauri::Window> = Vec::new();
-  let setup_window = create_window(app_handle, "setup_window".to_string(), FRONTEND_SETUP).unwrap();
+  let setup_window = create_window(app_handle, "setup_window".to_string(), FRONTEND_SETUP)?;
 
-  for (idx, monitor) in setup_window.available_monitors()?.iter().enumerate() {
+  for monitor in setup_window.available_monitors()? {
     if let Some(ref screen_names) = bar_config.screens.clone() {
       if screen_names.is_empty() {
-        bars.push(create_bar(app_handle, idx, &monitor, &bar_label, &bar_config)?);
+        bars.push(create_bar(app_handle, &monitor, &bar_label, &bar_config)?);
       } else {
         for screen_name in screen_names {
           if screen_name == monitor.name().unwrap_or(&"".to_string()) {
-            bars.push(create_bar(app_handle, idx, &monitor, &bar_label, &bar_config)?);
+            bars.push(create_bar(app_handle, &monitor, &bar_label, &bar_config)?);
           }
         }
       }
     } else {
-      bars.push(create_bar(app_handle, idx, &monitor, &bar_label, &bar_config)?);
+      bars.push(create_bar(app_handle, &monitor, &bar_label, &bar_config)?);
     }
   }
 
   setup_window.close()?;
 
   Ok(bars)
-}
-
-pub fn register_win32_app_bar(bar_window: tauri::Window, bar_config: &BarConfig) -> () {
-  app_bar::ab_register_and_position(&bar_window, bar_config.edge.clone()).unwrap();
 }

@@ -5,13 +5,8 @@ use crate::widgets::{BarWidget, ConfiguredWidget};
 
 
 #[tauri::command]
-pub fn retrieve_config(bar_label: String, bar_window: tauri::Window, config_state: State<configuration::Config>) -> configuration::BarConfig {
-  let bar_config = get_config_from_state(&config_state, &bar_label.as_str());
-  
-  if bar_config.win_app_bar.unwrap_or(false) {
-    super::bar::register_win32_app_bar(bar_window, &bar_config);
-  }
-  
+pub fn retrieve_config(bar_label: String, config_state: State<configuration::Config>) -> configuration::BarConfig {
+  let bar_config = get_config_from_state(&config_state, &bar_label.as_str());  
   bar_config
 }
 
