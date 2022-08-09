@@ -59,7 +59,8 @@ fn handle_menu_item_click(menu_id: String, app_handle: &AppHandle) -> Result<()>
         TRAY_QUIT => {
             log::info!("Exiting {}. Goodbye :)", app_name);
             win32::app_bar::ab_remove_all(&windows)?;
-            app_handle.exit(0);
+            app_handle.exit(1);
+            //app_handle.restart();
         },
 
         TRAY_HIDE_ALL => {

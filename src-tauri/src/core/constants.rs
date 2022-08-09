@@ -8,7 +8,7 @@ pub const CONFIG_DIR_NAME: &str = ".yasb";
 pub const CONFIG_FILENAME: &str = "config.yaml";
 pub const STYLES_FILENAME: &str = "styles.scss";
 
-// pub const DEFAULT_BAR_THICKNESS: u32 = 64;
+pub const DEFAULT_BAR_THICKNESS: u32 = 64;
 pub const DEFAULT_BAR_EDGE: BarEdge = BarEdge::Top;
 
 pub const CLI_ARG_CONFIG: &str = "config";

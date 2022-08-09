@@ -4218,6 +4218,7 @@ dependencies = [
  "tauri",
  "tauri-build",
  "tokio",
+ "uuid 1.1.2",
  "window-vibrancy",
  "windows 0.37.0",
 ]

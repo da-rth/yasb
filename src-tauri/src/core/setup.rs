@@ -12,6 +12,8 @@ use crate::core::{
   watcher
 };
 
+use super::configuration::YasbConfig;
+
 
 pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
   let app_handle = app.app_handle().clone();
@@ -61,6 +63,20 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
   // Create the bars based on given config. Styles are set later...
   bar::create_bars_from_config(&app_handle, config.clone());
 
+  log::info!("Initialising background listeners");
+  init_background_listeners(
+    app_handle.clone(),
+    config_path.clone(),
+    styles_path.clone(),
+    config.clone()
+  );
+
+  log::info!("Setup complete");
+  Ok(())
+}
+
+
+fn init_background_listeners(app_handle: AppHandle, config_path: PathBuf, styles_path: PathBuf, config: YasbConfig) -> () {
   // If any bar(s) have always_on_top enabled, watch and hide whenever fullscreen is active
   if config.bars.into_iter().any(|(_, bar_config)| bar_config.always_on_top.unwrap_or(false)) {
     log::info!("Always on top detected. Window(s) will be automatically hidden when fullscreen is detected.");
@@ -76,10 +92,7 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
   ).expect("File watcher failed to initialise!");
 
   std::mem::forget(hotwatch);
-
-  Ok(())
 }
-
 
 fn init_ctrlc_handler(app_handle: AppHandle) -> () {
   ctrlc::set_handler(move || {

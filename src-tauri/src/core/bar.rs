@@ -1,10 +1,13 @@
 use anyhow::{Result, Context};
-use tauri::{Manager, AppHandle};
+use tauri::{Manager, AppHandle, PhysicalPosition, PhysicalSize};
+use uuid::Uuid;
 use window_vibrancy::{apply_blur, apply_acrylic, apply_mica};
 use super::configuration::{BlurEffect, BarConfig, YasbConfig, validate_bar_label};
 use super::constants::{FRONTEND_INDEX, FRONTEND_SETUP};
 use super::tray::{TRAY_HIDE_ALL, TRAY_SHOW_ALL};
-use crate::win32::app_bar;
+use crate::core::configuration::BarEdge;
+use crate::core::constants::{DEFAULT_BAR_EDGE, DEFAULT_BAR_THICKNESS};
+use crate::win32::{app_bar, self};
 
 pub fn create_bars_from_config(app_handle: &AppHandle, config: YasbConfig) -> () {
   app_handle.tray_handle().get_item(TRAY_HIDE_ALL).set_enabled(false).expect("Failed to disable tray 'hide all' menu item");
@@ -41,8 +44,9 @@ fn create_window(app_handle: &AppHandle, label: String, url: &str) -> Result<tau
   window_builder.build().context(format!("Failed to build window for bar '{}'", label))
 }
 
-fn create_bar(app_handle: &AppHandle, bar_index: usize, monitor: &tauri::Monitor, bar_label: &String, bar_config: &BarConfig) -> Result<tauri::Window> {
-  let label = format!("{}_{}", bar_label, bar_index+1);
+fn create_bar(app_handle: &AppHandle, _bar_index: usize, monitor: &tauri::Monitor, bar_label: &String, bar_config: &BarConfig) -> Result<tauri::Window> {
+  let uuid = Uuid::new_v4().as_simple().to_string();
+  let label = format!("{}_{}", bar_label, uuid);
   let window = create_window(app_handle, label.clone(), FRONTEND_INDEX)?;
   let monitor_name = monitor.name().context(format!("Monitor for bar '{}' has NO NAME.", label));
   
@@ -66,12 +70,47 @@ fn create_bar(app_handle: &AppHandle, bar_index: usize, monitor: &tauri::Monitor
     }
   }
 
+  let bar_thickness = bar_config.thickness.unwrap_or(DEFAULT_BAR_THICKNESS);
+  let bar_edge = bar_config.edge.clone().unwrap_or(DEFAULT_BAR_EDGE);
+
+  // Default bar size and position is for top edge
+  let mut bar_position = PhysicalPosition::new(monitor.position().x, monitor.position().y);
+  let mut bar_size = PhysicalSize::new(monitor.size().width, bar_thickness);
+
+  // Change bar size and position based on edge provided in bar_config
+  match bar_edge {
+    BarEdge::Bottom => {
+      bar_position.y = monitor.position().y + monitor.size().height as i32 - bar_thickness as i32;
+    },
+    BarEdge::Left => {
+      bar_size.width = bar_thickness;
+      bar_size.height = monitor.size().height;
+    },
+    BarEdge::Right => {
+      bar_position.x = monitor.position().x + monitor.size().width as i32 - bar_thickness as i32;
+      bar_size.width = bar_thickness;
+      bar_size.height = monitor.size().height;
+    },
+    _ => {}
+  }
+
   window.set_decorations(false)?;
+  window.set_size(bar_size)?;
   window.set_skip_taskbar(true)?;
   window.set_resizable(false)?;
 
-  log::info!("Created {} on {}", label, monitor_name?);
+  // Minimum window height fix
+  let hwnd = window.hwnd().unwrap().clone();
+  win32::utils::mark_window_as_popup(hwnd);
+  window.set_position(bar_position)?;
 
+  log::info!(
+    "Created {} on {} at {},{}",
+    label,
+    monitor_name?,
+    bar_position.x,
+    bar_position.y
+  );
   Ok(window)
 }
 

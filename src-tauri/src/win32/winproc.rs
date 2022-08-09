@@ -1,10 +1,12 @@
 use std::ffi::{OsStr, c_void};
 use std::os::windows::ffi::OsStrExt;
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Manager, State};
 use windows::Win32::Foundation::{HWND, WPARAM, LPARAM, LRESULT, HINSTANCE};
 use windows::Win32::Graphics::Gdi::HBRUSH;
 use windows::Win32::UI::WindowsAndMessaging::{MSG, PeekMessageA, TranslateMessage, DispatchMessageA, WM_QUIT, PM_REMOVE, CreateWindowExW, RegisterClassW, WNDCLASSW, DefWindowProcW, PostQuitMessage, WM_DESTROY, HICON, HMENU, HCURSOR, WS_OVERLAPPED, WS_MINIMIZEBOX, WS_SYSMENU, WM_DISPLAYCHANGE};
 use windows::core::PCWSTR;
+
+use crate::core::{configuration, bar};
 
 // WinProc listener based off @jendrikillner's implementation
 // https://github.com/jendrikillner/RustMatch3/blob/master/os_window/src/os_window_lib.rs
@@ -17,10 +19,15 @@ unsafe extern "system" fn window_proc(
     w_param: WPARAM,
     l_param: LPARAM,
 ) -> LRESULT {
+  let app_handle = APP_HANDLE.clone().unwrap();
   match msg {
     WM_DISPLAYCHANGE => {
-      log::info!("WinProc: DIsplay change detected. Emitting 'ResolutionChangeEvent'");
-      let _ = APP_HANDLE.clone().unwrap().emit_all("ResolutionChangeEvent", true);
+      // Allow some time for added/removed monitors to update
+      std::thread::sleep(std::time::Duration::from_secs(1));
+      let config_state: State<configuration::Config> = app_handle.state();
+      let config = config_state.0.lock().unwrap().clone();
+      log::info!("WinProc: display change detected. Reloading windows...");
+      bar::create_bars_from_config(&app_handle.clone(), config);
     },
     WM_DESTROY => {
       PostQuitMessage(0);
@@ -76,6 +83,7 @@ pub fn listen(app_handle: AppHandle) -> () {
 
           // process messages
           loop {
+            std::thread::sleep(std::time::Duration::from_millis(500));
             if PeekMessageA(&mut msg, h_wnd_window, 0, 0, PM_REMOVE).as_bool() {
               TranslateMessage(&msg);
               DispatchMessageA(&msg);

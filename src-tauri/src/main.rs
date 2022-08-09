@@ -34,7 +34,6 @@ fn main() {
   // Prevent exit when all windows are closed. Exit via TrayIcon or by terminating process
   app.run(|_app_handle, event| match event {
     tauri::RunEvent::ExitRequested { api, .. } => {
-      log::info!("Prevented exit");
       api.prevent_exit();
     }
     _ => {}

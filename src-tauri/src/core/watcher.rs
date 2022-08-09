@@ -62,7 +62,7 @@ fn handle_config_changed(event: DebouncedEvent, app_handle: AppHandle) -> () {
         Ok(cfg) => {
           let config_state: State<configuration::Config> = app_handle.state();
           *config_state.0.lock().unwrap() = cfg.clone();
-
+          log::info!("Watcher: configuration change detected. Reloading windows...");
           bar::create_bars_from_config(&app_handle, cfg);
 
           notify_update_success(identifier, path_str, CONFIG_FILENAME);
