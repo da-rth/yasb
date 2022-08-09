@@ -10,6 +10,7 @@ pub const STYLES_FILENAME: &str = "styles.scss";
 
 pub const DEFAULT_BAR_THICKNESS: u32 = 64;
 pub const DEFAULT_BAR_EDGE: BarEdge = BarEdge::Top;
+pub const DEFAULT_BAR_TRANSPARENCY: bool = true;
 
 pub const CLI_ARG_CONFIG: &str = "config";
 pub const CLI_ARG_STYLES: &str = "styles";

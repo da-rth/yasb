@@ -22,7 +22,7 @@ pub enum BlurEffect {
   Mica
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, strum_macros::Display)]
 #[serde(rename_all = "lowercase")]
 pub enum BarEdge {
     Top,
@@ -45,7 +45,8 @@ pub struct BarConfig {
   pub widgets: ColumnBarWidgets,
   pub win_app_bar: Option<bool>,
   pub always_on_top: Option<bool>,
-  pub blur_effect: Option<BlurEffect>
+  pub blur_effect: Option<BlurEffect>,
+  pub transparency: Option<bool>
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

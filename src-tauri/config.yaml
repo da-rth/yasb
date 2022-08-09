@@ -6,6 +6,7 @@ bars:
     win_app_bar: true         # Optional, default: false, registers bar as a Windows Application Desktop Toolbar (e.g. a custom taskbar)
     # always_on_top: false    # Optional, default: false, ensures bar is always at TOPMOST window level.
     # blur_effect: "acrylic"  # Optional, default: None, options: blur|acrylic|mica. Mica works on Windows 11 only. Acrylic may have poor performance.
+    transparency: false      # Optional, default: true, enables fully transparent windows. Disable to see a white fallback window background.
     widgets:                  # Provide a list of widgets for left, middle and right bar columns
       left: [ left_txt ]
       middle: [ center_txt ]

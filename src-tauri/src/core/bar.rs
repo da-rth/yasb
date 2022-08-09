@@ -6,7 +6,7 @@ use super::configuration::{BlurEffect, BarConfig, YasbConfig, validate_bar_label
 use super::constants::{FRONTEND_INDEX, FRONTEND_SETUP};
 use super::tray::{TRAY_HIDE_ALL, TRAY_SHOW_ALL};
 use crate::core::configuration::BarEdge;
-use crate::core::constants::{DEFAULT_BAR_EDGE, DEFAULT_BAR_THICKNESS};
+use crate::core::constants::{DEFAULT_BAR_EDGE, DEFAULT_BAR_THICKNESS, DEFAULT_BAR_TRANSPARENCY};
 use crate::win32::{app_bar, self};
 
 pub fn create_bars_from_config(app_handle: &AppHandle, config: YasbConfig) -> () {
@@ -34,12 +34,12 @@ pub fn create_bars_from_config(app_handle: &AppHandle, config: YasbConfig) -> ()
     .expect("Failed to enable tray 'hide all' menu item");
 }
 
-fn create_window(app_handle: &AppHandle, label: String, url: &str) -> Result<tauri::Window> {
+fn create_window(app_handle: &AppHandle, label: String, url: &str, transparency: bool) -> Result<tauri::Window> {
   let window_builder = tauri::WindowBuilder::new(
     app_handle,
     label.clone(),
     tauri::WindowUrl::App(url.into())
-  ).min_inner_size(10.0, 10.0).visible(false).transparent(true);
+  ).min_inner_size(10.0, 10.0).visible(false).transparent(transparency);
 
   window_builder.build().context(format!("Failed to build window for bar '{}'", label))
 }
@@ -49,9 +49,12 @@ fn create_bar(app_handle: &AppHandle, monitor: &tauri::Monitor, bar_label: &Stri
   let label = format!("{}_{}", bar_label, &uuid[0..16]);
   let bar_thickness = bar_config.thickness.unwrap_or(DEFAULT_BAR_THICKNESS);
   let bar_edge = bar_config.edge.clone().unwrap_or(DEFAULT_BAR_EDGE);
-  let window = create_window(app_handle, label.clone(), FRONTEND_INDEX)?;
+  let bar_transparency = bar_config.transparency.unwrap_or(DEFAULT_BAR_TRANSPARENCY);
+  let bar_appbar = bar_config.win_app_bar.unwrap_or(false);
+
+  let window = create_window(app_handle, label.clone(), FRONTEND_INDEX, bar_transparency)?;
   
-  if bar_config.win_app_bar.unwrap_or(false) {
+  if bar_appbar {
     if let Err(e) = win32::app_bar::ab_register_and_position(window.clone(), bar_edge.clone(), bar_thickness.clone()) {
       log::error!("Failed to create Win32 App Bar for {}: {}", label.clone(), e);
     }
@@ -109,18 +112,20 @@ fn create_bar(app_handle: &AppHandle, monitor: &tauri::Monitor, bar_label: &Stri
   window.set_position(bar_position)?;
 
   log::info!(
-    "Created {} on {} at {},{}",
+    "Created {} on \"{}\" [ Pos: {},{} | Edge: {} | AppBar: {} ]",
     label,
     monitor_name?,
     bar_position.x,
-    bar_position.y
+    bar_position.y,
+    bar_edge,
+    bar_appbar
   );
   Ok(window)
 }
 
 fn create_bars(app_handle: &AppHandle, bar_label: &String, bar_config: &BarConfig) -> Result<Vec<tauri::Window>> {
   let mut bars: Vec<tauri::Window> = Vec::new();
-  let setup_window = create_window(app_handle, "setup_window".to_string(), FRONTEND_SETUP)?;
+  let setup_window = create_window(app_handle, "setup_window".to_string(), FRONTEND_SETUP, true)?;
 
   for monitor in setup_window.available_monitors()? {
     if let Some(ref screen_names) = bar_config.screens.clone() {
