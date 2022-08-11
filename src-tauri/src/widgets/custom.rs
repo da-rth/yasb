@@ -1,7 +1,9 @@
 use std::{process::{Command, Stdio, Child}, time::Duration, io::{Read, Error}};
 use serde::{Serialize, Deserialize};
+use std::os::windows::process::CommandExt;
 use wait_timeout::ChildExt;
 
+const DETACHED_PROCESS: u32 = 0x00000008;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -26,7 +28,13 @@ pub struct CommandResponse {
 
 #[tauri::command]
 pub fn process_custom_command(command: String, args: Vec<String>, timeout: u64) -> CommandResponse {
-  match Command::new(command.clone()).args(args.clone()).stdout(Stdio::piped()).stderr(Stdio::piped()).spawn() {
+  match Command::new(command.clone())
+    .args(args.clone())
+    .creation_flags(DETACHED_PROCESS)
+    .stdout(Stdio::piped())
+    .stderr(Stdio::piped())
+    .spawn()
+  {
     Ok(child) => process_child(child, timeout),
     Err(e) => process_error(command, args, e)
   }
