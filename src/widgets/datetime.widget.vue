@@ -2,23 +2,16 @@
 import moment from "moment"
 import { ref, onMounted } from "vue"
 
-const props = defineProps({
-  format: {
-      type: String,
-      required: false,
-      default: 'hh:mm:ss'
-  },
-  interval: {
-      type: Number,
-      required: false,
-      default: 1000
-  }
-});
+type DateTimeProps = {
+  format?: string,
+  interval?: number
+}
 
+const props = defineProps<DateTimeProps>();
 let currentDateTime = ref<Date | undefined>(undefined)
 
 onMounted(() => {
-    let timer = setInterval(updateCurrentDateTime, props.interval);
+    let timer = setInterval(updateCurrentDateTime, props.interval ?? 1000);
     updateCurrentDateTime()
 })
 
@@ -28,7 +21,7 @@ function updateCurrentDateTime() {
 </script>
 
 <template>
-  <span>{{moment(currentDateTime).format(props.format)}}</span>
+  <span>{{moment(currentDateTime).format(props.format ?? 'HH:mm:ss')}}</span>
 </template>
 
 <style scoped></style>

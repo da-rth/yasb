@@ -5,7 +5,7 @@ import { listen, Event as TauriEvent, UnlistenFn } from '@tauri-apps/api/event'
 import { availableWidgets, Widgets } from "./widgets";
 import { invoke } from '@tauri-apps/api/tauri';
 import { BarEdge, IBarConfig } from ".";
-import UnknownWidget from "./widgets/UnknownWidget.vue";
+import UnknownWidget from "./widgets/unknown.widget.vue";
 
 let windowHiddenByuser = false;
 let eventUnlistenFunctions: UnlistenFn[] = [];
@@ -63,6 +63,8 @@ onMounted(async () => {
   widgets.value.middle = Array.from(bar_widgets.middle.map((w: any) => Object.values(w)).flat());
   widgets.value.right = Array.from(bar_widgets.right.map((w: any) => Object.values(w)).flat());
 
+  console.log(widgets.value);
+  
   let bar_config: IBarConfig = await invoke('retrieve_config', {barLabel});
   config.value = bar_config;
 

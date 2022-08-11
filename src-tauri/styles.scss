@@ -64,5 +64,11 @@ body {
 }
 
 .separator {
-  background: red;
+  color: cadetblue;
+}
+
+#CustomWidget {
+  &.error {
+    color: red;
+  }
 }

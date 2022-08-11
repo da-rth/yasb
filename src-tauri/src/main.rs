@@ -26,7 +26,10 @@ fn main() {
     .invoke_handler(tauri::generate_handler![
       commands::retrieve_widgets,
       commands::retrieve_config,
-      commands::retrieve_styles
+      commands::retrieve_styles,
+
+      // Widget Commands
+      widgets::custom::process_custom_command
     ])
     .build(tauri::generate_context!())
     .expect(format!("Error while running application.").as_str());

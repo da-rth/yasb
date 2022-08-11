@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use tauri::State;
 use crate::core::configuration;
-use crate::widgets::{BarWidget, ConfiguredWidget};
+use crate::widgets::ConfiguredWidget;
 
 
 #[tauri::command]
@@ -16,7 +16,7 @@ pub fn retrieve_styles(styles_state: State<configuration::Styles>) -> String {
 }
 
 #[tauri::command]
-pub fn retrieve_widgets(bar_label: String, config_state: State<configuration::Config>) -> HashMap<String, Vec<BarWidget>> {
+pub fn retrieve_widgets(bar_label: String, config_state: State<configuration::Config>) -> HashMap<String, Vec<configuration::BarWidget>> {
   let bar_config = get_config_from_state(&config_state, &bar_label.as_str());
   let configured_widgets = get_configured_widgets_from_state(&config_state);
 
@@ -26,7 +26,7 @@ pub fn retrieve_widgets(bar_label: String, config_state: State<configuration::Co
     ("right".to_string(), bar_config.widgets.right.as_ref())
   ]);
 
-  let mut widgets_to_render: HashMap<String, Vec<BarWidget>> = HashMap::from([
+  let mut widgets_to_render: HashMap<String, Vec<configuration::BarWidget>> = HashMap::from([
     ("left".to_string(), Vec::new()),
     ("middle".to_string(), Vec::new()),
     ("right".to_string(), Vec::new())
@@ -38,9 +38,9 @@ pub fn retrieve_widgets(bar_label: String, config_state: State<configuration::Co
     if column_widgets.is_some() {
       for col_widget_name in column_widgets.unwrap() {
         if configured_widgets.contains_key(col_widget_name) {
-          column_to_render.push(BarWidget::Configured(configured_widgets.get(col_widget_name).unwrap().clone()));
+          column_to_render.push(configuration::BarWidget::Configured(configured_widgets.get(col_widget_name).unwrap().clone()));
         } else {
-          column_to_render.push(BarWidget::Default { kind: col_widget_name.to_string() });
+          column_to_render.push(configuration::BarWidget::Default { kind: col_widget_name.to_string() });
         }
       }
     }

@@ -3644,6 +3644,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "wait-timeout"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9f200f5b12eb75f8c1ed65abd4b2db8a6e1b138a20de009dacee265a2498f3f6"
+dependencies = [
+ "libc",
+]
+
+[[package]]
 name = "waker-fn"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4219,6 +4228,7 @@ dependencies = [
  "tauri-build",
  "tokio",
  "uuid 1.1.2",
+ "wait-timeout",
  "window-vibrancy",
  "windows 0.37.0",
 ]

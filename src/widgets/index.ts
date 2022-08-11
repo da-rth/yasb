@@ -1,9 +1,11 @@
-import TextWidget from "./Text.vue";
-import DateTimeWidget from "./DateTime.vue";
+import TextWidget from "./text.widget.vue";
+import DateTimeWidget from "./datetime.widget.vue";
+import CustomWidget from "./custom.widget.vue";
 
 export const availableWidgets = {
   TextWidget,
-  DateTimeWidget
+  DateTimeWidget,
+  CustomWidget
 }
 
 export interface Widget {

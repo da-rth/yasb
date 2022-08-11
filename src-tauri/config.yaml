@@ -8,24 +8,35 @@ bars:
     # blur_effect: "acrylic"  # Optional, default: None, options: blur|acrylic|mica. Mica works on Windows 11 only. Acrylic may have poor performance.
     # transparency: true      # Optional, default: true, enables fully transparent windows. Disable to see a white fallback window background.
     widgets:                  # Provide a list of widgets for left, middle and right bar columns
-      left: [ left_txt ]
-      middle: [ center_txt ]
-      right: [ right_txt, sep, DateTimeWidget ]
+      left: [ left_widget ]
+      middle: [ DateTimeWidget ]
+      right: [ ip_info, separator, right_widget  ]
 
 widgets:
-  left_txt:
+  left_widget:
     kind: TextWidget
     text: "left"
-  
-  right_txt:
+
+  right_widget:
     kind: TextWidget
     text: "right"
-  
-  center_txt:
-    kind: TextWidget
-    text: "middle"
 
-  sep:
+  separator:
     kind: TextWidget
     text: "|"
     class: separator
+
+  ip_info:
+    kind: CustomWidget
+    class: "ip_info"
+    label: "${data.city}, ${data.country}"
+    label_alt: "Public IP: ${data.ip}"
+    command:
+      cmd: "curl.exe"
+      args: ["https://ipinfo.io"]
+      interval: 60000
+    callbacks:
+      on_left: { exec: { cmd: "cmd.exe", args: ["/c", "start", "https://ipinfo.io/${data.ip}"] } }
+      on_right: { exec: { cmd: "cmd.exe", args: ["/c", "start", "https://maps.google.com/?q=${data.loc}"] } }
+      on_middle: "update"
+      on_hover: "toggle"

@@ -56,6 +56,15 @@ pub struct ColumnBarWidgets {
   pub right: Option<Vec<String>>,
 }
 
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum BarWidget {
+  Configured(ConfiguredWidget),
+  Default {
+    kind: String
+  }
+}
+
 pub struct Config(pub Arc<Mutex<YasbConfig>>);
 
 pub struct Styles(pub Arc<Mutex<String>>);
