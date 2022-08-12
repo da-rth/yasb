@@ -27,6 +27,7 @@ fn main() {
       commands::retrieve_widgets,
       commands::retrieve_config,
       commands::retrieve_styles,
+      commands::webview_log,
 
       // Widget Commands
       widgets::custom::process_custom_command

@@ -63,7 +63,7 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
   // Create the bars based on given config. Styles are set later...
   bar::create_bars_from_config(&app_handle, config.clone());
 
-  log::info!("Initialising background listeners");
+  log::info!("Initialising background listeners.");
   init_background_listeners(
     app_handle.clone(),
     config_path.clone(),
@@ -71,7 +71,7 @@ pub fn init(app: &mut tauri::App) ->  Result<(), Box<dyn std::error::Error>> {
     config.clone()
   );
 
-  log::info!("Setup complete");
+  log::info!("Initialisation complete.");
   Ok(())
 }
 

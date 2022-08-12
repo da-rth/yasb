@@ -5,6 +5,7 @@ import { listen, Event as TauriEvent, UnlistenFn } from '@tauri-apps/api/event'
 import { availableWidgets, Widgets } from "./widgets";
 import { invoke } from '@tauri-apps/api/tauri';
 import { BarEdge, IBarConfig } from ".";
+import log from "./log";
 import UnknownWidget from "./widgets/unknown.widget.vue";
 
 let windowHiddenByuser = false;
@@ -62,8 +63,6 @@ onMounted(async () => {
   widgets.value.left = Array.from(bar_widgets.left.map((w: any) => Object.values(w)).flat());
   widgets.value.middle = Array.from(bar_widgets.middle.map((w: any) => Object.values(w)).flat());
   widgets.value.right = Array.from(bar_widgets.right.map((w: any) => Object.values(w)).flat());
-
-  console.log(widgets.value);
   
   let bar_config: IBarConfig = await invoke('retrieve_config', {barLabel});
   config.value = bar_config;
@@ -76,6 +75,7 @@ onMounted(async () => {
 
   await appWindow.show();
   await appWindow.setAlwaysOnTop(bar_config?.always_on_top ?? false);
+  await log.info(`${appWindow.label} mounted.`)
 });
 
 onBeforeUnmount(async () => {

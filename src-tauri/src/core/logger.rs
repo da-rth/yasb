@@ -7,8 +7,31 @@ use simplelog::{
   Config,
   LevelFilter, TerminalMode, ColorChoice
 };
+use serde_repr::{Deserialize_repr, Serialize_repr};
 
 use crate::core::constants::{CONFIG_DIR_NAME, APP_LOG_FILENAME};
+
+#[derive(Debug, Clone, Deserialize_repr, Serialize_repr)]
+#[repr(u16)]
+pub enum WebviewLogLevel {
+  Info = 1,
+  Error = 2,
+  Debug = 3,
+  Trace = 4,
+  Warn = 5
+}
+
+impl From<WebviewLogLevel> for log::Level {
+  fn from(log_level: WebviewLogLevel) -> Self {
+    match log_level {
+      WebviewLogLevel::Trace => log::Level::Trace,
+      WebviewLogLevel::Debug => log::Level::Debug,
+      WebviewLogLevel::Info => log::Level::Info,
+      WebviewLogLevel::Warn => log::Level::Warn,
+      WebviewLogLevel::Error => log::Level::Error,
+    }
+  }
+}
 
 pub fn init_logger(verbose: bool) -> PathBuf {
   if let Some(home_path) = home_dir() {

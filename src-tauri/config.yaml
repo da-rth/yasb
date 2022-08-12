@@ -8,7 +8,7 @@ bars:
     # blur_effect: "acrylic"  # Optional, default: None, options: blur|acrylic|mica. Mica works on Windows 11 only. Acrylic may have poor performance.
     # transparency: true      # Optional, default: true, enables fully transparent windows. Disable to see a white fallback window background.
     widgets:                  # Provide a list of widgets for left, middle and right bar columns
-      left: [ left_widget ]
+      left: [ left_widget, CustomWidget ]
       middle: [ DateTimeWidget ]
       right: [ ip_info, separator, right_widget  ]
 

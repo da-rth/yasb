@@ -4221,6 +4221,7 @@ dependencies = [
  "rsass",
  "serde",
  "serde_json",
+ "serde_repr",
  "serde_yaml",
  "simplelog",
  "strum_macros 0.24.2",

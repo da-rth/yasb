@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use tauri::State;
 use crate::core::configuration;
 use crate::widgets::ConfiguredWidget;
+use crate::core::logger::WebviewLogLevel;
 
 
 #[tauri::command]
@@ -57,4 +58,10 @@ fn get_config_from_state(config: &State<configuration::Config>, bar_label: &str)
 fn get_configured_widgets_from_state(config: &State<configuration::Config>) -> HashMap<String, ConfiguredWidget> {
   let locked_config = config.0.lock().unwrap();
   locked_config.widgets.as_ref().unwrap().clone()
+}
+
+#[tauri::command]
+pub fn webview_log(level: WebviewLogLevel, message: String, location: Option<&str>) {
+  let location = location.unwrap_or("webview");
+  log::log!(target: location, level.into(), "Webview: {}", message)
 }
