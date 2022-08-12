@@ -5,6 +5,7 @@ type TextWidgetProps = {
 }
 
 const props = defineProps<TextWidgetProps>();
+
 </script>
 
 <template>

@@ -1,5 +1,4 @@
-import { createApp } from 'vue'
-import './style.css'
-import Bar from './Bar.vue'
+import {createApp} from 'vue';
+import bar from './components/bar.vue';
 
-createApp(Bar).mount('#YasbBar')
+createApp(bar).mount('#YasbBar');

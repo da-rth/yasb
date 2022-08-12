@@ -1,10 +1,12 @@
 <script setup lang="ts">
+
 const props = defineProps({
   kind: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 });
+
 </script>
 
 <template>
