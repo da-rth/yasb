@@ -4,7 +4,7 @@ cssutils==2.5.1
 humanize==4.3.0
 psutil==5.9.1
 PyQt6==6.3.1
-pytz==2022.1
+pytz==2022.2
 pywin32==304
 PyYAML==6.0
 tzlocal==4.2
