@@ -5,8 +5,6 @@
   "type": "module",
   "scripts": {
     "predev": "npm run lint",
-    "prebuild": "npm run lint",
-    "pretauri": "npm run lint",
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "tauri": "cross-env TAURI_DEV_WATCHER_IGNORE_FILE=.tauriignore tauri",
