@@ -1,4 +1,5 @@
 use super::constants::CONFIG_DIR_NAME;
+use crate::core::constants::APP_LOG_FILENAME;
 use crate::widgets::base::ConfiguredWidget;
 use anyhow::{Error, Result};
 use home::home_dir;
@@ -89,20 +90,20 @@ pub fn get_configuration_file(filename: &str) -> PathBuf {
         // try creating config path if it doesn't exist
         if !config_path.exists() {
             create_dir_all(config_path.parent().unwrap()).unwrap_or_else(|_| {
-                eprintln!("Error creating config directory");
+                eprintln!("The directory {} could not be created.", config_path.display());
             });
         }
 
         // get the actual config file path
-        let mut config_file_path = config_path;
+        let mut config_file_path = config_path.clone();
         config_file_path.push(filename);
 
-        if config_file_path.exists() {
+        if filename == APP_LOG_FILENAME || config_file_path.exists() {
             config_file_path
         } else {
             // TODO: copy the defaults over instead of exiting
             // If copy not possible, load configs from src directory
-            eprintln!("Config file does not exist. Exiting.");
+            log::error!("{} does not exist in {}. Exiting.", filename, config_path.display());
             std::process::exit(1);
         }
     } else {
