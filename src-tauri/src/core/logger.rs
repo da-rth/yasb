@@ -33,8 +33,6 @@ impl From<WebviewLogLevel> for log::Level {
 pub fn init_logger(verbose: bool) -> PathBuf {
     let log_path = get_configuration_file(APP_LOG_FILENAME);
 
-    eprint!("log path: {}", log_path.clone().display());
-
     CombinedLogger::init(vec![
         TermLogger::new(
             LevelFilter::Info,

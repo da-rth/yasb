@@ -77,12 +77,21 @@ pub fn get_configuration_file(filename: &str) -> PathBuf {
         // If neither directory existsm try get default directories for log and configuration files
         if !config_path.exists() {
             match create_dir_all(&config_path) {
-                Ok(_) => {},
+                Ok(_) => {}
                 Err(e) => {
                     // Default log directory is $HOME
                     // Default configuration file directory is where the program executable lives e.g. C:\Program Files\yasb\
-                    let default_path =  if filename == APP_LOG_FILENAME {  home_path.clone() } else { get_program_path() };
-                    eprintln!("The directory {} could not be created. Error: {}. Defaulting to: {}", config_path.clone().display(), e, default_path.clone().display());
+                    let default_path = if filename == APP_LOG_FILENAME {
+                        home_path.clone()
+                    } else {
+                        get_program_path()
+                    };
+                    eprintln!(
+                        "The directory {} could not be created. Error: {}. Defaulting to: {}",
+                        config_path.clone().display(),
+                        e,
+                        default_path.clone().display()
+                    );
                     config_path = default_path;
                     is_config_path_program_path = true;
                 }
@@ -92,14 +101,18 @@ pub fn get_configuration_file(filename: &str) -> PathBuf {
         // Get full path to configuration file
         let mut config_file_path = config_path.clone();
         config_file_path.push(filename);
-  
+
         // If configuration file is a (possibly nonexistant) path to a log file or exists, return the path
         if filename == APP_LOG_FILENAME || config_file_path.exists() {
-            return config_file_path
+            return config_file_path;
         } else {
             // If we have fallen back to the program configuration path and the default configuration file doesn't exist, exit.
             if is_config_path_program_path {
-                log::error!("The default for {} does not exist in {}. Exiting.", filename, config_file_path.display());
+                log::error!(
+                    "The default for {} does not exist in {}. Exiting.",
+                    filename,
+                    config_file_path.display()
+                );
                 std::process::exit(1);
             }
 
@@ -107,11 +120,20 @@ pub fn get_configuration_file(filename: &str) -> PathBuf {
             let default_file_path = get_default_configuration_file(filename);
             match std::fs::copy(&default_file_path, &config_file_path) {
                 Ok(_) => {
-                    log::info!("Successfully copied {} to {}", default_file_path.display(), config_file_path.display());
+                    log::info!(
+                        "Successfully copied {} to {}",
+                        default_file_path.display(),
+                        config_file_path.display()
+                    );
                     return config_file_path;
                 }
                 Err(e) => {
-                    log::error!("Failed copying {} to {} directory: {}.\n\nExiting.", filename, config_file_path.display(), e);
+                    log::error!(
+                        "Failed copying {} to {} directory: {}.\n\nExiting.",
+                        filename,
+                        config_file_path.display(),
+                        e
+                    );
                     std::process::exit(1);
                 }
             }
@@ -128,7 +150,7 @@ fn get_xdg_or_home_config_path(home_path: PathBuf) -> PathBuf {
             let mut xdg_config_path = Path::new(&xdg_path.clone()).to_path_buf();
             xdg_config_path.push(CONFIG_DIR_NAME);
             xdg_config_path
-        },
+        }
         Err(_) => {
             let mut home_config_path = home_path;
             home_config_path.push(".config");
@@ -139,18 +161,20 @@ fn get_xdg_or_home_config_path(home_path: PathBuf) -> PathBuf {
 }
 
 fn get_program_path() -> PathBuf {
-     match std::env::current_exe() {
+    match std::env::current_exe() {
         Ok(mut exe_path) => {
             exe_path.pop();
             exe_path
-        },
+        }
         Err(e) => {
-            log::error!("Failed loading default configuration files. Cannot find program path: {}.", e);
+            log::error!(
+                "Failed loading default configuration files. Cannot find program path: {}.",
+                e
+            );
             std::process::exit(1);
-        },
+        }
     }
 }
-
 
 fn get_default_configuration_file(filename: &str) -> PathBuf {
     let mut default_file_path = get_program_path();
@@ -159,7 +183,11 @@ fn get_default_configuration_file(filename: &str) -> PathBuf {
     if default_file_path.exists() {
         return default_file_path;
     } else {
-        log::error!("The default for {} does not exist in {}. Exiting.", filename, default_file_path.display());
+        log::error!(
+            "The default for {} does not exist in {}. Exiting.",
+            filename,
+            default_file_path.display()
+        );
         std::process::exit(1);
     }
 }

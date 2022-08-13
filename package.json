@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "pretauri": "npm run eslint",
+    "pretauri": "npm run cargo:test && npm run lint",
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build --emptyOutDir",
     "tauri": "cross-env TAURI_DEV_WATCHER_IGNORE_FILE=.tauriignore tauri",
