@@ -1,7 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directory: "/src"
+    directory: "/"
     schedule:
       interval: "weekly"
   - package-ecosystem: "cargo"
