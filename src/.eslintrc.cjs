@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 module.exports = {
   root: true,
   parser: "vue-eslint-parser",
@@ -15,7 +16,7 @@ module.exports = {
     "prettier/prettier": [
       "error",
       {
-        endOfLine: "clrf",
+        endOfLine: "crlf",
       },
     ],
     "vue/multi-word-component-names": "off",
