@@ -16,6 +16,8 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::Mutex;
+use tauri::api::dialog::blocking::MessageDialogBuilder;
+use tauri::api::dialog::{MessageDialogButtons, MessageDialogKind};
 use ts_rs::TS;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
@@ -69,6 +71,8 @@ pub struct Config(pub Arc<Mutex<YasbConfig>>);
 
 pub struct Styles(pub Arc<Mutex<String>>);
 
+static mut COPY_FILES: bool = false;
+
 pub fn get_configuration_file(filename: &str) -> PathBuf {
     if let Some(home_path) = home_dir() {
         let mut config_path = get_xdg_or_home_config_path(home_path.clone());
@@ -76,8 +80,28 @@ pub fn get_configuration_file(filename: &str) -> PathBuf {
 
         // If neither directory existsm try get default directories for log and configuration files
         if !config_path.exists() {
+            println!("path no existerino");
             match create_dir_all(&config_path) {
-                Ok(_) => {}
+                Ok(_) => {
+                    println!("path creat");
+                    // Ask if configuration files should be copied to configuration directory
+                    let title = "Setup: configuration directory";
+                    let message = format!(
+                        "Successfully created directory: {}\n\nDo you want to copy default config files to this path?\n\nOtherwise, the default configuration files will be loaded.",
+                        config_path.clone().display(),
+                    );
+
+                    log::info!(
+                        "Successfully created configuration directory: {}",
+                        config_path.clone().display()
+                    );
+
+                    unsafe {
+                        COPY_FILES = MessageDialogBuilder::new(title, message)
+                            .buttons(MessageDialogButtons::YesNo)
+                            .show();
+                    }
+                }
                 Err(e) => {
                     // Default log directory is $HOME
                     // Default configuration file directory is where the program executable lives e.g. C:\Program Files\yasb\
@@ -107,35 +131,73 @@ pub fn get_configuration_file(filename: &str) -> PathBuf {
             return config_file_path;
         } else {
             // If we have fallen back to the program configuration path and the default configuration file doesn't exist, exit.
-            if is_config_path_program_path {
-                log::error!(
-                    "The default for {} does not exist in {}. Exiting.",
-                    filename,
-                    config_file_path.display()
-                );
-                std::process::exit(1);
-            }
+            if !is_config_path_program_path {
+                let default_file_path = get_default_configuration_file(filename);
 
-            // Otherwise, try copy from the default configuration file to the non-existing configuration file path
-            let default_file_path = get_default_configuration_file(filename);
-            match std::fs::copy(&default_file_path, &config_file_path) {
-                Ok(_) => {
-                    log::info!(
-                        "Successfully copied {} to {}",
-                        default_file_path.display(),
-                        config_file_path.display()
+                // If the default file path for the given file doesn't exist, exit.
+                if !default_file_path.exists() {
+                    let title = "Setup: configuration error";
+                    let message = format!(
+                        "Failed to find file: {}\n\nReason: File does not exist.\n\nPlease ensure a valid file exists at this path and try again.",
+                        default_file_path.clone().display()
                     );
-                    return config_file_path;
-                }
-                Err(e) => {
-                    log::error!(
-                        "Failed copying {} to {} directory: {}.\n\nExiting.",
-                        filename,
-                        config_file_path.display(),
-                        e
-                    );
+                    log::error!("{}", message);
+                    let _ = MessageDialogBuilder::new(title, message)
+                        .kind(MessageDialogKind::Error)
+                        .buttons(MessageDialogButtons::Ok)
+                        .show();
                     std::process::exit(1);
                 }
+
+                // Otherwise, if copying is enabled, try copy from the default configuration file to the non-existing configuration file path
+                unsafe {
+                    if COPY_FILES {
+                        match std::fs::copy(&default_file_path, &config_file_path) {
+                            Ok(_) => {
+                                log::info!(
+                                    "Successfully copied {} to {}",
+                                    default_file_path.display(),
+                                    config_file_path.display()
+                                );
+                                return config_file_path;
+                            }
+                            Err(e) => {
+                                let title = "Setup: configuration error";
+                                let message = format!(
+                                    "Failed coping configuraiton file:\n- from: {}\n- to: {}\n\nReason: File does not exist.\n\nPlease ensure a valid file exists at this path and try again.",
+                                    default_file_path.clone().display(),
+                                    config_file_path.clone().display()
+                                );
+                                log::error!(
+                                    "Failed copying configuration file from {} to {}: {}. Exiting.",
+                                    filename,
+                                    config_file_path.display(),
+                                    e
+                                );
+                                let _ = MessageDialogBuilder::new(title, message)
+                                    .kind(MessageDialogKind::Error)
+                                    .buttons(MessageDialogButtons::Ok)
+                                    .show();
+                                std::process::exit(1);
+                            }
+                        }
+                    } else {
+                        default_file_path
+                    }
+                }
+            } else {
+                let title = "Setup: configuration error";
+                let message = format!(
+                    "Failed to load file: {}\n\nReason: File does not exist.\n\nPlease ensure a valid file exists at this path and try again.",
+                    config_file_path.clone().display(),
+                );
+                log::error!("{}", message);
+                let _ = MessageDialogBuilder::new(title, message)
+                    .kind(MessageDialogKind::Error)
+                    .buttons(MessageDialogButtons::Ok)
+                    .show();
+
+                std::process::exit(1);
             }
         }
     } else {
@@ -183,11 +245,16 @@ fn get_default_configuration_file(filename: &str) -> PathBuf {
     if default_file_path.exists() {
         return default_file_path;
     } else {
-        log::error!(
-            "The default for {} does not exist in {}. Exiting.",
-            filename,
-            default_file_path.display()
+        let title = "Init: configuration error";
+        let message = format!(
+            "Failed to load default file: {}\n\nReason: File does not exist.\n\nPlease ensure a valid file exists at this path and try again.",
+            default_file_path.clone().display(),
         );
+        log::error!("{}", message);
+        let _ = MessageDialogBuilder::new(title, message)
+            .kind(MessageDialogKind::Error)
+            .buttons(MessageDialogButtons::Ok)
+            .show();
         std::process::exit(1);
     }
 }
