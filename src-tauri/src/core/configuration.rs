@@ -15,17 +15,29 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::Mutex;
+use ts_rs::TS;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, strum_macros::Display)]
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "../src/bindings/config/")]
+pub struct YasbConfig {
+  pub bars: HashMap<String, BarConfig>,
+  pub widgets: Option<HashMap<String, ConfiguredWidget>>
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, strum_macros::Display, TS)]
 #[serde(rename_all = "lowercase")]
+#[ts(export, export_to = "../src/bindings/config/")]
 pub enum BlurEffect {
   Blur,
   Acrylic,
   Mica,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, strum_macros::Display)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, strum_macros::Display, TS)]
 #[serde(rename_all = "lowercase")]
+#[ts(export, export_to = "../src/bindings/config/")]
 pub enum BarEdge {
   Top,
   Left,
@@ -39,7 +51,9 @@ pub struct YasbConfig {
   pub widgets: Option<HashMap<String, ConfiguredWidget>>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "../src/bindings/config/")]
 pub struct BarConfig {
   pub thickness: Option<u32>,
   pub edge: Option<BarEdge>,
@@ -51,17 +65,12 @@ pub struct BarConfig {
   pub transparency: Option<bool>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "../src/bindings/config/")]
 pub struct ColumnBarWidgets {
   pub left: Option<Vec<String>>,
   pub middle: Option<Vec<String>>,
   pub right: Option<Vec<String>>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub enum BarWidget {
-  Configured(ConfiguredWidget),
-  Default { kind: String },
 }
 
 pub struct Config(pub Arc<Mutex<YasbConfig>>);

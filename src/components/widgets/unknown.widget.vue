@@ -1,16 +1,16 @@
 <script setup lang="ts">
-
 const props = defineProps({
   kind: {
     type: String,
     required: true,
   },
 });
-
 </script>
 
 <template>
-  <span class="widget" id="UnknownWidget" placeholder="unknown widget">{{props.kind}}</span>
+  <span class="widget" id="UnknownWidget" placeholder="unknown widget">{{
+    props.kind
+  }}</span>
 </template>
 
 <style scoped>

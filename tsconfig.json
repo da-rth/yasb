@@ -11,7 +11,10 @@
     "isolatedModules": false,
     "esModuleInterop": true,
     "lib": ["ESNext", "DOM"],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "~/*": ["./src/*", "./dist/*"]
+    }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/utils"],
   "references": [{ "path": "./tsconfig.node.json" }]
