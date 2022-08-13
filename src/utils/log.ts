@@ -1,22 +1,23 @@
-import {invoke} from '@tauri-apps/api/tauri';
+import { invoke } from "@tauri-apps/api/tauri";
 
 enum LogLevel {
   Info = 1,
   Error = 2,
   Debug = 3,
   Trace = 4,
-  Warn = 5
+  Warn = 5,
 }
-
 
 export default class Log {
   private static async logger(level: LogLevel, message: string): Promise<void> {
-    const traces = new Error().stack?.split('\n').map((line) => line.split('@'));
+    const traces = new Error().stack
+      ?.split("\n")
+      .map((line) => line.split("@"));
     const filtered = traces?.filter(
-      ([name, location]) => name.length && location !== '[native code]'
+      ([name, location]) => name.length && location !== "[native code]"
     );
-    const location = filtered?.[0]?.join('@');
-    await invoke('webview_log', {level, message, location});
+    const location = filtered?.[0]?.join("@");
+    await invoke("webview_log", { level, message, location });
   }
 
   public static async error(msg: string): Promise<void> {
@@ -34,4 +35,4 @@ export default class Log {
   public static async info(msg: string): Promise<void> {
     await this.logger(LogLevel.Info, msg);
   }
-};
+}
