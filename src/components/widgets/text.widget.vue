@@ -1,13 +1,9 @@
 <script setup lang="ts">
-
-type TextWidgetProps = {
-  text?: string
-}
+import { TextWidgetProps } from "~/bindings/widget/text/TextWidgetProps";
 
 const props = defineProps<TextWidgetProps>();
-
 </script>
 
 <template>
-  <span>{{props.text ?? 'Text'}}</span>
+  <span :class="['widget', props.class]">{{ props.text ?? "Text" }}</span>
 </template>

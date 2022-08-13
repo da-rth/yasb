@@ -1,34 +1,23 @@
 module.exports = {
-  'env': {
-    'browser': true,
-    'es2021': true,
+  root: true,
+  parser: "vue-eslint-parser",
+  parserOptions: {
+    parser: "@typescript-eslint/parser",
   },
-  'extends': [
-    'plugin:vue/vue3-essential',
-    'google',
-    'plugin:vue/base',
+  extends: [
+    "plugin:vue/strongly-recommended",
+    "eslint:recommended",
+    "@vue/typescript/recommended",
+    "prettier",
   ],
-  'parser': 'vue-eslint-parser',
-  'parserOptions': {
-    'parser': '@typescript-eslint/parser',
-    'sourceType': 'module',
-    'ecmaVersion': 2018,
-    'ecmaFeatures': {
-      'globalReturn': false,
-      'impliedStrict': false,
-      'jsx': false,
-    },
-  },
-  'plugins': [
-    'vue',
-    '@typescript-eslint',
-  ],
-  'rules': {
-    'no-unused-vars': 'off',
-    'vue/multi-word-component-names': 'off',
-    'linebreak-style': ['error', 'windows'],
-    'indent': ['error', 2],
-    'max-len': ['error', {'code': 128}],
-    'require-jsdoc': 'off',
+  plugins: ["@typescript-eslint", "prettier"],
+  rules: {
+    "prettier/prettier": [
+      "error",
+      {
+        endOfLine: "clrf",
+      },
+    ],
+    "vue/multi-word-component-names": "off",
   },
 };

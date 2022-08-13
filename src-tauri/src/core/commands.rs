@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use tauri::State;
 use crate::core::configuration;
-use crate::widgets::ConfiguredWidget;
+use crate::widgets::base::{ConfiguredWidget, ConfiguredOrDefaultWidget, ConfiguredOrDefaultWidgets};
 use crate::core::logger::WebviewLogLevel;
 
 
@@ -16,8 +16,9 @@ pub fn retrieve_styles(styles_state: State<configuration::Styles>) -> String {
   styles_state.0.lock().unwrap().to_string()
 }
 
+
 #[tauri::command]
-pub fn retrieve_widgets(bar_label: String, config_state: State<configuration::Config>) -> HashMap<String, Vec<configuration::BarWidget>> {
+pub fn retrieve_widgets(bar_label: String, config_state: State<configuration::Config>) -> ConfiguredOrDefaultWidgets {
   let bar_config = get_config_from_state(&config_state, &bar_label.as_str());
   let configured_widgets = get_configured_widgets_from_state(&config_state);
 
@@ -27,21 +28,21 @@ pub fn retrieve_widgets(bar_label: String, config_state: State<configuration::Co
     ("right".to_string(), bar_config.widgets.right.as_ref())
   ]);
 
-  let mut widgets_to_render: HashMap<String, Vec<configuration::BarWidget>> = HashMap::from([
-    ("left".to_string(), Vec::new()),
-    ("middle".to_string(), Vec::new()),
-    ("right".to_string(), Vec::new())
-  ]);
+  let mut widgets_to_render = ConfiguredOrDefaultWidgets {
+    left: Vec::new(),
+    middle: Vec::new(),
+    right: Vec::new(),
+  };
   
   for (bar_column, column_widgets) in bar_widgets {
-    let column_to_render = widgets_to_render.get_mut(&bar_column).unwrap();
+    let column_to_render = widgets_to_render.get_column(&bar_column).unwrap();
 
     if column_widgets.is_some() {
       for col_widget_name in column_widgets.unwrap() {
         if configured_widgets.contains_key(col_widget_name) {
-          column_to_render.push(configuration::BarWidget::Configured(configured_widgets.get(col_widget_name).unwrap().clone()));
+          column_to_render.push(ConfiguredOrDefaultWidget::Configured(configured_widgets.get(col_widget_name).unwrap().clone()));
         } else {
-          column_to_render.push(configuration::BarWidget::Default { kind: col_widget_name.to_string() });
+          column_to_render.push(ConfiguredOrDefaultWidget::Default { kind: col_widget_name.to_string() });
         }
       }
     }

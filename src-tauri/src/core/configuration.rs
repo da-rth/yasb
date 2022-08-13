@@ -10,20 +10,31 @@ use serde::Serialize;
 use home::home_dir;
 use rsass::{compile_scss_path, output};
 use anyhow::{Result, Error};
-use crate::widgets::ConfiguredWidget;
+use ts_rs::TS;
+use crate::widgets::base::ConfiguredWidget;
 use super::constants::CONFIG_DIR_NAME;
 
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, strum_macros::Display)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "../src/bindings/config/")]
+pub struct YasbConfig {
+  pub bars: HashMap<String, BarConfig>,
+  pub widgets: Option<HashMap<String, ConfiguredWidget>>
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, strum_macros::Display, TS)]
 #[serde(rename_all = "lowercase")]
+#[ts(export, export_to = "../src/bindings/config/")]
 pub enum BlurEffect {
   Blur,
   Acrylic,
   Mica
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, strum_macros::Display)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, strum_macros::Display, TS)]
 #[serde(rename_all = "lowercase")]
+#[ts(export, export_to = "../src/bindings/config/")]
 pub enum BarEdge {
     Top,
     Left,
@@ -31,13 +42,8 @@ pub enum BarEdge {
     Right
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct YasbConfig {
-  pub bars: HashMap<String, BarConfig>,
-  pub widgets: Option<HashMap<String, ConfiguredWidget>>
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "../src/bindings/config/")]
 pub struct BarConfig {
   pub thickness: Option<u32>,
   pub edge: Option<BarEdge>,
@@ -49,20 +55,12 @@ pub struct BarConfig {
   pub transparency: Option<bool>
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "../src/bindings/config/")]
 pub struct ColumnBarWidgets {
   pub left: Option<Vec<String>>,
   pub middle: Option<Vec<String>>,
   pub right: Option<Vec<String>>,
-}
-
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub enum BarWidget {
-  Configured(ConfiguredWidget),
-  Default {
-    kind: String
-  }
 }
 
 pub struct Config(pub Arc<Mutex<YasbConfig>>);

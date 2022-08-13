@@ -1,33 +1,41 @@
 use std::{process::{Command, Stdio, Child}, time::Duration, io::{Read, Error}};
 use serde::{Serialize, Deserialize};
+use ts_rs::TS;
 use std::os::windows::process::CommandExt;
 use wait_timeout::ChildExt;
 
+use super::base::WidgetCallbacks;
+
 const DETACHED_PROCESS: u32 = 0x00000008;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum CommandOutputFormat {
-  String,
-  Json
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "../src/bindings/widget/custom/")]
+pub struct CustomWidgetProps {
+  class: Option<String>,
+  label: Option<String>,
+  label_alt: Option<String>,
+  command: Option<CustomCommandOptions>,
+  callbacks: Option<WidgetCallbacks>
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct CommandOptions {
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "../src/bindings/widget/custom/")]
+pub struct CustomCommandOptions {
   cmd: String,
   args: Option<Vec<String>>,
   interval: Option<u32>
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CommandResponse {
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "../src/bindings/widget/custom/")]
+pub struct CustomCommandResponse {
   stdout: Option<String>,
   stderr: Option<String>,
   status: Option<i32>
 }
 
 #[tauri::command]
-pub fn process_custom_command(command: String, args: Vec<String>, timeout: u64) -> CommandResponse {
+pub fn process_custom_command(command: String, args: Vec<String>, timeout: u64) -> CustomCommandResponse {
   match Command::new(command.clone())
     .args(args.clone())
     .creation_flags(DETACHED_PROCESS)
@@ -40,7 +48,7 @@ pub fn process_custom_command(command: String, args: Vec<String>, timeout: u64) 
   }
 }
 
-fn process_child(mut child: Child, timeout: u64) -> CommandResponse {
+fn process_child(mut child: Child, timeout: u64) -> CustomCommandResponse {
   let timeout = Duration::from_millis(timeout);
 
   let status = match child.wait_timeout(timeout).unwrap() {
@@ -69,10 +77,10 @@ fn process_child(mut child: Child, timeout: u64) -> CommandResponse {
     None => None
   };
 
-  CommandResponse { stdout, stderr, status }
+  CustomCommandResponse { stdout, stderr, status }
 }
 
-fn process_error(cmd: String, args: Vec<String>, error: Error) -> CommandResponse {
+fn process_error(cmd: String, args: Vec<String>, error: Error) -> CustomCommandResponse {
   log::error!("Error processing CustomWidget command: {} {:?}: {}", cmd, args, error);
-  CommandResponse { stdout: None, stderr: Some(error.to_string()), status: Some(1) }
+  CustomCommandResponse { stdout: None, stderr: Some(error.to_string()), status: Some(1) }
 }

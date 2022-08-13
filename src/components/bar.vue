@@ -1,38 +1,19 @@
 <script setup lang="ts">
-
-import {computed, onMounted, Ref, ref, onBeforeUnmount} from 'vue';
-import {appWindow} from '@tauri-apps/api/window';
-import {listen, Event as TauriEvent, UnlistenFn} from '@tauri-apps/api/event';
-import {availableWidgets, Widgets} from './widgets';
-import {invoke} from '@tauri-apps/api/tauri';
-import log from '@/utils/log';
-import UnknownWidget from './widgets/unknown.widget.vue';
-
-enum BarEdge {
-  Top = 'top',
-  Left = 'left',
-  Bottom = 'bottom',
-  Right = 'right'
-}
-
-type ColumnBarWidgets = {
-  left?: string[],
-  middle?: string[],
-  right?: string[]
-}
-
-interface IBarConfig {
-  thickness?: number,
-  edge?: BarEdge,
-  screens?: string[],
-  widgets?: ColumnBarWidgets,
-  win_app_bar?: boolean,
-  always_on_top?: boolean
-}
+import { computed, onMounted, Ref, ref, onBeforeUnmount } from "vue";
+import { appWindow } from "@tauri-apps/api/window";
+import { listen, Event as TauriEvent, UnlistenFn } from "@tauri-apps/api/event";
+import { availableWidgets } from "./widgets";
+import { invoke } from "@tauri-apps/api/tauri";
+import { BarConfig } from "~/bindings/config/BarConfig";
+import { ConfiguredWidget } from "~/bindings/widget/ConfiguredWidget";
+import { ConfiguredWidgets } from "~/bindings/widget/ConfiguredWidgets";
+import { ConfiguredOrDefaultWidgets } from "~/bindings/widget/base/ConfiguredOrDefaultWidgets";
+import UnknownWidget from "./widgets/unknown.widget.vue";
+import log from "~/utils/log";
 
 const unlisteners: UnlistenFn[] = [];
-const config: Ref<IBarConfig> = ref({});
-const widgets: Ref<Widgets> = ref({
+const config: Ref<BarConfig | undefined> = ref();
+const widgets: Ref<ConfiguredWidgets> = ref({
   left: [],
   middle: [],
   right: [],
@@ -41,9 +22,9 @@ const widgets: Ref<Widgets> = ref({
 let windowHiddenByuser = false;
 let stylesheetElement: HTMLElement | undefined;
 
-const barLabel = appWindow.label.slice(0, appWindow.label.lastIndexOf('_'));
+const barLabel = appWindow.label.slice(0, appWindow.label.lastIndexOf("_"));
 const edgeClass = computed(() => {
-  return config.value.edge ? `edge-${config.value.edge}` : '';
+  return config.value?.edge ? `edge-${config.value?.edge}` : "";
 });
 
 const onStylesChanged = (event: TauriEvent<string>) => {
@@ -52,50 +33,58 @@ const onStylesChanged = (event: TauriEvent<string>) => {
   }
 };
 
-const onHideAllWindows = (event: TauriEvent<boolean>) => {
+const onHideAllWindows = () => {
   windowHiddenByuser = true;
   appWindow.hide();
 };
 
-const onShowAllWindows = (event: TauriEvent<boolean>) => {
+const onShowAllWindows = () => {
   windowHiddenByuser = false;
   appWindow.show();
 };
 
-const onFullscreenHide = () => {
-  // Don't hide or show windows explicitly hidden by the user
-  if (config.value.always_on_top && !windowHiddenByuser) {
+const onHideFullscreen = () => {
+  if (config.value?.always_on_top && !windowHiddenByuser) {
     appWindow.hide();
   }
 };
 
-const onFullscreenShow = () => {
-  // Don't hide or show windows explicitly hidden by the user
-  if (config.value.always_on_top && !windowHiddenByuser) {
+const onShowFullscreen = () => {
+  if (config.value?.always_on_top && !windowHiddenByuser) {
     appWindow.show();
   }
 };
 
 onMounted(async () => {
-  const barStyles: string = await invoke('retrieve_styles');
-  stylesheetElement = document.createElement('style');
-  stylesheetElement.setAttribute('type', 'text/css');
+  const barStyles: string = await invoke("retrieve_styles");
+  stylesheetElement = document.createElement("style");
+  stylesheetElement.setAttribute("type", "text/css");
   stylesheetElement.textContent = barStyles;
   document.head.appendChild(stylesheetElement);
 
-  const barWidgets: any = await invoke('retrieve_widgets', {barLabel});
-  widgets.value.left = Array.from(barWidgets.left.map((w: any) => Object.values(w)).flat());
-  widgets.value.middle = Array.from(barWidgets.middle.map((w: any) => Object.values(w)).flat());
-  widgets.value.right = Array.from(barWidgets.right.map((w: any) => Object.values(w)).flat());
+  const barWidgets: ConfiguredOrDefaultWidgets = await invoke(
+    "retrieve_widgets",
+    { barLabel }
+  );
 
-  const barConfig: IBarConfig = await invoke('retrieve_config', {barLabel});
+  widgets.value.left = Array.from(
+    barWidgets.left.map((w) => Object.values(w) as ConfiguredWidget[]).flat()
+  );
+  widgets.value.middle = Array.from(
+    barWidgets.middle.map((w) => Object.values(w) as ConfiguredWidget[]).flat()
+  );
+  widgets.value.right = Array.from(
+    barWidgets.right.map((w) => Object.values(w) as ConfiguredWidget[]).flat()
+  );
+
+  const barConfig: BarConfig = await invoke("retrieve_config", { barLabel });
   config.value = barConfig;
 
-  unlisteners.push(await listen('StylesChangedEvent', onStylesChanged));
-  unlisteners.push(await listen('HideAllWindowsEvent', onHideAllWindows));
-  unlisteners.push(await listen('ShowAllWindowsEvent', onShowAllWindows));
-  unlisteners.push(await listen('FullscreenHideWindow', onFullscreenHide));
-  unlisteners.push(await listen('FullscreenShowWindow', onFullscreenShow));
+  unlisteners.push(await listen("StylesChangedEvent", onStylesChanged));
+  unlisteners.push(await listen("HideAllWindowsEvent", onHideAllWindows));
+  unlisteners.push(await listen("ShowAllWindowsEvent", onShowAllWindows));
+  unlisteners.push(await listen("FullscreenHideWindow", onHideFullscreen));
+  unlisteners.push(await listen("FullscreenShowWindow", onShowFullscreen));
 
   await appWindow.show();
   await appWindow.setAlwaysOnTop(barConfig?.always_on_top ?? false);
@@ -109,50 +98,58 @@ onBeforeUnmount(async () => {
     unlistener();
   }
 });
-
 </script>
 
 <template>
   <div id="bar" :class="[barLabel, edgeClass]">
     <div class="widgets-container bar-left">
-      <template v-for="(widget, _idx) in widgets.left" :key="`l_${widget.kind}_${_idx}`">
-       <component
+      <template v-for="(widget, _idx) in widgets.left">
+        <component
           v-if="widget.kind in availableWidgets"
+          v-bind="widget"
           :is="availableWidgets[widget.kind]"
           :id="widget.kind"
-          :class="widget.class"
-          class="widget"
-          v-bind="widget"
+          :key="`left_${widget.kind}_${_idx}`"
         ></component>
-        <UnknownWidget :kind="widget.kind" v-else/>
+        <UnknownWidget
+          :kind="widget.kind"
+          :key="`left_unknown_${widget.kind}_${_idx}`"
+          v-else
+        />
       </template>
     </div>
 
     <div class="widgets-container bar-middle">
-      <template v-for="(widget, _idx) in widgets.middle" :key="`m_${widget.kind}_${_idx}`">
+      <template v-for="(widget, _idx) in widgets.middle">
         <component
           v-if="widget.kind in availableWidgets"
+          v-bind="widget"
           :is="availableWidgets[widget.kind]"
           :id="widget.kind"
-          :class="widget.class"
-          class="widget"
-          v-bind="widget"
+          :key="`middle_${widget.kind}_${_idx}`"
         ></component>
-        <UnknownWidget :kind="widget.kind" v-else/>
+        <UnknownWidget
+          :kind="widget.kind"
+          :key="`middle_unknown_${widget.kind}_${_idx}`"
+          v-else
+        />
       </template>
     </div>
 
     <div class="widgets-container bar-right">
-      <template v-for="(widget, _idx) in widgets.right" :key="`r_${widget.kind}_${_idx}`">
+      <template v-for="(widget, _idx) in widgets.right">
         <component
           v-if="widget.kind in availableWidgets"
+          v-bind="widget"
           :is="availableWidgets[widget.kind]"
           :id="widget.kind"
-          :class="widget.class"
-          class="widget"
-          v-bind="widget"
+          :key="`right_${widget.kind}_${_idx}`"
         ></component>
-        <UnknownWidget :kind="widget.kind" v-else/>
+        <UnknownWidget
+          :kind="widget.kind"
+          :key="`right_unknown_${widget.kind}_${_idx}`"
+          v-else
+        />
       </template>
     </div>
   </div>
