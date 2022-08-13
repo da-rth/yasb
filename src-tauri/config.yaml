@@ -1,6 +1,6 @@
 bars:
   yasb_bar:                   # Required, label MUST be in snake_case or ClassCase e.g. "foo_bar" or "FooBar"
-    thickness: 64             # Optional, default: 64, the width (or height) of the bar in pixels
+    thickness: 32             # Optional, default: 64, the width (or height) of the bar in pixels
     edge: "top"               # Optional, default: top, options: top|left|bottom|right
     screens: []               # Optional, default: [] (all screens), takes: list of screen names to show bar on
     win_app_bar: true         # Optional, default: false, registers bar as a Windows Application Desktop Toolbar (e.g. a custom taskbar)
