@@ -15,7 +15,7 @@ module.exports = {
     "prettier/prettier": [
       "error",
       {
-        endOfLine: "clrf",
+        endOfLine: "crlf",
       },
     ],
     "vue/multi-word-component-names": "off",
