@@ -1,5 +1,5 @@
 use super::constants::CONFIG_DIR_NAME;
-use crate::widgets::ConfiguredWidget;
+use crate::widgets::base::ConfiguredWidget;
 use anyhow::{Error, Result};
 use home::home_dir;
 use inflector::cases::classcase::is_class_case;
@@ -44,13 +44,6 @@ pub enum BarEdge {
   Bottom,
   Right,
 }
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct YasbConfig {
-  pub bars: HashMap<String, BarConfig>,
-  pub widgets: Option<HashMap<String, ConfiguredWidget>>,
-}
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/config/")]
@@ -110,6 +103,7 @@ pub fn get_configuration_file(filename: &str) -> PathBuf {
       config_file_path
     } else {
       // TODO: copy the defaults over instead of exiting
+      // If copy not possible, load configs from src directory
       eprintln!("Config file does not exist. Exiting.");
       std::process::exit(1);
     }
