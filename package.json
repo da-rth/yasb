@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "tauri": "cross-env TAURI_DEV_WATCHER_IGNORE_FILE=.tauriignore tauri",
-    "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src"
+    "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src && rustfmt ./src-tauri/src/main.rs"
   },
   "dependencies": {
     "@tauri-apps/api": "^1.0.2",
