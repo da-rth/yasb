@@ -1,14 +1,9 @@
-use tauri::{
-    AppHandle,
-    CustomMenuItem,
-    SystemTray,
-    SystemTrayEvent,
-    SystemTrayMenu,
-    SystemTrayMenuItem,
-    Manager
-};
-use anyhow::Result;
 use crate::win32;
+use anyhow::Result;
+use tauri::{
+    AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu,
+    SystemTrayMenuItem,
+};
 
 pub const TRAY_QUIT: &str = "quit";
 pub const TRAY_HIDE_ALL: &str = "hide_all";
@@ -16,8 +11,8 @@ pub const TRAY_SHOW_ALL: &str = "show_all";
 
 #[derive(strum_macros::Display)]
 enum TrayEvent {
-  HideAllWindowsEvent,
-  ShowAllWindowsEvent
+    HideAllWindowsEvent,
+    ShowAllWindowsEvent,
 }
 
 pub fn build_tray() -> SystemTray {
@@ -33,7 +28,7 @@ pub fn build_tray() -> SystemTray {
         .add_item(show)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(quit);
-    
+
     SystemTray::new().with_menu(tray_menu)
 }
 
@@ -43,7 +38,11 @@ pub fn tray_event_handler(app: &AppHandle, event: SystemTrayEvent) -> () {
             log::info!("Tray: handling click for menu item '{}'.", id.as_str());
 
             if let Err(error) = handle_menu_item_click(id.clone(), app) {
-                log::error!("Tray: failed handling click for menu item '{}': {:?}", id.as_str(), error);
+                log::error!(
+                    "Tray: failed handling click for menu item '{}': {:?}",
+                    id.as_str(),
+                    error
+                );
             }
         }
         _ => {}
@@ -61,14 +60,14 @@ fn handle_menu_item_click(menu_id: String, app_handle: &AppHandle) -> Result<()>
             win32::app_bar::ab_remove_all(&windows)?;
             app_handle.exit(1);
             //app_handle.restart();
-        },
+        }
 
         TRAY_HIDE_ALL => {
             log::info!("Hiding all windows...");
             app_handle.emit_all(TrayEvent::HideAllWindowsEvent.to_string().as_str(), true)?;
             tray_handle.get_item(TRAY_HIDE_ALL).set_enabled(false)?;
             tray_handle.get_item(TRAY_SHOW_ALL).set_enabled(true)?;
-        },
+        }
 
         TRAY_SHOW_ALL => {
             log::info!("Showing all windows...");

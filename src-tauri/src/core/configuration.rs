@@ -17,53 +17,51 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use ts_rs::TS;
 
-
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/config/")]
 pub struct YasbConfig {
-  pub bars: HashMap<String, BarConfig>,
-  pub widgets: Option<HashMap<String, ConfiguredWidget>>
+    pub bars: HashMap<String, BarConfig>,
+    pub widgets: Option<HashMap<String, ConfiguredWidget>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, strum_macros::Display, TS)]
 #[serde(rename_all = "lowercase")]
 #[ts(export, export_to = "../src/bindings/config/")]
 pub enum BlurEffect {
-  Blur,
-  Acrylic,
-  Mica,
+    Blur,
+    Acrylic,
+    Mica,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, strum_macros::Display, TS)]
 #[serde(rename_all = "lowercase")]
 #[ts(export, export_to = "../src/bindings/config/")]
 pub enum BarEdge {
-  Top,
-  Left,
-  Bottom,
-  Right,
+    Top,
+    Left,
+    Bottom,
+    Right,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/config/")]
 pub struct BarConfig {
-  pub thickness: Option<u32>,
-  pub edge: Option<BarEdge>,
-  pub screens: Option<Vec<String>>,
-  pub widgets: ColumnBarWidgets,
-  pub win_app_bar: Option<bool>,
-  pub always_on_top: Option<bool>,
-  pub blur_effect: Option<BlurEffect>,
-  pub transparency: Option<bool>,
+    pub thickness: Option<u32>,
+    pub edge: Option<BarEdge>,
+    pub screens: Option<Vec<String>>,
+    pub widgets: ColumnBarWidgets,
+    pub win_app_bar: Option<bool>,
+    pub always_on_top: Option<bool>,
+    pub blur_effect: Option<BlurEffect>,
+    pub transparency: Option<bool>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/config/")]
 pub struct ColumnBarWidgets {
-  pub left: Option<Vec<String>>,
-  pub middle: Option<Vec<String>>,
-  pub right: Option<Vec<String>>,
+    pub left: Option<Vec<String>>,
+    pub middle: Option<Vec<String>>,
+    pub right: Option<Vec<String>>,
 }
 
 pub struct Config(pub Arc<Mutex<YasbConfig>>);
@@ -71,76 +69,76 @@ pub struct Config(pub Arc<Mutex<YasbConfig>>);
 pub struct Styles(pub Arc<Mutex<String>>);
 
 pub fn get_configuration_file(filename: &str) -> PathBuf {
-  if let Some(home_path) = home_dir() {
-    // try using $XDG_CONFIG_HOME for config if it exists
-    if let Ok(xdg_config_home) = env::var("XDG_CONFIG_HOME") {
-      let mut xdg_config_path = Path::new(&xdg_config_home.clone()).to_path_buf();
+    if let Some(home_path) = home_dir() {
+        // try using $XDG_CONFIG_HOME for config if it exists
+        if let Ok(xdg_config_home) = env::var("XDG_CONFIG_HOME") {
+            let mut xdg_config_path = Path::new(&xdg_config_home.clone()).to_path_buf();
 
-      xdg_config_path.push(filename);
+            xdg_config_path.push(filename);
 
-      if xdg_config_path.exists() {
-        return xdg_config_path;
-      }
-    }
+            if xdg_config_path.exists() {
+                return xdg_config_path;
+            }
+        }
 
-    // otherwise, try using .config
-    let mut config_path = home_path;
-    config_path.push(".config");
-    config_path.push(CONFIG_DIR_NAME);
+        // otherwise, try using .config
+        let mut config_path = home_path;
+        config_path.push(".config");
+        config_path.push(CONFIG_DIR_NAME);
 
-    // try creating config path if it doesn't exist
-    if !config_path.exists() {
-      create_dir_all(config_path.parent().unwrap()).unwrap_or_else(|_| {
-        eprintln!("Error creating config directory");
-      });
-    }
+        // try creating config path if it doesn't exist
+        if !config_path.exists() {
+            create_dir_all(config_path.parent().unwrap()).unwrap_or_else(|_| {
+                eprintln!("Error creating config directory");
+            });
+        }
 
-    // get the actual config file path
-    let mut config_file_path = config_path;
-    config_file_path.push(filename);
+        // get the actual config file path
+        let mut config_file_path = config_path;
+        config_file_path.push(filename);
 
-    if config_file_path.exists() {
-      config_file_path
+        if config_file_path.exists() {
+            config_file_path
+        } else {
+            // TODO: copy the defaults over instead of exiting
+            // If copy not possible, load configs from src directory
+            eprintln!("Config file does not exist. Exiting.");
+            std::process::exit(1);
+        }
     } else {
-      // TODO: copy the defaults over instead of exiting
-      // If copy not possible, load configs from src directory
-      eprintln!("Config file does not exist. Exiting.");
-      std::process::exit(1);
+        eprintln!("Could not find user $HOME directory. Exiting.");
+        std::process::exit(1);
     }
-  } else {
-    eprintln!("Could not find user $HOME directory. Exiting.");
-    std::process::exit(1);
-  }
 }
 
 pub fn validate_bar_label(bar_label: &str) -> String {
-  if !is_snake_case(bar_label) && !is_class_case(bar_label) && !is_kebab_case(bar_label) {
-    let snake_cased_label = to_snake_case(bar_label);
-    log::warn!(
-      "Invalid bar label '{}' provided. Converted to camel_case: '{}'",
-      bar_label,
-      snake_cased_label
-    );
-    snake_cased_label
-  } else {
-    bar_label.to_string()
-  }
+    if !is_snake_case(bar_label) && !is_class_case(bar_label) && !is_kebab_case(bar_label) {
+        let snake_cased_label = to_snake_case(bar_label);
+        log::warn!(
+            "Invalid bar label '{}' provided. Converted to camel_case: '{}'",
+            bar_label,
+            snake_cased_label
+        );
+        snake_cased_label
+    } else {
+        bar_label.to_string()
+    }
 }
 
 pub fn get_config(config_path: &PathBuf) -> Result<YasbConfig, Error> {
-  let config_stream = std::fs::read_to_string(config_path)?;
-  let config: YasbConfig = serde_yaml::from_str(&config_stream.as_str())?;
+    let config_stream = std::fs::read_to_string(config_path)?;
+    let config: YasbConfig = serde_yaml::from_str(&config_stream.as_str())?;
 
-  Ok(config)
+    Ok(config)
 }
 
 pub fn get_styles(styles_path: &PathBuf) -> Result<String, Error> {
-  let format = output::Format {
-    style: output::Style::Compressed,
-    ..Default::default()
-  };
-  let css_buf = compile_scss_path(styles_path, format)?;
-  let css_str = std::str::from_utf8(&css_buf)?;
+    let format = output::Format {
+        style: output::Style::Compressed,
+        ..Default::default()
+    };
+    let css_buf = compile_scss_path(styles_path, format)?;
+    let css_str = std::str::from_utf8(&css_buf)?;
 
-  Ok(css_str.to_string())
+    Ok(css_str.to_string())
 }
