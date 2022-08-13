@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
+use super::cat::CatWidgetProps;
 use super::{custom::CustomWidgetProps, datetime::DateTimeWidgetProps, text::TextWidgetProps};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
@@ -10,6 +11,7 @@ pub enum ConfiguredWidget {
     TextWidget(TextWidgetProps),
     DateTimeWidget(DateTimeWidgetProps),
     CustomWidget(CustomWidgetProps),
+    CatWidget(CatWidgetProps),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]

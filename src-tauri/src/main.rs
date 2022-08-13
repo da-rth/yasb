@@ -29,7 +29,8 @@ fn main() {
             commands::retrieve_styles,
             commands::webview_log,
             // Widget Commands
-            widgets::custom::process_custom_command
+            widgets::custom::process_custom_command,
+            widgets::cat::process_cat_command
         ])
         .build(tauri::generate_context!())
         .expect(format!("Error while running application.").as_str());

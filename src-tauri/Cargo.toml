@@ -39,6 +39,7 @@ serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.0.5", features = ["api-all", "cli", "system-tray"] }
 ctrlc = { version = "3.2.2", features = ["termination"] }
 tokio = { version = "1.20.1", features = ["full" ] }
+shellexpand = "2"
 
 [dev-dependencies]
 ts-rs = { version = "6.1", features = ["serde-compat", "format"] }
