@@ -1,15 +1,12 @@
-use std::{fs::{File, create_dir_all}, path::PathBuf};
-use home::home_dir;
-use simplelog::{
-  CombinedLogger,
-  TermLogger,
-  WriteLogger,
-  Config,
-  LevelFilter, TerminalMode, ColorChoice
-};
 use serde_repr::{Deserialize_repr, Serialize_repr};
+use simplelog::{
+  ColorChoice, CombinedLogger, Config, LevelFilter, TermLogger, TerminalMode, WriteLogger,
+};
+use std::{fs::File, path::PathBuf};
 
-use crate::core::constants::{CONFIG_DIR_NAME, APP_LOG_FILENAME};
+use crate::core::constants::APP_LOG_FILENAME;
+
+use super::configuration::get_configuration_file;
 
 #[derive(Debug, Clone, Deserialize_repr, Serialize_repr)]
 #[repr(u16)]
@@ -18,7 +15,7 @@ pub enum WebviewLogLevel {
   Error = 2,
   Debug = 3,
   Trace = 4,
-  Warn = 5
+  Warn = 5,
 }
 
 impl From<WebviewLogLevel> for log::Level {
@@ -34,35 +31,26 @@ impl From<WebviewLogLevel> for log::Level {
 }
 
 pub fn init_logger(verbose: bool) -> PathBuf {
-  if let Some(home_path) = home_dir() {
+  let log_path = get_configuration_file(APP_LOG_FILENAME);
 
-    let mut log_path = home_path;
-    log_path.push(CONFIG_DIR_NAME);
-    log_path.push(APP_LOG_FILENAME);
+  CombinedLogger::init(vec![
+    TermLogger::new(
+      LevelFilter::Info,
+      Config::default(),
+      TerminalMode::Mixed,
+      if verbose {
+        ColorChoice::Never
+      } else {
+        ColorChoice::Auto
+      },
+    ),
+    WriteLogger::new(
+      LevelFilter::Info,
+      Config::default(),
+      File::create(log_path.clone()).unwrap(),
+    ),
+  ])
+  .expect("Failed to initialise logger");
 
-    create_dir_all(log_path.parent().unwrap()).unwrap_or_else(|_| {
-      eprintln!("Error creating logger directory");
-    });
-
-    CombinedLogger::init(
-      vec![
-        TermLogger::new(
-          LevelFilter::Info,
-          Config::default(),
-          TerminalMode::Mixed,
-          if verbose { ColorChoice::Never } else { ColorChoice::Auto }
-        ),
-        WriteLogger::new(
-          LevelFilter::Info,
-          Config::default(),
-          File::create(log_path.clone()).unwrap()
-        )
-      ]
-    ).expect("Failed to initialise logger");
-
-    log_path
-  } else {
-    eprintln!("No home directory could be fine. Exiting...");
-    std::process::exit(1);
-  }
+  log_path
 }

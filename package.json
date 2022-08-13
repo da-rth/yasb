@@ -7,9 +7,10 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build --emptyOutDir",
     "tauri": "cross-env TAURI_DEV_WATCHER_IGNORE_FILE=.tauriignore tauri",
+    "lint": "npm run eslint && npm run rustfmt",
     "eslint": "eslint src --ext .ts,.vue --max-warnings=0 --fix",
+    "rustfmt": "rustfmt ./src-tauri/src/main.rs",
     "cargo:test": "cargo test --manifest-path ./src-tauri/Cargo.toml",
-    "rustfmt": "rustfmt ./src-tauri/src/main.rs"
   },
   "dependencies": {
     "@tauri-apps/api": "^1.0.2",
