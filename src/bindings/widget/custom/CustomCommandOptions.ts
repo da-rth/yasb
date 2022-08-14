@@ -5,5 +5,4 @@ export interface CustomCommandOptions {
   args: Array<string> | null;
   interval: number | null;
   timeout: number | null;
-  detach_process: boolean | null;
 }

@@ -10,7 +10,7 @@ use wait_timeout::ChildExt;
 
 use super::base::WidgetCallbacks;
 
-const DETACHED_PROCESS: u32 = 0x00000008;
+const CREATE_NO_WINDOW: u32 = 0x08000000;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/widget/custom/")]
@@ -29,7 +29,6 @@ pub struct CustomCommandOptions {
     args: Option<Vec<String>>,
     interval: Option<u32>,
     timeout: Option<u32>,
-    detach_process: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize, TS)]
@@ -45,16 +44,12 @@ pub fn process_custom_command(
     command: String,
     args: Vec<String>,
     timeout: u64,
-    detach: bool,
 ) -> CustomCommandResponse {
     let mut cmd = Command::new(command.clone());
     cmd.args(args.clone());
     cmd.stdout(Stdio::piped());
     cmd.stderr(Stdio::piped());
-
-    if detach {
-        cmd.creation_flags(DETACHED_PROCESS);
-    }
+    cmd.creation_flags(CREATE_NO_WINDOW);
 
     match cmd.spawn() {
         Ok(child) => process_child(child, timeout),

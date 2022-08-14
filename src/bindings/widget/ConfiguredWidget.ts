@@ -4,6 +4,6 @@ import type { DateTimeWidgetProps } from "./datetime\\DateTimeWidgetProps";
 import type { TextWidgetProps } from "./text\\TextWidgetProps";
 
 export type ConfiguredWidget =
-  | ({ kind: "TextWidget" } & TextWidgetProps)
-  | ({ kind: "DateTimeWidget" } & DateTimeWidgetProps)
-  | ({ kind: "CustomWidget" } & CustomWidgetProps);
+  | { kind: "TextWidget" } & TextWidgetProps
+  | { kind: "DateTimeWidget" } & DateTimeWidgetProps
+  | { kind: "CustomWidget" } & CustomWidgetProps;

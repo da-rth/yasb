@@ -39,7 +39,6 @@ const executeCommand = async () => {
     command: props.command?.cmd,
     args: props.command?.args ?? [],
     timeout: props.command?.timeout ?? props.command?.interval ?? 1000,
-    detach: props.command?.detach_process ?? true,
   });
 
   updateActiveLabel();
