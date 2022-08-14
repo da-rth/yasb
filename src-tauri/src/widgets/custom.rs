@@ -28,6 +28,8 @@ pub struct CustomCommandOptions {
     cmd: String,
     args: Option<Vec<String>>,
     interval: Option<u32>,
+    timeout: Option<u32>,
+    detach_process: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize, TS)]
@@ -43,14 +45,18 @@ pub fn process_custom_command(
     command: String,
     args: Vec<String>,
     timeout: u64,
+    detach: bool,
 ) -> CustomCommandResponse {
-    match Command::new(command.clone())
-        .args(args.clone())
-        .creation_flags(DETACHED_PROCESS)
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
-    {
+    let mut cmd = Command::new(command.clone());
+    cmd.args(args.clone());
+    cmd.stdout(Stdio::piped());
+    cmd.stderr(Stdio::piped());
+
+    if detach {
+        cmd.creation_flags(DETACHED_PROCESS);
+    }
+
+    match cmd.spawn() {
         Ok(child) => process_child(child, timeout),
         Err(e) => process_error(command, args, e),
     }
