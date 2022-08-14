@@ -49,7 +49,7 @@ const updateActiveLabel = () => {
     try {
       data = JSON.parse(commandResult.stdout);
     } catch {
-      data = commandResult.stdout.replace("\n", "\\n");
+      data = commandResult.stdout.replace(/(\r\n|\n|\r)/gm, "");
     }
     try {
       const fmt = eval("`" + activeLabel.replace(/`/g, "\\`") + "`");
