@@ -1,9 +1,9 @@
 use crate::core::configuration;
 use crate::core::logger::WebviewLogLevel;
-use crate::widgets::base::{
-    ConfiguredOrDefaultWidget, ConfiguredOrDefaultWidgets, ConfiguredWidget,
-};
+use crate::widgets::base::{ConfiguredWidget, ConfiguredWidgets};
+use crate::widgets::unknown::UnknownWidgetProps;
 use std::collections::HashMap;
+use std::str::FromStr;
 use tauri::State;
 
 #[tauri::command]
@@ -24,7 +24,7 @@ pub fn retrieve_styles(styles_state: State<configuration::Styles>) -> String {
 pub fn retrieve_widgets(
     bar_label: String,
     config_state: State<configuration::Config>,
-) -> ConfiguredOrDefaultWidgets {
+) -> ConfiguredWidgets {
     let bar_config = get_config_from_state(&config_state, &bar_label.as_str());
     let configured_widgets = get_configured_widgets_from_state(&config_state);
 
@@ -34,7 +34,7 @@ pub fn retrieve_widgets(
         ("right".to_string(), bar_config.widgets.right.as_ref()),
     ]);
 
-    let mut widgets_to_render = ConfiguredOrDefaultWidgets {
+    let mut widgets_to_render = ConfiguredWidgets {
         left: Vec::new(),
         middle: Vec::new(),
         right: Vec::new(),
@@ -46,13 +46,15 @@ pub fn retrieve_widgets(
         if column_widgets.is_some() {
             for col_widget_name in column_widgets.unwrap() {
                 if configured_widgets.contains_key(col_widget_name) {
-                    column_to_render.push(ConfiguredOrDefaultWidget::Configured(
-                        configured_widgets.get(col_widget_name).unwrap().clone(),
-                    ));
+                    let widget = configured_widgets.get(col_widget_name).unwrap().clone();
+                    column_to_render.push(widget);
                 } else {
-                    column_to_render.push(ConfiguredOrDefaultWidget::Default {
-                        kind: col_widget_name.to_string(),
-                    });
+                    // col_widget_name to default struct
+                    column_to_render.push(ConfiguredWidget::from_str(col_widget_name).unwrap_or(
+                        ConfiguredWidget::UnknownWidget(UnknownWidgetProps {
+                            kind: col_widget_name.to_string(),
+                        }),
+                    ));
                 }
             }
         }

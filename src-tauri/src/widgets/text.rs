@@ -7,3 +7,12 @@ pub struct TextWidgetProps {
     class: Option<String>,
     text: Option<String>,
 }
+
+impl Default for TextWidgetProps {
+    fn default() -> TextWidgetProps {
+        TextWidgetProps {
+            class: None,
+            text: None,
+        }
+    }
+}

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import moment from "moment";
+import type { DateTimeWidgetProps } from "~/bindings/widget/datetime/DateTimeWidgetProps";
 import { ref, onMounted } from "vue";
-import { DateTimeWidgetProps } from "~/bindings/widget/datetime/DateTimeWidgetProps";
+import moment from "moment";
 
 const props = defineProps<DateTimeWidgetProps>();
 const currentDateTime = ref<Date | undefined>(undefined);

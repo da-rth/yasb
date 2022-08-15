@@ -1,4 +1,5 @@
+import "./default.scss";
 import { createApp } from "vue";
-import bar from "./components/bar.vue";
+import YasbBar from "./components/Yasbbar.vue";
 
-createApp(bar).mount("#YasbBar");
+createApp(YasbBar).mount("#YasbBar");

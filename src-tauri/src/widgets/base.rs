@@ -1,15 +1,39 @@
 use serde::{Deserialize, Serialize};
+use std::str::FromStr;
 use ts_rs::TS;
 
-use super::{custom::CustomWidgetProps, datetime::DateTimeWidgetProps, text::TextWidgetProps};
+use super::{
+    active_window::ActiveWindowWidgetProps, custom::CustomWidgetProps,
+    datetime::DateTimeWidgetProps, text::TextWidgetProps, unknown::UnknownWidgetProps,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[serde(tag = "kind")]
 #[ts(export, export_to = "../src/bindings/widget/")]
 pub enum ConfiguredWidget {
-    TextWidget(TextWidgetProps),
-    DateTimeWidget(DateTimeWidgetProps),
+    ActiveWindowWidget(ActiveWindowWidgetProps),
     CustomWidget(CustomWidgetProps),
+    DateTimeWidget(DateTimeWidgetProps),
+    TextWidget(TextWidgetProps),
+    UnknownWidget(UnknownWidgetProps),
+}
+
+impl FromStr for ConfiguredWidget {
+    type Err = ();
+
+    fn from_str(input: &str) -> Result<ConfiguredWidget, Self::Err> {
+        match input {
+            "ActiveWindowWidget" => Ok(ConfiguredWidget::ActiveWindowWidget(
+                ActiveWindowWidgetProps::default(),
+            )),
+            "CustomWidget" => Ok(ConfiguredWidget::CustomWidget(CustomWidgetProps::default())),
+            "DateTimeWidget" => Ok(ConfiguredWidget::DateTimeWidget(
+                DateTimeWidgetProps::default(),
+            )),
+            "TextWidget" => Ok(ConfiguredWidget::TextWidget(TextWidgetProps::default())),
+            _ => Err(()),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
@@ -20,6 +44,17 @@ pub struct ConfiguredWidgets {
     pub right: Vec<ConfiguredWidget>,
 }
 
+impl ConfiguredWidgets {
+    pub fn get_column(&mut self, field: &str) -> Option<&mut Vec<ConfiguredWidget>> {
+        match field {
+            "left" => Some(&mut self.left),
+            "middle" => Some(&mut self.middle),
+            "right" => Some(&mut self.right),
+            _ => None,
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/widget/base/")]
 #[serde(rename_all = "snake_case")]
@@ -28,6 +63,13 @@ pub enum CallbackEvent {
     OnMiddle,
     OnRight,
     OnHover,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "../src/bindings/widget/base/")]
+pub struct CallbackTypeExecOptions {
+    cmd: String,
+    args: Option<Vec<String>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
@@ -42,48 +84,9 @@ pub enum CallbackType {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/widget/base/")]
-pub struct CallbackTypeExec {
-    exec: CallbackTypeExecOptions,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
-#[ts(export, export_to = "../src/bindings/widget/base/")]
-pub struct CallbackTypeExecOptions {
-    cmd: String,
-    args: Option<Vec<String>>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
-#[ts(export, export_to = "../src/bindings/widget/base/")]
 pub struct WidgetCallbacks {
     on_left: Option<CallbackType>,
     on_middle: Option<CallbackType>,
     on_right: Option<CallbackType>,
     on_hover: Option<CallbackType>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
-#[ts(export, export_to = "../src/bindings/widget/base/")]
-pub enum ConfiguredOrDefaultWidget {
-    Configured(ConfiguredWidget),
-    Default { kind: String },
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
-#[ts(export, export_to = "../src/bindings/widget/base/")]
-pub struct ConfiguredOrDefaultWidgets {
-    pub left: Vec<ConfiguredOrDefaultWidget>,
-    pub middle: Vec<ConfiguredOrDefaultWidget>,
-    pub right: Vec<ConfiguredOrDefaultWidget>,
-}
-
-impl ConfiguredOrDefaultWidgets {
-    pub fn get_column(&mut self, field: &str) -> Option<&mut Vec<ConfiguredOrDefaultWidget>> {
-        match field {
-            "left" => Some(&mut self.left),
-            "middle" => Some(&mut self.middle),
-            "right" => Some(&mut self.right),
-            _ => None,
-        }
-    }
 }

@@ -1,6 +1,7 @@
 use crate::core::bar;
 use crate::core::configuration;
 use crate::core::constants::{APP_LOG_FILENAME, CONFIG_FILENAME, STYLES_FILENAME};
+use crate::core::events::BarEvent;
 use anyhow::{Error, Result};
 use hotwatch::Hotwatch;
 use notify::DebouncedEvent;
@@ -10,14 +11,9 @@ use tauri::api::notification::Notification;
 use tauri::State;
 use tauri::{AppHandle, Manager};
 
-#[derive(strum_macros::Display)]
-enum Event {
-    StylesChangedEvent,
-}
-
 fn send_event_payload<S: Serialize + Clone>(
     app_handle: &AppHandle,
-    event: Event,
+    event: BarEvent,
     payload: S,
 ) -> () {
     let event_str = &event.to_string();
@@ -98,7 +94,7 @@ fn handle_styles_changed(event: DebouncedEvent, app_handle: AppHandle) -> () {
                     let styles_state: State<configuration::Styles> = app_handle.state();
                     *styles_state.0.lock().unwrap() = css.clone();
 
-                    send_event_payload(&app_handle, Event::StylesChangedEvent, css);
+                    send_event_payload(&app_handle, BarEvent::StylesChangedEvent, css);
                     notify_update_success(identifier, path_str, STYLES_FILENAME);
                 }
                 Err(e) => notify_update_failure(identifier, path_str, e),
