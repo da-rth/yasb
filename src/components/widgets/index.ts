@@ -1,9 +1,13 @@
-import TextWidget from "./text.widget.vue";
-import DateTimeWidget from "./datetime.widget.vue";
-import CustomWidget from "./custom.widget.vue";
+import ActiveWindowWidget from "./ActiveWindowWidget.vue";
+import CustomWidget from "./CustomWidget.vue";
+import DateTimeWidget from "./DateTimeWidget.vue";
+import TextWidget from "./TextWidget.vue";
+import UnknownWidget from "./UnknownWidget.vue";
 
-export const availableWidgets = {
-  TextWidget,
-  DateTimeWidget,
+export default {
+  ActiveWindowWidget,
   CustomWidget,
+  DateTimeWidget,
+  TextWidget,
+  UnknownWidget,
 };

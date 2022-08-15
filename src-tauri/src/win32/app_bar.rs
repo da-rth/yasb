@@ -42,13 +42,11 @@ pub fn abd_create(hwnd: HWND, edge: Option<BarEdge>) -> Result<APPBARDATA> {
     return Ok(abd);
 }
 
-pub fn ab_register_and_position(
-    window: tauri::Window,
-    edge: BarEdge,
-    thickness: u32,
-) -> Result<()> {
-    let mut abd = abd_create(window.hwnd()?.clone(), Some(edge.clone()))?;
+pub fn ab_register_and_position(hwnd: HWND, edge: BarEdge, thickness: u32) -> Result<()> {
+    let mut abd = abd_create(hwnd, Some(edge.clone()))?;
     abm_new(&mut abd);
+
+    let thickness = thickness;
 
     let monitor_rect = utils::get_monitor_from_window(abd.hWnd.clone());
     let monitor_width = monitor_rect.right - monitor_rect.left;
@@ -86,7 +84,7 @@ pub fn ab_register_and_position(
 }
 
 pub fn ab_remove(window: &tauri::Window) -> Result<()> {
-    let mut abd = abd_create(window.hwnd()?, None)?;
+    let mut abd = abd_create(HWND(window.hwnd()?.0), None)?;
     abm_remove(&mut abd);
     Ok(())
 }

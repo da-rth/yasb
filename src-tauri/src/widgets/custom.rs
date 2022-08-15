@@ -22,6 +22,18 @@ pub struct CustomWidgetProps {
     callbacks: Option<WidgetCallbacks>,
 }
 
+impl Default for CustomWidgetProps {
+    fn default() -> CustomWidgetProps {
+        CustomWidgetProps {
+            class: None,
+            label: None,
+            label_alt: None,
+            command: None,
+            callbacks: None,
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/widget/custom/")]
 pub struct CustomCommandOptions {

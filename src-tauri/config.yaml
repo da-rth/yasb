@@ -1,16 +1,16 @@
 bars:
   yasb_bar:                   # Required, label MUST be in snake_case or ClassCase e.g. "foo_bar" or "FooBar"
-    thickness: 32             # Optional, default: 64, the width (or height) of the bar in pixels
+    thickness: 48             # Optional, default: 64, the width (or height) of the bar in pixels
     edge: "top"               # Optional, default: top, options: top|left|bottom|right
     screens: []               # Optional, default: [] (all screens), takes: list of screen names to show bar on
     win_app_bar: true         # Optional, default: false, registers bar as a Windows Application Desktop Toolbar (e.g. a custom taskbar)
-    # always_on_top: false    # Optional, default: false, ensures bar is always at TOPMOST window level.
+    always_on_top: true       # Optional, default: false, ensures bar is always at TOPMOST window level.
     # blur_effect: "acrylic"  # Optional, default: None, options: blur|acrylic|mica. Mica works on Windows 11 only. Acrylic may have poor performance.
     # transparency: true      # Optional, default: true, enables fully transparent windows. Disable to see a white fallback window background.
     widgets:                  # Provide a list of widgets for left, middle and right bar columns
-      left: [ left_widget ]
+      left: [ left_widget, active_window ]
       middle: [ DateTimeWidget ]
-      right: [ ip_info, separator, right_widget  ]
+      right: [ right_widget ]
 
 widgets:
   left_widget:
@@ -19,12 +19,18 @@ widgets:
 
   right_widget:
     kind: TextWidget
+    class: "bold-right-widget"
     text: "right"
-
-  separator:
-    kind: TextWidget
-    text: "|"
-    class: separator
+  
+  active_window:
+    kind: ActiveWindowWidget
+    label: "${data.title}"
+    label_alt: "class=${data.class} exe=${data.exe_name}"
+    label_tooltip: "data: ${JSON.stringify(data, null, 2)}"
+    exclusive: true
+    callbacks:
+      on_left: "toggle"
+      on_right: { exec: { cmd: "cmd.exe", args: ["/c", "start", "https://www.google.com/search?q=${data.exe_name}"] } }
 
   ip_info:
     kind: CustomWidget
@@ -34,7 +40,7 @@ widgets:
     command:
       cmd: "curl.exe"
       args: ["https://ipinfo.io"]
-      interval: 60000
+      interval: 600000
     callbacks:
       on_left: { exec: { cmd: "cmd.exe", args: ["/c", "start", "https://ipinfo.io/${data.ip}"] } }
       on_right: { exec: { cmd: "cmd.exe", args: ["/c", "start", "https://maps.google.com/?q=${data.loc}"] } }
