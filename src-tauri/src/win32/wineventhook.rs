@@ -4,7 +4,7 @@ use tauri::AppHandle;
 use tokio::sync::mpsc;
 use windows::Win32::Foundation::HWND;
 use wineventhook::{
-    raw_event::{OBJECT_NAMECHANGE, SYSTEM_CAPTUREEND, SYSTEM_FOREGROUND, SYSTEM_MOVESIZEEND},
+    raw_event::{OBJECT_NAMECHANGE, SYSTEM_FOREGROUND},
     AccessibleObjectId, EventFilter, WindowEvent, WindowEventHook,
 };
 
