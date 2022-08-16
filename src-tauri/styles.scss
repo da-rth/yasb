@@ -60,10 +60,13 @@ body {
   background-color: $bar-widget-background-color;
 }
 
-
 // You can style widgets based on their ID (widget type)
 #ActiveWindowWidget {
   background-color: $bar-widget-background-color-alt;
+  // Specify the max width of the active window title
+  overflow: hidden;
+  max-width: 48ch;
+  text-overflow: ellipsis;
 }
 
 #DateTimeWidget {

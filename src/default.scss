@@ -11,7 +11,7 @@ body {
     height: 100vh;
     width: 100vw;
     align-items: center;
-    display: flex;
+    display: inline-flex;
 
     &.edge-top,
     &.edge-bottom {
@@ -41,21 +41,22 @@ body {
     }
 
     .widgets-container {
+      display: inline-flex;
       flex-grow: 1;
       flex-basis: 33.33%;
       overflow: hidden;
       white-space: nowrap;
 
       &.bar-left {
-        text-align: left;
+        justify-content: left;
       }
 
       &.bar-middle {
-        text-align: center;
+        justify-content: center;
       }
 
       &.bar-right {
-        text-align: right;
+        justify-content: right;
       }
 
       .widget {

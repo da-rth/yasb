@@ -87,7 +87,7 @@ pub fn listen(app_handle: AppHandle) -> () {
 
             // process messages
             loop {
-                std::thread::sleep(std::time::Duration::from_millis(500));
+                std::thread::sleep(std::time::Duration::from_secs(5));
                 if PeekMessageA(&mut msg, h_wnd_window, 0, 0, PM_REMOVE).as_bool() {
                     TranslateMessage(&msg);
                     DispatchMessageA(&msg);

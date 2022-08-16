@@ -9,7 +9,6 @@ import { currentMonitor } from "@tauri-apps/api/window";
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { tryFormatArgsEval, tryFormatEval } from "../../utils/format";
 import WidgetWrapper from "../WidgetWrapper.vue";
-import Log from "~/utils/log";
 
 const APP_TITLE = "yasb";
 const APP_PROC_NAME = "yasb.exe";
@@ -66,18 +65,11 @@ onBeforeUnmount(async () => {
 });
 
 const onActiveWindowChange = async (event: TauriEvent<ActiveWindowPayload>) => {
-  Log.info(event.payload.title + " " + event.payload.class);
   if (
     (!event.payload.title && event.payload.class != "WorkerW") ||
     event.payload.title == APP_TITLE ||
     event.payload.exe_name == APP_PROC_NAME
   ) {
-    return;
-  }
-
-  // If navigation has changed on explorer, get the new foreground title
-  if (explorerNavigationClasses.includes(event.payload.class ?? "")) {
-    await invoke("detect_foreground_window");
     return;
   }
 
@@ -91,6 +83,14 @@ const onActiveWindowChange = async (event: TauriEvent<ActiveWindowPayload>) => {
     isHidden.value = true;
   } else {
     isHidden.value = !!props.exclusive && win.monitor != currentMonitorName;
+
+    if (!isHidden.value) {
+      // If navigation has changed on explorer, get the new foreground title
+      if (explorerNavigationClasses.includes(event.payload.class ?? "")) {
+        await invoke("detect_foreground_window");
+        return;
+      }
+    }
     updateLabels();
   }
 };
@@ -128,7 +128,6 @@ const onCallbackExec = async (exec_options: CallbackTypeExecOptions) => {
   const command = exec_options.cmd;
   const args = tryFormatArgsEval(exec_options?.args ?? [], win);
   await invoke("process_custom_command", { command, args, timeout: 1000 });
-  Log.info(`ActiveWindowWidget: ${command} ${args}`);
 };
 </script>
 

@@ -79,7 +79,7 @@ fn create_bar(
     let bar_edge = bar_config.edge.clone().unwrap_or(DEFAULT_BAR_EDGE);
     let bar_transparency = bar_config.transparency.unwrap_or(DEFAULT_BAR_TRANSPARENCY);
     let bar_appbar = bar_config.win_app_bar.unwrap_or(DEFAULT_BAR_WINAPPBAR);
-
+    let scaled_bar_thickness = (bar_thickness as f64 * monitor.scale_factor()) as u32;
     let window = create_window(app_handle, label.clone(), FRONTEND_INDEX, bar_transparency)?;
 
     window.set_decorations(false)?;
@@ -111,22 +111,22 @@ fn create_bar(
 
     // Default bar size and position is for top edge
     let mut bar_position = PhysicalPosition::new(monitor.position().x, monitor.position().y);
-    let mut bar_size = PhysicalSize::new(monitor.size().width, bar_thickness);
+    let mut bar_size = PhysicalSize::new(monitor.size().width, scaled_bar_thickness);
 
     // Change bar size and position based on edge provided in bar_config
     match bar_edge {
         BarEdge::Bottom => {
             bar_position.y =
-                monitor.position().y + monitor.size().height as i32 - bar_thickness as i32;
+                monitor.position().y + monitor.size().height as i32 - scaled_bar_thickness as i32;
         }
         BarEdge::Left => {
-            bar_size.width = bar_thickness;
+            bar_size.width = scaled_bar_thickness;
             bar_size.height = monitor.size().height;
         }
         BarEdge::Right => {
             bar_position.x =
-                monitor.position().x + monitor.size().width as i32 - bar_thickness as i32;
-            bar_size.width = bar_thickness;
+                monitor.position().x + monitor.size().width as i32 - scaled_bar_thickness as i32;
+            bar_size.width = scaled_bar_thickness;
             bar_size.height = monitor.size().height;
         }
         _ => {}
@@ -138,7 +138,7 @@ fn create_bar(
         if let Err(e) = win32::app_bar::ab_register_and_position(
             HWND(window.hwnd()?.0),
             bar_edge.clone(),
-            bar_thickness.clone(),
+            scaled_bar_thickness.clone(),
         ) {
             log::error!(
                 "Failed to create Win32 App Bar for {}: {}",
