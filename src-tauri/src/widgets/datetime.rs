@@ -8,3 +8,13 @@ pub struct DateTimeWidgetProps {
     format: Option<String>,
     interval: Option<u32>,
 }
+
+impl Default for DateTimeWidgetProps {
+    fn default() -> DateTimeWidgetProps {
+        DateTimeWidgetProps {
+            class: None,
+            format: None,
+            interval: None,
+        }
+    }
+}

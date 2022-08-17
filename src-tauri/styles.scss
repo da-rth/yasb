@@ -1,74 +1,81 @@
+/**
+  Yet Another Status Bar - styles.scss
+
+  Stylesheet configuration live here.
+**/
+
+
+// Theme: https://www.nordtheme.com/
+$bar-text-color: #f5f5f5;
+$bar-background-color: #2E3440;
+$bar-error-text-color: 	#BF616A;
+$bar-widget-text-color-dark: #434C5E;
+$bar-widget-background-color: #4C566A;
+$bar-widget-background-color-alt: #5E81AC;
+$bar-widget-background-color-alt2: #8FBCBB;
+
+
+// In order override default styles, you must follow the same level of specificity defined in default.scss
+// https://github.com/denBot/yasb/tree/tauri-port/src/default.scss
 body {
-  overflow: hidden;
-  margin: 0;
   font-family: 'Courier New', Courier, monospace;
-  align-items: center;
-}
+  .bar {
+    background: $bar-background-color;
+    color: $bar-text-color;
 
-#bar {
-  background: #2E3440;
-  color: #fff;
-  font-weight: 400;
-  height: 100vh;
-  width: 100vw;
-  align-items: center;
-  display: flex;
-}
+    // You can calculate inner bar widths and heights
+    height: calc(100vh - 12px);
+    width: calc(100vw - 12px);
+    margin: 6px;
+    border-radius: 5px;
 
-.edge-left,
-.edge-right {
-  writing-mode: tb-rl;
-}
+    .widgets-container {
 
-.edge-left {
-  transform: rotate(180deg);
-}
+      .widget {
 
-.widget-container {
-  flex-direction: row;
-}
-
-.edge-top .widgets-container,
-.edge-bottom .widgets-container {
-  width: 33.333%;
-}
-
-.edge-left .widgets-container,
-.edge-right .widgets-container {
-  height: 33.333%;
-  writing-mode: vertical-lr;
-}
-
-
-
-.bar-left {
-  text-align: left;
-}
-.bar-middle {
-  text-align: center;
-}
-.bar-right {
-  text-align: right;
-}
-
-.widget-container {
-  display: inline-block;
-  display: flex;
-  justify-content: space-between;
-  background: red;
-}
-
-.widget {
-  margin: 5px;
-  user-select: none;
-}
-
-.separator {
-  color: cadetblue;
-}
-
-#CustomWidget {
-  &.error {
-    color: red;
+        &.error {
+          background: $bar-error-text-color;
+          color: $bar-text-color;
+        }
+      }
+    }
   }
+}
+
+// Styles not defined in default.scss do not need to match the same level of specificity.
+.widgets-container {
+  .bar-left {
+    margin-left: 3px;
+  }
+  .bar-right {
+    margin-right: 3px;
+  }
+}
+
+// Shared class names can also be styled  e.g. '.widget' targets all widgets:
+.widget {
+  display: flex;
+  padding: 3px 7px;
+  border-radius: 5px;
+  background-color: $bar-widget-background-color;
+}
+
+// You can style widgets based on their ID (widget type)
+#ActiveWindowWidget {
+  background-color: $bar-widget-background-color-alt;
+  // Specify the max width of the active window title
+  overflow: hidden;
+  max-width: 48ch;
+  text-overflow: ellipsis;
+}
+
+#DateTimeWidget {
+  background-color: transparent;
+}
+
+// Or via a user defined class name
+.bold-right-widget {
+  background: $bar-widget-background-color-alt2;
+  color: $bar-widget-text-color-dark;
+  font-weight: bold;
 }

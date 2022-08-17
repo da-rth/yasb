@@ -3,6 +3,7 @@ pub mod cli;
 pub mod commands;
 pub mod configuration;
 pub mod constants;
+pub mod events;
 pub mod logger;
 pub mod setup;
 pub mod tray;

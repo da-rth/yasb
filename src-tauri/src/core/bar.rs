@@ -2,12 +2,15 @@ use super::configuration::{validate_bar_label, BarConfig, BlurEffect, YasbConfig
 use super::constants::{FRONTEND_INDEX, FRONTEND_SETUP};
 use super::tray::{TRAY_HIDE_ALL, TRAY_SHOW_ALL};
 use crate::core::configuration::BarEdge;
-use crate::core::constants::{DEFAULT_BAR_EDGE, DEFAULT_BAR_THICKNESS, DEFAULT_BAR_TRANSPARENCY};
+use crate::core::constants::{
+    DEFAULT_BAR_EDGE, DEFAULT_BAR_THICKNESS, DEFAULT_BAR_TRANSPARENCY, DEFAULT_BAR_WINAPPBAR,
+};
 use crate::win32::{self, app_bar};
 use anyhow::{Context, Result};
 use tauri::{AppHandle, Manager, PhysicalPosition, PhysicalSize};
 use uuid::Uuid;
 use window_vibrancy::{apply_acrylic, apply_blur, apply_mica};
+use windows::Win32::Foundation::HWND;
 
 pub fn create_bars_from_config(app_handle: &AppHandle, config: YasbConfig) -> () {
     app_handle
@@ -75,23 +78,12 @@ fn create_bar(
     let bar_thickness = bar_config.thickness.unwrap_or(DEFAULT_BAR_THICKNESS);
     let bar_edge = bar_config.edge.clone().unwrap_or(DEFAULT_BAR_EDGE);
     let bar_transparency = bar_config.transparency.unwrap_or(DEFAULT_BAR_TRANSPARENCY);
-    let bar_appbar = bar_config.win_app_bar.unwrap_or(false);
-
+    let bar_appbar = bar_config.win_app_bar.unwrap_or(DEFAULT_BAR_WINAPPBAR);
+    let scaled_bar_thickness = (bar_thickness as f64 * monitor.scale_factor()) as u32;
     let window = create_window(app_handle, label.clone(), FRONTEND_INDEX, bar_transparency)?;
 
-    if bar_appbar {
-        if let Err(e) = win32::app_bar::ab_register_and_position(
-            window.clone(),
-            bar_edge.clone(),
-            bar_thickness.clone(),
-        ) {
-            log::error!(
-                "Failed to create Win32 App Bar for {}: {}",
-                label.clone(),
-                e
-            );
-        }
-    }
+    window.set_decorations(false)?;
+    window.set_resizable(false)?;
 
     let monitor_name = monitor
         .name()
@@ -119,34 +111,55 @@ fn create_bar(
 
     // Default bar size and position is for top edge
     let mut bar_position = PhysicalPosition::new(monitor.position().x, monitor.position().y);
-    let mut bar_size = PhysicalSize::new(monitor.size().width, bar_thickness);
+    let mut bar_size = PhysicalSize::new(monitor.size().width, scaled_bar_thickness);
 
     // Change bar size and position based on edge provided in bar_config
     match bar_edge {
         BarEdge::Bottom => {
             bar_position.y =
-                monitor.position().y + monitor.size().height as i32 - bar_thickness as i32;
+                monitor.position().y + monitor.size().height as i32 - scaled_bar_thickness as i32;
         }
         BarEdge::Left => {
-            bar_size.width = bar_thickness;
+            bar_size.width = scaled_bar_thickness;
             bar_size.height = monitor.size().height;
         }
         BarEdge::Right => {
             bar_position.x =
-                monitor.position().x + monitor.size().width as i32 - bar_thickness as i32;
-            bar_size.width = bar_thickness;
+                monitor.position().x + monitor.size().width as i32 - scaled_bar_thickness as i32;
+            bar_size.width = scaled_bar_thickness;
             bar_size.height = monitor.size().height;
         }
         _ => {}
     }
 
-    window.set_decorations(false)?;
     window.set_size(bar_size)?;
-    window.set_skip_taskbar(true)?;
-    window.set_resizable(false)?;
 
-    win32::utils::mark_window_as_popup(window.hwnd().unwrap().clone());
+    if bar_appbar {
+        if let Err(e) = win32::app_bar::ab_register_and_position(
+            HWND(window.hwnd()?.0),
+            bar_edge.clone(),
+            scaled_bar_thickness.clone(),
+        ) {
+            log::error!(
+                "Failed to create Win32 App Bar for {}: {}",
+                label.clone(),
+                e
+            );
+        }
+    }
+
+    win32::utils::set_no_activate(HWND(window.hwnd().unwrap().0.clone()));
     window.set_position(bar_position)?;
+    window.set_skip_taskbar(true)?;
+    window.set_title(
+        app_handle
+            .config()
+            .package
+            .product_name
+            .as_ref()
+            .unwrap()
+            .as_str(),
+    )?;
 
     log::info!(
         "Created {} on \"{}\" [ Pos: {},{} | Edge: {} | AppBar: {} ]",

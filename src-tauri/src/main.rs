@@ -28,8 +28,11 @@ fn main() {
             commands::retrieve_config,
             commands::retrieve_styles,
             commands::webview_log,
+            // Background tasks
+            win32::wineventhook::init_win_event_hook,
             // Widget Commands
-            widgets::custom::process_custom_command
+            widgets::custom::process_custom_command,
+            widgets::active_window::detect_foreground_window
         ])
         .build(tauri::generate_context!())
         .expect(format!("Error while running application.").as_str());

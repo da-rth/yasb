@@ -18,7 +18,7 @@ use crate::core::{bar, configuration};
 static mut APP_HANDLE: Option<AppHandle> = None;
 
 unsafe extern "system" fn window_proc(
-    h_wnd: HWND,
+    hwnd: HWND,
     msg: u32,
     w_param: WPARAM,
     l_param: LPARAM,
@@ -39,7 +39,7 @@ unsafe extern "system" fn window_proc(
         _ => {}
     }
 
-    DefWindowProcW(h_wnd, msg, w_param, l_param)
+    DefWindowProcW(hwnd, msg, w_param, l_param)
 }
 
 pub fn listen(app_handle: AppHandle) -> () {
@@ -87,7 +87,7 @@ pub fn listen(app_handle: AppHandle) -> () {
 
             // process messages
             loop {
-                std::thread::sleep(std::time::Duration::from_millis(500));
+                std::thread::sleep(std::time::Duration::from_secs(5));
                 if PeekMessageA(&mut msg, h_wnd_window, 0, 0, PM_REMOVE).as_bool() {
                     TranslateMessage(&msg);
                     DispatchMessageA(&msg);

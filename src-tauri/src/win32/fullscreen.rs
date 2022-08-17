@@ -9,6 +9,7 @@ use windows::Win32::UI::Shell::{
 use windows::Win32::UI::WindowsAndMessaging::{GetClassNameW, GetWindowRect, WindowFromPoint};
 
 use crate::core::constants::IGNORED_FULLSCREEN_CLASSES;
+use crate::core::events::BarEvent;
 
 pub fn is_fullscreen_present() -> bool {
     let user_notification_state = unsafe { SHQueryUserNotificationState() }.unwrap();
@@ -59,23 +60,35 @@ pub fn hide_on_fullscreen(app_handle: AppHandle) -> () {
             {
                 if !is_visible {
                     app_handle
-                        .emit_to(label.as_str(), "FullscreenShowWindow", true)
+                        .emit_to(
+                            label.as_str(),
+                            BarEvent::ShowWindowEvent.to_string().as_str(),
+                            true,
+                        )
                         .unwrap();
                 }
                 continue;
             }
 
             unsafe {
-                if is_monitor_fullscreen(window.hwnd().unwrap().clone()) {
+                if is_monitor_fullscreen(HWND(window.hwnd().unwrap().0.clone())) {
                     if is_visible {
                         app_handle
-                            .emit_to(label.as_str(), "FullscreenHideWindow", true)
+                            .emit_to(
+                                label.as_str(),
+                                BarEvent::HideWindowEvent.to_string().as_str(),
+                                true,
+                            )
                             .unwrap();
                     }
                 } else {
                     if !is_visible {
                         app_handle
-                            .emit_to(label.as_str(), "FullscreenShowWindow", true)
+                            .emit_to(
+                                label.as_str(),
+                                BarEvent::ShowWindowEvent.to_string().as_str(),
+                                true,
+                            )
                             .unwrap();
                     }
                 }
