@@ -32,7 +32,8 @@ fn main() {
             win32::wineventhook::init_win_event_hook,
             // Widget Commands
             widgets::custom::process_custom_command,
-            widgets::active_window::detect_foreground_window
+            widgets::active_window::detect_foreground_window,
+            widgets::sys_info::get_sys_info
         ])
         .build(tauri::generate_context!())
         .expect(format!("Error while running application.").as_str());

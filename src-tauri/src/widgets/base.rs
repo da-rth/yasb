@@ -4,10 +4,11 @@ use ts_rs::TS;
 
 use super::{
     active_window::ActiveWindowWidgetProps, custom::CustomWidgetProps,
-    datetime::DateTimeWidgetProps, text::TextWidgetProps, unknown::UnknownWidgetProps,
+    datetime::DateTimeWidgetProps, sys_info::SysInfoWidgetProps, text::TextWidgetProps,
+    unknown::UnknownWidgetProps,
 };
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(tag = "kind")]
 #[ts(export, export_to = "../src/bindings/widget/")]
 pub enum ConfiguredWidget {
@@ -15,6 +16,7 @@ pub enum ConfiguredWidget {
     CustomWidget(CustomWidgetProps),
     DateTimeWidget(DateTimeWidgetProps),
     TextWidget(TextWidgetProps),
+    SysInfoWidget(SysInfoWidgetProps),
     UnknownWidget(UnknownWidgetProps),
 }
 
@@ -30,13 +32,16 @@ impl FromStr for ConfiguredWidget {
             "DateTimeWidget" => Ok(ConfiguredWidget::DateTimeWidget(
                 DateTimeWidgetProps::default(),
             )),
+            "SysInfoWidget" => Ok(ConfiguredWidget::SysInfoWidget(
+                SysInfoWidgetProps::default(),
+            )),
             "TextWidget" => Ok(ConfiguredWidget::TextWidget(TextWidgetProps::default())),
             _ => Err(()),
         }
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/widget/")]
 pub struct ConfiguredWidgets {
     pub left: Vec<ConfiguredWidget>,

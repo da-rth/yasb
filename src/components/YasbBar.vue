@@ -61,7 +61,7 @@ onMounted(async () => {
   widgets.value = await invoke("retrieve_widgets", {
     barLabel,
   });
-
+  console.log(widgets);
   config.value = await invoke("retrieve_config", { barLabel });
 
   unlisteners.push(await listen("StylesChangedEvent", onStylesChanged));

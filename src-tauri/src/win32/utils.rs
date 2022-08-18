@@ -112,7 +112,7 @@ pub fn get_win_class(hwnd: HWND) -> Option<String> {
 
 pub fn get_thread_process_id(hwnd: HWND) -> (u32, u32) {
     let mut process_id: u32 = 0;
-    let thread_id = unsafe { GetWindowThreadProcessId(hwnd, &mut process_id) };
+    let thread_id = unsafe { GetWindowThreadProcessId(hwnd, Some(&mut process_id)) };
     (process_id, thread_id)
 }
 

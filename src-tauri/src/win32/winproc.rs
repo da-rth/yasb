@@ -80,7 +80,7 @@ pub fn listen(app_handle: AppHandle) -> () {
                 HWND(0),
                 HMENU(0),
                 HINSTANCE(0),
-                std::ptr::null_mut() as *mut c_void,
+                Some(std::ptr::null_mut() as *mut c_void),
             );
 
             let mut msg: MSG = std::mem::zeroed();

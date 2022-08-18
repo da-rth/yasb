@@ -1,9 +1,12 @@
 use crate::core::constants::{CONFIG_FILENAME, STYLES_FILENAME};
 use crate::core::{bar, cli, configuration, logger, watcher};
+use crate::widgets::sys_info::SysInfoSystemState;
+// use crate::widgets::sys_info::CpuLoadState;
 use crate::win32;
 use std::fs::canonicalize;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
+use sysinfo::{System, SystemExt};
 use tauri::{AppHandle, Manager};
 
 use super::configuration::YasbConfig;
@@ -72,6 +75,7 @@ pub fn init(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     let (config, styles) = init_config_paths(&app_handle, &config_path, &styles_path);
     app_handle.manage(configuration::Config(Arc::new(Mutex::new(config.clone()))));
     app_handle.manage(configuration::Styles(Arc::new(Mutex::new(styles.clone()))));
+    app_handle.manage(SysInfoSystemState(Arc::new(Mutex::new(System::new_all()))));
 
     // Create the bars based on given config. Styles are set later...
     bar::create_bars_from_config(&app_handle, config.clone());
