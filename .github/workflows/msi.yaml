@@ -2,9 +2,8 @@ name: Build .msi
 
 on:
   push:
-    branches: [ "tauri-port" ]
-  pull_request:
-    branches: [ "tauri-port" ]
+    tags:
+      - "*.*.*"
 
 jobs:
   build:
@@ -16,3 +15,8 @@ jobs:
     - run: npm run build
     - run: npm run tauri build
     - run: ls ./src-tauri/target/release/bundle/msi
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          src-tauri/target/release/bundle/msi/*
