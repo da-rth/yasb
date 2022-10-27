@@ -1,0 +1,22 @@
+name: Build .msi
+
+on:
+  push:
+    tags:
+      - "*.*.*"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - run: node -v
+    - run: npm install
+    - run: npm run build
+    - run: npm run tauri build
+    - run: ls ./src-tauri/target/release/bundle/msi
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          src-tauri/target/release/bundle/msi/*
