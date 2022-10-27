@@ -270,7 +270,7 @@ bars:
           # ^ A list of class_names the widget should ignore. Accepts: list of strings
         # process: []
           # ^ A list of process names the widget should ignore. Accepts: list of strings
-        # title:
+        # titles:
           # ^ A list of titles the widget should ignore. Accepts: list of strings
       # callbacks:
         # on_left: "toggle_label" - toggles between the clock and alternate clock labels
