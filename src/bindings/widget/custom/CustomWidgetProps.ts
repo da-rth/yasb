@@ -6,6 +6,7 @@ export interface CustomWidgetProps {
   class: string | null;
   label: string | null;
   label_alt: string | null;
+  label_tooltip: string | null;
   command: CustomCommandOptions | null;
   callbacks: WidgetCallbacks | null;
 }

@@ -8,8 +8,12 @@ import { SystemInformation } from "../../bindings/widget/sysinfo/SystemInformati
 import WidgetWrapper from "../WidgetWrapper.vue";
 import { CallbackTypeExecOptions } from "../../bindings/widget/base/CallbackTypeExecOptions";
 
+// TODO
+// block multiple invokes to get_sys_info, have server respond single object to all listeners
+// could use std::sync::call_once and is_completed?
+
 const DEFAULT_LABEL = "host: ${data.sys.host}";
-const DEFAULT_TOOLTIP = "${JSON.stringify(data, null, 2)}";
+const DEFAULT_TOOLTIP = "${JSON.stringify(data.sys, null, 2)}";
 const props = defineProps<SysInfoWidgetProps>();
 const activeLabelTooltip = ref<string | null>(null);
 const activeLabelFormatted = ref<string>(

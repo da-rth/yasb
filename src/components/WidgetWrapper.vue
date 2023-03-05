@@ -16,6 +16,8 @@ const handleCallback = async (callbackEvent: CallbackEvent) => {
   if (props.callbacks) {
     const callbackType: CallbackType | null = props.callbacks[callbackEvent];
 
+    if (callbackEvent === "on_hover" && callbackType === "tooltip") return;
+
     if (typeof callbackType === "string") {
       switch (callbackType) {
         case "toggle":

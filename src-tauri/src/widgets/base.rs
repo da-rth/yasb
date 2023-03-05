@@ -84,6 +84,7 @@ pub enum CallbackType {
     None,
     Toggle,
     Update,
+    Tooltip,
     Exec(CallbackTypeExecOptions),
 }
 

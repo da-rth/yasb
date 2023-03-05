@@ -18,6 +18,7 @@ pub struct CustomWidgetProps {
     class: Option<String>,
     label: Option<String>,
     label_alt: Option<String>,
+    label_tooltip: Option<String>,
     command: Option<CustomCommandOptions>,
     callbacks: Option<WidgetCallbacks>,
 }
@@ -28,6 +29,7 @@ impl Default for CustomWidgetProps {
             class: None,
             label: None,
             label_alt: None,
+            label_tooltip: None,
             command: None,
             callbacks: None,
         }

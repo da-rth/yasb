@@ -11,6 +11,7 @@ import Log from "~/utils/log";
 
 const props = defineProps<CustomWidgetProps>();
 const defaultLabel = "CustomWidget";
+const activeLabelTooltip = ref<string | null>(null);
 const activeLabelError = ref<string | null>(null);
 const activeLabelFormatted = ref<string>(
   props.label_alt ?? props.label ?? defaultLabel
@@ -19,7 +20,8 @@ const activeLabelFormatted = ref<string>(
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
 let commandResultData: any;
 let showAltLabel = false;
-let activeLabel = props.label ?? defaultLabel;
+const unformattedActiveTooltip = props.label_tooltip ?? "";
+let unformattedActiveLabel = props.label ?? defaultLabel;
 let commandResult: CustomCommandResponse;
 
 onMounted(async () => {
@@ -50,13 +52,17 @@ const updateActiveLabel = () => {
       commandResultData = commandResult.stdout.replace("\n", "\\n");
     }
     try {
+      activeLabelTooltip.value = props.label_tooltip
+        ? tryFormatEval(unformattedActiveTooltip, commandResultData)
+        : null;
       activeLabelFormatted.value = tryFormatEval(
-        activeLabel,
+        unformattedActiveLabel,
         commandResultData
       );
       activeLabelError.value = null;
     } catch (error) {
-      activeLabelFormatted.value = activeLabel;
+      activeLabelTooltip.value = unformattedActiveTooltip;
+      activeLabelFormatted.value = unformattedActiveLabel;
       activeLabelError.value = `Error formatting label:\n\n${
         (error as Error).message
       }`;
@@ -70,13 +76,14 @@ const updateActiveLabel = () => {
     activeLabelError.value = `exited with code: ${status}\n\n${cmd}${args}\n\nstderr: ${
       commandResult.stderr ?? "empty"
     }`;
-    activeLabelFormatted.value = cmd ?? activeLabel;
+    activeLabelFormatted.value = cmd ?? unformattedActiveLabel;
   }
 };
 
 const toggleActiveLabel = async () => {
   showAltLabel = !showAltLabel;
-  activeLabel = (showAltLabel ? props.label_alt : props.label) ?? defaultLabel;
+  unformattedActiveLabel =
+    (showAltLabel ? props.label_alt : props.label) ?? defaultLabel;
   updateActiveLabel();
 };
 
@@ -95,7 +102,7 @@ const onCallbackExec = async (exec_options: CallbackTypeExecOptions) => {
     :on-update="executeCustomCommand"
     :on-exec="onCallbackExec"
     :data-toggle="!!activeLabelError"
-    :title="activeLabelError ?? ''"
+    :title="activeLabelError ?? activeLabelTooltip ?? ''"
     :class="['widget', props.class, { error: !!activeLabelError }]"
   >
     {{ activeLabelFormatted }}

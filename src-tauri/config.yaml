@@ -26,6 +26,7 @@ widgets:
     kind: SysInfoWidget
     label: "${humanizer(data.sys.uptime * 1000, { language: 'shorter', delimiter: ' ', spacer: '', round: true, units: ['d', 'h', 'm'] })}" # See: https://github.com/EvanHahn/HumanizeDuration.js
     label_alt: "${moment(new Date(data.sys.boot_time * 1000)).format('YYYY-MM-DD HH:mm:ss')}"
+    label_tooltip: null
     interval: 1000
     callbacks:
       on_left: "toggle"
@@ -70,9 +71,11 @@ widgets:
     kind: CustomWidget
     label: "temp: ${data.current_weather.temperature}°c"
     label_alt: "windspeed: ${data.current_weather.windspeed}"
+    label_tooltip: "${JSON.stringify(data, null, 2)}"
     command:
       cmd: "curl.exe"
       args: ["https://api.open-meteo.com/v1/forecast?current_weather=true&temperature_unit=celsius&latitude=55.87&longitude=-4.26"] # See https://open-meteo.com/en/docs
       interval: 1800000 # Every 30 minutes
     callbacks:
       on_left: "toggle"
+      on_hover: "tooltip"
