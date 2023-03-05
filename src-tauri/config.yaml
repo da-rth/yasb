@@ -5,23 +5,43 @@ bars:
     screens: []               # Optional, default: [] (all screens), takes: list of screen names to show bar on
     win_app_bar: true         # Optional, default: false, registers bar as a Windows Application Desktop Toolbar (e.g. a custom taskbar)
     always_on_top: true       # Optional, default: false, ensures bar is always at TOPMOST window level.
-    # blur_effect: "acrylic"  # Optional, default: None, options: blur|acrylic|mica. Mica works on Windows 11 only. Acrylic may have poor performance.
-    # transparency: true      # Optional, default: true, enables fully transparent windows. Disable to see a white fallback window background.
+    blur_effect: null         # Optional, default: None, options: blur|acrylic|mica. Mica works on Windows 11 only. Acrylic may have poor performance.
+    transparency: true        # Optional, default: true, enables fully transparent windows. Disable to see a white fallback window background.
     widgets:                  # Provide a list of widgets for left, middle and right bar columns
       left: [ left_widget, active_window ]
       middle: [ DateTimeWidget ]
-      right: [ right_widget ]
+      right: [
+        cpu_usage_widget,
+        uptime_widget,
+        hostname_widget,
+        custom_weather_widget
+      ]
 
 widgets:
   left_widget:
     kind: TextWidget
-    text: "left"
-
-  right_widget:
-    kind: TextWidget
-    class: "bold-right-widget"
-    text: "right"
+    text: "yasb"
   
+  uptime_widget:
+    kind: SysInfoWidget
+    label: "${humanizer(data.sys.uptime * 1000, { language: 'shorter', delimiter: ' ', spacer: '', round: true, units: ['d', 'h', 'm'] })}" # See: https://github.com/EvanHahn/HumanizeDuration.js
+    label_alt: "${moment(new Date(data.sys.boot_time * 1000)).format('YYYY-MM-DD HH:mm:ss')}"
+    interval: 1000
+    callbacks:
+      on_left: "toggle"
+  
+  hostname_widget:
+    kind: SysInfoWidget
+    label: "${data.sys.host}"
+    label_tooltip: "${JSON.stringify(data.sys, null, 2)}"
+    interval: null
+  
+  cpu_usage_widget:
+    kind: SysInfoWidget
+    label: "cpu: ${parseFloat(data.sys.cpu_info.cpu_usage).toFixed(2)}"
+    label_tooltip: "${data.sys.cpu_info.brand}"
+    interval: 1000
+
   active_window:
     kind: ActiveWindowWidget
     label: "${data.title}"
@@ -30,13 +50,12 @@ widgets:
     exclusive: true
     callbacks:
       on_left: "toggle"
-      on_right: { exec: { cmd: "cmd.exe", args: ["/c", "start", "https://www.google.com/search?q=${data.exe_name}"] } }
 
-  ip_info:
+  custom_ipinfo_widget:
     kind: CustomWidget
     class: "ip_info"
     label: "${data.city}, ${data.country}"
-    label_alt: "Public IP: ${data.ip}"
+    label_alt: "IP: ${data.ip}"
     command:
       cmd: "curl.exe"
       args: ["https://ipinfo.io"]
@@ -46,3 +65,14 @@ widgets:
       on_right: { exec: { cmd: "cmd.exe", args: ["/c", "start", "https://maps.google.com/?q=${data.loc}"] } }
       on_middle: "update"
       on_hover: "toggle"
+  
+  custom_weather_widget:
+    kind: CustomWidget
+    label: "temp: ${data.current_weather.temperature}°c"
+    label_alt: "windspeed: ${data.current_weather.windspeed}"
+    command:
+      cmd: "curl.exe"
+      args: ["https://api.open-meteo.com/v1/forecast?current_weather=true&temperature_unit=celsius&latitude=55.87&longitude=-4.26"] # See https://open-meteo.com/en/docs
+      interval: 1800000 # Every 30 minutes
+    callbacks:
+      on_left: "toggle"

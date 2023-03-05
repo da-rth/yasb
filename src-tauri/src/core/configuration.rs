@@ -20,7 +20,7 @@ use tauri::api::dialog::blocking::MessageDialogBuilder;
 use tauri::api::dialog::{MessageDialogButtons, MessageDialogKind};
 use ts_rs::TS;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/config/")]
 pub struct YasbConfig {
     pub bars: HashMap<String, BarConfig>,
