@@ -42,12 +42,12 @@ def get_process_info(hwnd: int) -> dict:
     return {
         'name': process.name(),
         'pid': process.pid,
-        'ppid': process.ppid,
-        'cpu_percent': process.cpu_percent,
-        'mem_percent': process.memory_percent,
-        'num_threads': process.num_threads,
-        'username': process.username,
-        'status': process.status
+        'ppid': process.ppid(),
+        'cpu_percent': process.cpu_percent(),
+        'mem_percent': process.memory_percent(),
+        'num_threads': process.num_threads(),
+        'username': process.username(),
+        'status': process.status()
     }
 
 
