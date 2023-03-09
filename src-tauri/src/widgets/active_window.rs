@@ -1,18 +1,25 @@
+use super::base::{CallbackTypeExecOptions, WidgetCallbacks};
+use crate::win32::utils;
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager};
 use ts_rs::TS;
 use windows::Win32::{Foundation::HWND, UI::WindowsAndMessaging::GetForegroundWindow};
 
-use crate::win32::utils;
-
-use super::base::WidgetCallbacks;
-
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/widget/active_window/")]
 pub struct IgnoreLists {
-    class: Option<Vec<String>>,
-    process: Option<Vec<String>>,
-    title: Option<Vec<String>>,
+    by_class: Option<Vec<String>>,
+    by_process: Option<Vec<String>>,
+    by_title: Option<Vec<String>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "snake_case")]
+#[ts(export, export_to = "../src/bindings/widget/active_window/")]
+pub enum ActiveWindowCallbackType {
+    ToggleLabel,
+    ToggleJsonViewer,
+    Exec(CallbackTypeExecOptions),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
@@ -21,10 +28,10 @@ pub struct ActiveWindowWidgetProps {
     class: Option<String>,
     label: Option<String>,
     label_alt: Option<String>,
-    label_tooltip: Option<String>,
-    exclusive: Option<bool>,
-    ignore: Option<IgnoreLists>,
-    callbacks: Option<WidgetCallbacks>,
+    label_max_len: Option<u32>,
+    is_monitor_exclusive: Option<bool>,
+    ignored_windows: Option<IgnoreLists>,
+    callbacks: Option<WidgetCallbacks<ActiveWindowCallbackType>>,
 }
 
 impl Default for ActiveWindowWidgetProps {
@@ -33,9 +40,9 @@ impl Default for ActiveWindowWidgetProps {
             class: None,
             label: None,
             label_alt: None,
-            label_tooltip: None,
-            exclusive: None,
-            ignore: None,
+            label_max_len: None,
+            is_monitor_exclusive: None,
+            ignored_windows: None,
             callbacks: None,
         }
     }
@@ -93,6 +100,15 @@ pub fn handle_window_title_change(app_handle: &AppHandle, hwnd: HWND) {
         exe_name: proc_name,
         monitor: monitor_name,
     };
+
+    let p = payload.clone();
+    if (p.title.is_none() && p.class.unwrap_or("".to_string()) != "WorkerW")
+        || (p.title.unwrap_or("".to_string()) == "yasb")
+        || (p.exe_name.unwrap_or("".to_string()) == "yasb.exe")
+    {
+        return;
+    }
+
     let _ = app_handle.emit_all("ActiveWindowChanged", payload);
 }
 

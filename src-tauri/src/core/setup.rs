@@ -102,7 +102,7 @@ fn init_background_listeners(
     if config
         .bars
         .into_iter()
-        .any(|(_, bar_config)| bar_config.always_on_top.unwrap_or(false))
+        .any(|(_, bar_config)| bar_config.always_on_top)
     {
         log::info!("Always on top detected. Window(s) will be automatically hidden when fullscreen is detected.");
         win32::fullscreen::hide_on_fullscreen(app_handle.clone());

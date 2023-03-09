@@ -5,10 +5,4 @@ import type { SystemCpuInfo } from "./SystemCpuInfo";
 import type { SystemMemoryInfo } from "./SystemMemoryInfo";
 import type { SystemNetowrkData } from "./SystemNetowrkData";
 
-export interface SystemInformation {
-  sys: OperatingSystemInfo;
-  mem: SystemMemoryInfo;
-  cpus: Array<SystemCpuInfo>;
-  networks: Record<string, SystemNetowrkData>;
-  components: Array<SystemComponentsInfo>;
-}
+export interface SystemInformation { sys: OperatingSystemInfo, mem: SystemMemoryInfo, cpus: Array<SystemCpuInfo>, networks: Record<string, SystemNetowrkData>, components: Array<SystemComponentsInfo>, }

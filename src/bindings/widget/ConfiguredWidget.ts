@@ -6,10 +6,4 @@ import type { SysInfoWidgetProps } from "./sysinfo\\SysInfoWidgetProps";
 import type { TextWidgetProps } from "./text\\TextWidgetProps";
 import type { UnknownWidgetProps } from "./unknown\\UnknownWidgetProps";
 
-export type ConfiguredWidget =
-  | { kind: "ActiveWindowWidget" } & ActiveWindowWidgetProps
-  | { kind: "CustomWidget" } & CustomWidgetProps
-  | { kind: "DateTimeWidget" } & DateTimeWidgetProps
-  | { kind: "TextWidget" } & TextWidgetProps
-  | { kind: "SysInfoWidget" } & SysInfoWidgetProps
-  | { kind: "UnknownWidget" } & UnknownWidgetProps;
+export type ConfiguredWidget = { kind: "ActiveWindowWidget" } & ActiveWindowWidgetProps | { kind: "CustomWidget" } & CustomWidgetProps | { kind: "DateTimeWidget" } & DateTimeWidgetProps | { kind: "TextWidget" } & TextWidgetProps | { kind: "SysInfoWidget" } & SysInfoWidgetProps | { kind: "UnknownWidget" } & UnknownWidgetProps;

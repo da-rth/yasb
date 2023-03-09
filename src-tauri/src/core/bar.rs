@@ -2,9 +2,6 @@ use super::configuration::{validate_bar_label, BarConfig, BlurEffect, YasbConfig
 use super::constants::{FRONTEND_INDEX, FRONTEND_SETUP};
 use super::tray::{TRAY_HIDE_ALL, TRAY_SHOW_ALL};
 use crate::core::configuration::BarEdge;
-use crate::core::constants::{
-    DEFAULT_BAR_EDGE, DEFAULT_BAR_THICKNESS, DEFAULT_BAR_TRANSPARENCY, DEFAULT_BAR_WINAPPBAR,
-};
 use crate::win32::{self, app_bar};
 use anyhow::{Context, Result};
 use tauri::{AppHandle, Manager, PhysicalPosition, PhysicalSize};
@@ -75,10 +72,10 @@ fn create_bar(
 ) -> Result<tauri::Window> {
     let uuid = Uuid::new_v4().as_simple().to_string();
     let label = format!("{}_{}", bar_label, &uuid[0..16]);
-    let bar_thickness = bar_config.thickness.unwrap_or(DEFAULT_BAR_THICKNESS);
-    let bar_edge = bar_config.edge.clone().unwrap_or(DEFAULT_BAR_EDGE);
-    let bar_transparency = bar_config.transparency.unwrap_or(DEFAULT_BAR_TRANSPARENCY);
-    let bar_appbar = bar_config.win_app_bar.unwrap_or(DEFAULT_BAR_WINAPPBAR);
+    let bar_thickness = bar_config.thickness;
+    let bar_edge = &bar_config.edge;
+    let bar_transparency = bar_config.transparency;
+    let bar_appbar = bar_config.win_app_bar;
     let scaled_bar_thickness = (bar_thickness as f64 * monitor.scale_factor()) as u32;
     let window = create_window(app_handle, label.clone(), FRONTEND_INDEX, bar_transparency)?;
 

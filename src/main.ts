@@ -1,5 +1,8 @@
-import "./default.scss";
-import { createApp } from "vue";
-import YasbBar from "./components/Yasbbar.vue";
+import { platformBrowserDynamic } from "@angular/platform-browser-dynamic";
+import { AppModule } from "./app/app.module";
 
-createApp(YasbBar).mount("#YasbBar");
+platformBrowserDynamic()
+  .bootstrapModule(AppModule, {
+    preserveWhitespaces: false,
+  })
+  .catch((err) => console.error(err));

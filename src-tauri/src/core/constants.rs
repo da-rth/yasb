@@ -10,6 +10,7 @@ pub const STYLES_FILENAME: &str = "styles.scss";
 
 pub const DEFAULT_BAR_THICKNESS: u32 = 64;
 pub const DEFAULT_BAR_EDGE: BarEdge = BarEdge::Top;
+pub const DEFAULT_BAR_ALWAYSONTOP: bool = true;
 pub const DEFAULT_BAR_TRANSPARENCY: bool = true;
 pub const DEFAULT_BAR_WINAPPBAR: bool = true;
 

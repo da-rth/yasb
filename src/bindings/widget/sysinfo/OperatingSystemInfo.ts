@@ -2,14 +2,4 @@
 import type { SystemCpuInfo } from "./SystemCpuInfo";
 import type { SystemLoadAverage } from "./SystemLoadAverage";
 
-export interface OperatingSystemInfo {
-  name: string | null;
-  ver: string | null;
-  host: string | null;
-  boot_time: bigint;
-  uptime: bigint;
-  num_cpus: number;
-  num_cores: number | null;
-  cpu_info: SystemCpuInfo;
-  load_avg: SystemLoadAverage;
-}
+export interface OperatingSystemInfo { name: string | null, ver: string | null, host: string | null, boot_time: bigint, uptime: bigint, num_cpus: number, num_cores: number | null, cpu_info: SystemCpuInfo, load_avg: SystemLoadAverage, }

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { invoke } from "@tauri-apps/api/tauri";
 
 enum LogLevel {

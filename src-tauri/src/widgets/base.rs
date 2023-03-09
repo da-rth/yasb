@@ -28,14 +28,18 @@ impl FromStr for ConfiguredWidget {
             "ActiveWindowWidget" => Ok(ConfiguredWidget::ActiveWindowWidget(
                 ActiveWindowWidgetProps::default(),
             )),
-            "CustomWidget" => Ok(ConfiguredWidget::CustomWidget(CustomWidgetProps::default())),
+            "CustomWidget" => Ok(ConfiguredWidget::CustomWidget(
+                CustomWidgetProps::default()
+            )),
             "DateTimeWidget" => Ok(ConfiguredWidget::DateTimeWidget(
                 DateTimeWidgetProps::default(),
             )),
             "SysInfoWidget" => Ok(ConfiguredWidget::SysInfoWidget(
                 SysInfoWidgetProps::default(),
             )),
-            "TextWidget" => Ok(ConfiguredWidget::TextWidget(TextWidgetProps::default())),
+            "TextWidget" => Ok(ConfiguredWidget::TextWidget(
+                TextWidgetProps::default()
+            )),
             _ => Err(()),
         }
     }
@@ -78,21 +82,19 @@ pub struct CallbackTypeExecOptions {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
-#[serde(rename_all = "lowercase")]
 #[ts(export, export_to = "../src/bindings/widget/base/")]
-pub enum CallbackType {
-    None,
-    Toggle,
-    Update,
-    Tooltip,
-    Exec(CallbackTypeExecOptions),
+pub struct WidgetCallbacks<T> {
+    on_left: Option<T>,
+    on_middle: Option<T>,
+    on_right: Option<T>,
+    on_hover: Option<T>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/widget/base/")]
-pub struct WidgetCallbacks {
-    on_left: Option<CallbackType>,
-    on_middle: Option<CallbackType>,
-    on_right: Option<CallbackType>,
-    on_hover: Option<CallbackType>,
+pub struct BasePopupProps {
+    pub width: Option<u32>,
+    pub height: Option<u32>,
+    pub padding: Option<u32>,
+    pub class: Option<String>
 }

@@ -1,0 +1,3 @@
+src/bindings/**
+src/environments/**
+src/polyfills.ts

@@ -38,6 +38,7 @@ typings/
 
 # Optional npm cache directory
 .npm
+.angular
 
 # Optional yarn cache directory
 .yarn
@@ -62,10 +63,7 @@ typings/
 *.sublime*
 .idea
 debug.log
-package-lock.json
-.vscode
 .vscode/settings.json
-*/.vscode/
 proptest-regressions/
 TODO.md
 

@@ -2,7 +2,4 @@
 import type { BarConfig } from "./BarConfig";
 import type { ConfiguredWidget } from "..\\widget\\ConfiguredWidget";
 
-export interface YasbConfig {
-  bars: Record<string, BarConfig>;
-  widgets: Record<string, ConfiguredWidget> | null;
-}
+export interface YasbConfig { bars: Record<string, BarConfig>, widgets: Record<string, ConfiguredWidget> | null, }

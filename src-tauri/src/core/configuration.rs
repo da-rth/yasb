@@ -1,4 +1,4 @@
-use super::constants::CONFIG_DIR_NAME;
+use super::constants;
 use crate::core::constants::APP_LOG_FILENAME;
 use crate::widgets::base::ConfiguredWidget;
 use anyhow::{Error, Result};
@@ -49,15 +49,26 @@ pub enum BarEdge {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/config/")]
 pub struct BarConfig {
-    pub thickness: Option<u32>,
-    pub edge: Option<BarEdge>,
+    #[serde(default="default_thickness")]
+    pub thickness: u32,
+    #[serde(default="default_edge")]
+    pub edge: BarEdge,
+    #[serde(default="default_win_app_bar")]
+    pub win_app_bar: bool,
+    #[serde(default="default_always_on_top")]
+    pub always_on_top: bool,
+    #[serde(default="default_transparency")]
+    pub transparency: bool,
+    pub blur_effect: Option<BlurEffect>,
     pub screens: Option<Vec<String>>,
     pub widgets: ColumnBarWidgets,
-    pub win_app_bar: Option<bool>,
-    pub always_on_top: Option<bool>,
-    pub blur_effect: Option<BlurEffect>,
-    pub transparency: Option<bool>,
 }
+
+pub fn default_thickness() -> u32 { constants::DEFAULT_BAR_THICKNESS }
+pub fn default_edge() -> BarEdge { constants::DEFAULT_BAR_EDGE }
+pub fn default_win_app_bar() -> bool { constants::DEFAULT_BAR_WINAPPBAR }
+pub fn default_always_on_top() -> bool { constants::DEFAULT_BAR_ALWAYSONTOP }
+pub fn default_transparency() -> bool { constants::DEFAULT_BAR_TRANSPARENCY }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/config/")]
@@ -78,12 +89,10 @@ pub fn get_configuration_file(filename: &str) -> PathBuf {
         let mut config_path = get_xdg_or_home_config_path(home_path.clone());
         let mut is_config_path_program_path = false;
 
-        // If neither directory existsm try get default directories for log and configuration files
+        // If neither directory exists try get default directories for log and configuration files
         if !config_path.exists() {
-            println!("path no existerino");
             match create_dir_all(&config_path) {
                 Ok(_) => {
-                    println!("path creat");
                     // Ask if configuration files should be copied to configuration directory
                     let title = "Setup: configuration directory";
                     let message = format!(
@@ -210,13 +219,13 @@ fn get_xdg_or_home_config_path(home_path: PathBuf) -> PathBuf {
     match env::var("XDG_CONFIG_HOME") {
         Ok(xdg_path) => {
             let mut xdg_config_path = Path::new(&xdg_path.clone()).to_path_buf();
-            xdg_config_path.push(CONFIG_DIR_NAME);
+            xdg_config_path.push(constants::CONFIG_DIR_NAME);
             xdg_config_path
         }
         Err(_) => {
             let mut home_config_path = home_path;
             home_config_path.push(".config");
-            home_config_path.push(CONFIG_DIR_NAME);
+            home_config_path.push(constants::CONFIG_DIR_NAME);
             home_config_path
         }
     }

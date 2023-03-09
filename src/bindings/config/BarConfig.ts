@@ -3,13 +3,4 @@ import type { BarEdge } from "./BarEdge";
 import type { BlurEffect } from "./BlurEffect";
 import type { ColumnBarWidgets } from "./ColumnBarWidgets";
 
-export interface BarConfig {
-  thickness: number | null;
-  edge: BarEdge | null;
-  screens: Array<string> | null;
-  widgets: ColumnBarWidgets;
-  win_app_bar: boolean | null;
-  always_on_top: boolean | null;
-  blur_effect: BlurEffect | null;
-  transparency: boolean | null;
-}
+export interface BarConfig { thickness: number, edge: BarEdge, win_app_bar: boolean, always_on_top: boolean, transparency: boolean, blur_effect: BlurEffect | null, screens: Array<string> | null, widgets: ColumnBarWidgets, }

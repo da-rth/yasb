@@ -1,11 +1,6 @@
-/**
-  Yet Another Status Bar - styles.scss
+/** Yet Another Status Bar - styles.scss **/
 
-  Stylesheet configuration live here.
-**/
-
-
-// Theme: https://www.nordtheme.com/
+/** Theme: https://www.nordtheme.com/ **/
 $bar-text-color: #f5f5f5;
 $bar-background-color: #2E3440;
 $bar-error-text-color: 	#BF616A;
@@ -13,12 +8,17 @@ $bar-widget-text-color-dark: #434C5E;
 $bar-widget-background-color: #4C566A;
 $bar-widget-background-color-alt: #5E81AC;
 $bar-widget-background-color-alt2: #8FBCBB;
+$bar-widget-hl-1: #88C0D0;
 
+// :root {
+//   // https://github.com/hivivo/ngx-json-viewer#theming
+//   --ngx-json-key: #5E81AC;
+//   --ngx-json-string: #8FBCBB;
+// }
 
 // In order override default styles, you must follow the same level of specificity defined in default.scss
 // https://github.com/denBot/yasb/tree/tauri-port/src/default.scss
 body {
-  font-family: 'Courier New', Courier, monospace;
   .bar {
     background: $bar-background-color;
     color: $bar-text-color;
@@ -32,6 +32,7 @@ body {
     .widgets-container {
 
       .widget {
+        font-family: 'Courier New', Courier, monospace;
 
         &.error {
           background: $bar-error-text-color;
@@ -63,10 +64,6 @@ body {
 // You can style widgets based on their ID (widget type)
 #ActiveWindowWidget {
   background-color: $bar-widget-background-color-alt;
-  // Specify the max width of the active window title
-  overflow: hidden;
-  max-width: 48ch;
-  text-overflow: ellipsis;
 }
 
 #DateTimeWidget {
@@ -78,4 +75,61 @@ body {
   background: $bar-widget-background-color-alt2;
   color: $bar-widget-text-color-dark;
   font-weight: bold;
+}
+
+// .json-viewer-popup {
+//   background-color: $bar-background-color;
+
+//   .ngx-json-viewer {
+//     overflow-y: auto;
+//     background-color: #1b1f27;
+//     border: 1px solid #000;
+//     border-radius: 5px;
+//   }
+// }
+
+.calendar-popup {
+  background: $bar-background-color;
+  border: 1px solid #000;
+
+  * {
+      color: $bar-text-color;
+  }
+
+  .mat-calendar-arrow {
+      fill: $bar-text-color;
+  }
+
+  .mat-calendar-body-selected {
+      color: $bar-widget-background-color-alt2;
+  }
+
+  .mat-calendar-table-header th {
+    font-weight: normal;
+  }
+ 
+  .mat-calendar-body-selected {
+    background-color: $bar-widget-background-color-alt2;
+  }
+
+  .mat-calendar-body-today {
+    background-color: $bar-widget-hl-1;
+    color: $bar-widget-text-color-dark;
+  }
+
+  .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover > 
+  .mat-calendar-body-cell-content:not(.mat-calendar-body-selected):not(.mat-calendar-body-comparison-identical) {
+    background-color: $bar-widget-hl-1;
+    color: $bar-widget-text-color-dark;
+    opacity: 0.75;
+  }
+
+  .cdk-program-focused .mat-calendar-body-active > 
+  .mat-calendar-body-cell-content:not(.mat-calendar-body-selected):not(.mat-calendar-body-comparison-identical) {
+    color: $bar-widget-hl-1;
+
+    &:hover {
+      color: $bar-widget-text-color-dark;
+    }
+  }
 }

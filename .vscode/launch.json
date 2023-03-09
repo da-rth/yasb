@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  // Rust debugging requires the vscode-lldb extension
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Yasb Rust Dev Debug",
+      "cargo": {
+        "args": [
+          "build",
+          "--manifest-path=./src-tauri/Cargo.toml",
+          "--no-default-features"
+        ]
+      },
+      "preLaunchTask": "ui:dev"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Yasb Rust Prod Debug",
+      "cargo": {
+        "args": ["build", "--release", "--manifest-path=./src-tauri/Cargo.toml"]
+      },
+      "preLaunchTask": "rs:build"
+    },
+  ]
+}

@@ -9,7 +9,7 @@ bars:
     transparency: true        # Optional, default: true, enables fully transparent windows. Disable to see a white fallback window background.
     widgets:                  # Provide a list of widgets for left, middle and right bar columns
       left: [ left_widget, active_window ]
-      middle: [ DateTimeWidget ]
+      middle: [ clock_widget ]
       right: [
         cpu_usage_widget,
         uptime_widget,
@@ -22,14 +22,27 @@ widgets:
     kind: TextWidget
     text: "yasb"
   
+  clock_widget:
+    kind: DateTimeWidget
+    formats: ['mediumTime', 'mediumDate']
+    timezones: ['GMT', 'EST']
+    calendar:
+      locale: "en"
+      popup:
+        width: 300
+        height: 350
+    callbacks:
+      on_left: "toggle_calendar"
+      on_right: "next_timezone"
+  
   uptime_widget:
     kind: SysInfoWidget
-    label: "${humanizer(data.sys.uptime * 1000, { language: 'shorter', delimiter: ' ', spacer: '', round: true, units: ['d', 'h', 'm'] })}" # See: https://github.com/EvanHahn/HumanizeDuration.js
-    label_alt: "${moment(new Date(data.sys.boot_time * 1000)).format('YYYY-MM-DD HH:mm:ss')}"
+    label: "uptime: ${humanizer(data.sys.uptime * 1000, { language: 'shorter', delimiter: ' ', spacer: '', round: true, units: ['d', 'h', 'm'] })}" # See: https://github.com/EvanHahn/HumanizeDuration.js
+    label_alt: "startup: ${new Date(data.sys.boot_time * 1000).toLocaleString()}"
     label_tooltip: null
     interval: 1000
     callbacks:
-      on_left: "toggle"
+      on_left: "toggle_label"
   
   hostname_widget:
     kind: SysInfoWidget
@@ -42,15 +55,18 @@ widgets:
     label: "cpu: ${parseFloat(data.sys.cpu_info.cpu_usage).toFixed(2)}"
     label_tooltip: "${data.sys.cpu_info.brand}"
     interval: 1000
+    callbacks:
+      on_left: "toggle_json_viewer"
 
   active_window:
     kind: ActiveWindowWidget
     label: "${data.title}"
     label_alt: "class=${data.class} exe=${data.exe_name}"
-    label_tooltip: "data: ${JSON.stringify(data, null, 2)}"
-    exclusive: true
+    label_max_len: 64
+    is_monitor_exclusive: true
     callbacks:
-      on_left: "toggle"
+      on_left: "toggle_json_viewer"
+      on_right: { exec: { cmd: "cmd.exe", args: ["/c", "start", "https://google.com/?q=${data.exe_name}"] } }
 
   custom_ipinfo_widget:
     kind: CustomWidget
@@ -64,8 +80,8 @@ widgets:
     callbacks:
       on_left: { exec: { cmd: "cmd.exe", args: ["/c", "start", "https://ipinfo.io/${data.ip}"] } }
       on_right: { exec: { cmd: "cmd.exe", args: ["/c", "start", "https://maps.google.com/?q=${data.loc}"] } }
-      on_middle: "update"
-      on_hover: "toggle"
+      # on_middle: "update"
+      on_hover: "toggle_label"
   
   custom_weather_widget:
     kind: CustomWidget
@@ -77,5 +93,5 @@ widgets:
       args: ["https://api.open-meteo.com/v1/forecast?current_weather=true&temperature_unit=celsius&latitude=55.87&longitude=-4.26"] # See https://open-meteo.com/en/docs
       interval: 1800000 # Every 30 minutes
     callbacks:
-      on_left: "toggle"
-      on_hover: "tooltip"
+      on_left: "toggle_label"
+      # on_hover: "tooltip"

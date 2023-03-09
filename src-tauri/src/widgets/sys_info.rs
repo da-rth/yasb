@@ -12,7 +12,18 @@ use sysinfo::SystemExt;
 use tauri::State;
 use ts_rs::TS;
 
+use super::base::CallbackTypeExecOptions;
 use super::base::WidgetCallbacks;
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "snake_case")]
+#[ts(export, export_to = "../src/bindings/widget/sysinfo/")]
+pub enum SysInfoCallbackType {
+    ToggleLabel,
+    ToggleJsonViewer,
+    Exec(CallbackTypeExecOptions),
+}
+
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/widget/sysinfo/")]
@@ -22,7 +33,7 @@ pub struct SysInfoWidgetProps {
     label_alt: Option<String>,
     label_tooltip: Option<String>,
     interval: Option<i32>,
-    callbacks: Option<WidgetCallbacks>,
+    callbacks: Option<WidgetCallbacks<SysInfoCallbackType>>,
 }
 
 impl Default for SysInfoWidgetProps {

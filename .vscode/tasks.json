@@ -1,0 +1,18 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "ui:dev",
+      "type": "shell",
+      "isBackground": true,
+      "command": "npm",
+      "args": ["run", "web:serve"]
+    },
+    {
+      "label": "rs:build",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "web:prod"]
+    },
+  ]
+}

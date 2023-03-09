@@ -7,10 +7,18 @@ use std::{
 };
 use ts_rs::TS;
 use wait_timeout::ChildExt;
-
-use super::base::WidgetCallbacks;
+use super::base::{WidgetCallbacks, CallbackTypeExecOptions};
 
 const CREATE_NO_WINDOW: u32 = 0x08000000;
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "snake_case")]
+#[ts(export, export_to = "../src/bindings/widget/custom/")]
+pub enum CustomCallbackType {
+    ToggleLabel,
+    ToggleJsonViewer,
+    Exec(CallbackTypeExecOptions),
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/widget/custom/")]
@@ -20,7 +28,7 @@ pub struct CustomWidgetProps {
     label_alt: Option<String>,
     label_tooltip: Option<String>,
     command: Option<CustomCommandOptions>,
-    callbacks: Option<WidgetCallbacks>,
+    callbacks: Option<WidgetCallbacks<CustomCallbackType>>,
 }
 
 impl Default for CustomWidgetProps {

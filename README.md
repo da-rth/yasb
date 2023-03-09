@@ -105,7 +105,7 @@ npm run tauri -- --debug
 ```
 To manually lint [[eslint](https://eslint.org/)] `src` and format [[rustfmt](https://github.com/rust-lang/rustfmt)] `src-tauri` directories run:
 ```
-npm run lint
+npm run format
 ```
 To generate [TypeScript Bindings](https://docs.rs/ts-rs/latest/ts_rs/) from `src-tauri/` to `src/bindings/` run:
 ```
