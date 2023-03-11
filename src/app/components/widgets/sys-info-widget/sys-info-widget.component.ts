@@ -1,17 +1,20 @@
 import { Component, Inject, OnInit, ViewEncapsulation } from "@angular/core";
 import { invoke } from "@tauri-apps/api";
-import { emit, listen } from "@tauri-apps/api/event";
+import { emit } from "@tauri-apps/api/event";
 import { WIDGET_PROPS } from "..";
 import { WidgetCallbacks } from "../../../../bindings/widget/base/WidgetCallbacks";
 import { SysInfoCallbackType } from "../../../../bindings/widget/sysinfo/SysInfoCallbackType";
 import { SysInfoWidgetProps } from "../../../../bindings/widget/sysinfo/SysInfoWidgetProps";
 import { SystemInformationPayload } from "../../../../bindings/widget/sysinfo/SystemInformationPayload";
 import { tryFormatEval } from "../../../../utils/format";
+import {
+  JSON_VIEWER_DEFAULT_HEIGHT,
+  JSON_VIEWER_DEFAULT_PADDING,
+  JSON_VIEWER_DEFAULT_WIDTH,
+} from "../../popups/json-viewer/json-viewer.component";
 import { CallbackWidgetComponent } from "../callback-widget.component";
 
 const DEFAULT_LABEL = "hostname: ${data.sys.host}";
-// TODO add json popup
-// TODO emit sys info event, make single-call, unlock after data obtained, emit new data event
 
 @Component({
   selector: "sys-info-widget",
@@ -33,13 +36,14 @@ export class SysInfoWidgetComponent
   private showAltLabel = false;
   private activeLabel: string;
 
-  private jsonPopupWidth = 500;
-  private jsonPopupHeight = 260;
-  private jsonPopupPadding = 10;
-  private isJsonViewerCallbackConfigured = true;
-
   public constructor(@Inject(WIDGET_PROPS) public props?: SysInfoWidgetProps) {
     super(props?.callbacks as WidgetCallbacks<SysInfoCallbackType>);
+    this.jsonViewerProps = this.props?.json_viewer;
+    this.popupWindowOptions = {
+      width: this.props?.json_viewer?.width ?? JSON_VIEWER_DEFAULT_WIDTH,
+      height: this.props?.json_viewer?.height ?? JSON_VIEWER_DEFAULT_HEIGHT,
+      padding: this.props?.json_viewer?.padding ?? JSON_VIEWER_DEFAULT_PADDING,
+    };
     this.label = this.props?.label ?? DEFAULT_LABEL;
     this.labelAlt = this.props?.label_alt ?? undefined;
     this.activeLabel = this.label;
@@ -57,20 +61,25 @@ export class SysInfoWidgetComponent
     switch (callbackType) {
       case "toggle_label":
         return this.onCallbackLabelToggle.bind(this);
-      case "toggle_json_viewer":
+      case "json_viewer":
         return this.toggleJsonViewer.bind(this);
       default:
-        return () => {};
+        return;
     }
   }
 
   private async queryInfo(): Promise<void> {
     await invoke("get_sys_info").then(async (info) => {
       this.sysInfo = info as SystemInformationPayload;
-      //   if ((await this.popupWebview?.isVisible())) {
-      //   await emit(`${this.popupWebview?.label}_data`, this.sysInfo);
-      // }
+      this.jsonViewerData = this.sysInfo;
       this.updateLabels();
+
+      if (
+        (await this.popupWebview?.isVisible()) &&
+        (this.props?.json_viewer?.update_on_interval ?? true)
+      ) {
+        await emit(`${this.popupWebview?.label}_data`, this.jsonViewerData);
+      }
     });
   }
 
@@ -92,35 +101,6 @@ export class SysInfoWidgetComponent
     if (this.labelAlt) {
       this.showAltLabel = !this.showAltLabel;
       this.activeLabel = this.showAltLabel ? this.labelAlt : this.label;
-    }
-  }
-
-  private async toggleJsonViewer(event: MouseEvent): Promise<void> {
-    if (!this.popupWebview && this.isJsonViewerCallbackConfigured) {
-      await this.createPopupWindow(
-        event,
-        "json-viewer",
-        this.jsonPopupWidth,
-        this.jsonPopupHeight,
-        this.jsonPopupPadding
-      );
-      const unlisten = await listen(
-        `${(this.popupWebview as any).label}_init`,
-        async () => {
-          await emit(`${this.popupWebview?.label}_data`, this.sysInfo);
-          unlisten();
-        }
-      );
-    } else if (await this.popupWebview?.isVisible()) {
-      await this.popupWebview?.hide();
-    } else if (this.popupWebview) {
-      await emit(`${this.popupWebview?.label}_data`, this.sysInfo);
-      await this.showPopupWindow(
-        event,
-        this.jsonPopupWidth,
-        this.jsonPopupHeight,
-        this.jsonPopupPadding
-      );
     }
   }
 }

@@ -1,4 +1,4 @@
-use super::base::{CallbackTypeExecOptions, WidgetCallbacks};
+use super::base::{ExecOptions, WidgetCallbacks, JsonViewerPopupOptions};
 use crate::win32::utils;
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager};
@@ -18,8 +18,8 @@ pub struct IgnoreLists {
 #[ts(export, export_to = "../src/bindings/widget/active_window/")]
 pub enum ActiveWindowCallbackType {
     ToggleLabel,
-    ToggleJsonViewer,
-    Exec(CallbackTypeExecOptions),
+    JsonViewer,
+    Exec(ExecOptions),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
@@ -31,6 +31,7 @@ pub struct ActiveWindowWidgetProps {
     label_max_len: Option<u32>,
     is_monitor_exclusive: Option<bool>,
     ignored_windows: Option<IgnoreLists>,
+    json_viewer: Option<JsonViewerPopupOptions>,
     callbacks: Option<WidgetCallbacks<ActiveWindowCallbackType>>,
 }
 
@@ -43,6 +44,7 @@ impl Default for ActiveWindowWidgetProps {
             label_max_len: None,
             is_monitor_exclusive: None,
             ignored_windows: None,
+            json_viewer: None,
             callbacks: None,
         }
     }

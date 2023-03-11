@@ -1,5 +1,6 @@
 import { Component, HostListener, Inject, OnDestroy } from "@angular/core";
 import { invoke } from "@tauri-apps/api";
+import { emit, listen } from "@tauri-apps/api/event";
 import {
   appWindow,
   currentMonitor,
@@ -9,20 +10,34 @@ import {
 } from "@tauri-apps/api/window";
 import { v4 } from "uuid";
 import { BarConfig } from "../../../bindings/config/BarConfig";
-import { CallbackTypeExecOptions } from "../../../bindings/widget/base/CallbackTypeExecOptions";
+import { ExecOptions } from "../../../bindings/widget/base/ExecOptions";
 import { WidgetCallbacks } from "../../../bindings/widget/base/WidgetCallbacks";
 import { tryFormatArgsEval } from "../../../utils/format";
+import { JsonViewerProps } from "../popups/json-viewer/json-viewer.component";
 
 export interface ExecCallback {
-  exec: CallbackTypeExecOptions;
+  exec: ExecOptions;
 }
 
 export type GenericCallbackType = string | ExecCallback | null | undefined;
+
+export interface PopupWindowOptions {
+  width: number;
+  height: number;
+  padding: number;
+}
+
+const DEFAULT_POPUP_WIDTH = 300;
+const DEFAULT_POPUP_HEIGHT = 350;
+const DEFAULT_POPUP_PADDING = 10;
 
 @Component({ template: "" })
 export abstract class CallbackWidgetComponent implements OnDestroy {
   protected execData?: any;
   protected popupWebview?: WebviewWindow;
+  protected popupWindowOptions?: PopupWindowOptions;
+  protected jsonViewerData?: any;
+  protected jsonViewerProps?: JsonViewerProps | null;
 
   constructor(
     @Inject("callbacks") protected callbacks?: WidgetCallbacks<any> | null
@@ -37,6 +52,10 @@ export abstract class CallbackWidgetComponent implements OnDestroy {
   protected abstract mapCallback(
     callbackType: string
   ): ((event: MouseEvent, callbackType: string) => void) | undefined;
+
+  protected isCallbackTypePresent(callbackType: string): boolean {
+    return Object.values(this.callbacks ?? {}).some((c) => c === callbackType);
+  }
 
   @HostListener("click", ["$event"])
   protected async onLeftClick(event: MouseEvent): Promise<void> {
@@ -92,25 +111,24 @@ export abstract class CallbackWidgetComponent implements OnDestroy {
 
   protected async createPopupWindow(
     event: MouseEvent,
-    popupType: string,
-    width: number,
-    height: number,
-    padding: number
+    popupType: string
   ): Promise<void> {
+    if (!this.popupWindowOptions) return;
+
     const barLabel = (window as any).barLabel as string;
     const popupLabel = `${barLabel}_${popupType}_popup_${v4()}`;
     const { x, y } = await this.getWidgetPopupPosition(
       event,
-      width,
-      height,
-      padding
+      this.popupWindowOptions.width,
+      this.popupWindowOptions.height,
+      this.popupWindowOptions.padding
     );
     this.popupWebview = new WebviewWindow(popupLabel, {
       url: `popup/${popupType}`,
       title: "yasb-popup",
       alwaysOnTop: true,
-      width,
-      height,
+      width: this.popupWindowOptions.width,
+      height: this.popupWindowOptions.height,
       x,
       y,
       decorations: false,
@@ -118,22 +136,36 @@ export abstract class CallbackWidgetComponent implements OnDestroy {
       resizable: false,
       skipTaskbar: true,
     } as WindowOptions);
+
+    await listen(`${popupLabel}_init`, async () => {
+      await emit(`${popupLabel}_props`, this.jsonViewerProps);
+      await emit(`${popupLabel}_data`, this.jsonViewerData);
+    });
   }
 
-  protected async showPopupWindow(
-    event: MouseEvent,
-    width: number,
-    height: number,
-    padding: number
-  ): Promise<void> {
+  protected async showPopupWindow(event: MouseEvent): Promise<void> {
     const { x, y } = await this.getWidgetPopupPosition(
       event,
-      width,
-      height,
-      padding
+      this.popupWindowOptions?.width ?? DEFAULT_POPUP_WIDTH,
+      this.popupWindowOptions?.height ?? DEFAULT_POPUP_HEIGHT,
+      this.popupWindowOptions?.padding ?? DEFAULT_POPUP_PADDING
     );
     await this.popupWebview?.setPosition(new LogicalPosition(x, y));
     await this.popupWebview?.show();
+  }
+
+  protected async toggleJsonViewer(event: MouseEvent): Promise<void> {
+    if (!this.popupWebview && this.isCallbackTypePresent("json_viewer")) {
+      await this.createPopupWindow(event, "json-viewer");
+    } else if (await this.popupWebview?.isVisible()) {
+      await this.popupWebview?.hide();
+    } else if (this.popupWebview) {
+      await emit(`${this.popupWebview?.label}_data`, this.jsonViewerData).then(
+        async () => {
+          await this.showPopupWindow(event);
+        }
+      );
+    }
   }
 
   protected async getWidgetPopupPosition(

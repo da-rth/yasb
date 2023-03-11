@@ -1,23 +1,16 @@
-use super::base::{BasePopupProps, WidgetCallbacks};
+use super::base::{WidgetCallbacks, CalendarPopupOptions};
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[serde(rename_all = "snake_case")]
-#[ts(export, export_to = "../src/bindings/widget/datetime/")]
+#[ts(export, export_to = "../src/bindings/widget/base/")]
 pub enum DateTimeCallbackType {
     NextFormat,
     PrevFormat,
     NextTimezone,
     PrevTimezone,
-    ToggleCalendar,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
-#[ts(export, export_to = "../src/bindings/widget/datetime/")]
-pub struct CalendarProps {
-    popup: Option<BasePopupProps>,
-    locale: Option<String>,
+    Calendar,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
@@ -27,7 +20,7 @@ pub struct DateTimeWidgetProps {
     formats: Option<Vec<String>>,
     timezones: Option<Vec<String>>,
     interval: Option<u32>,
-    calendar: Option<CalendarProps>,
+    calendar: Option<CalendarPopupOptions>,
     callbacks: Option<WidgetCallbacks<DateTimeCallbackType>>,
 }
 

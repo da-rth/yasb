@@ -1,7 +1,6 @@
 import {
   Component,
   Inject,
-  NgZone,
   OnDestroy,
   OnInit,
   ViewEncapsulation,
@@ -21,6 +20,11 @@ import { WIDGET_PROPS } from "..";
 import { CallbackWidgetComponent } from "../callback-widget.component";
 import { ActiveWindowCallbackType } from "../../../../bindings/widget/active_window/ActiveWindowCallbackType";
 import { WidgetCallbacks } from "../../../../bindings/widget/base/WidgetCallbacks";
+import {
+  JSON_VIEWER_DEFAULT_HEIGHT,
+  JSON_VIEWER_DEFAULT_PADDING,
+  JSON_VIEWER_DEFAULT_WIDTH,
+} from "../../popups/json-viewer/json-viewer.component";
 
 const NAVIGATION_CLASSES = [
   "SHELLDLL_DefView",
@@ -61,29 +65,25 @@ export class ActiveWindowWidgetComponent
   private showAltLabel = false;
   private activeWindow?: ActiveWindowPayload;
   private activeWindowUnlistener?: UnlistenFn;
-  private jsonPopupWidth = 500;
-  private jsonPopupHeight = 260;
-  private jsonPopupPadding = 10;
-  private isJsonViewerCallbackConfigured = false;
 
   public constructor(
-    @Inject(WIDGET_PROPS) public props: ActiveWindowWidgetProps,
-    public ngZone: NgZone
+    @Inject(WIDGET_PROPS) public props?: ActiveWindowWidgetProps
   ) {
     super(props?.callbacks as WidgetCallbacks<ActiveWindowCallbackType>);
-    this.isJsonViewerCallbackConfigured = Object.values(
-      this.props?.callbacks ?? {}
-    ).some((c) => c === "toggle_json_viewer");
-
-    this.unformattedActiveLabel = this.props.label ?? DEFAULT_LABEL;
-    this.ignoredTitles = [...(this.props.ignored_windows?.by_class ?? [])];
+    this.popupWindowOptions = {
+      width: this.props?.json_viewer?.width ?? JSON_VIEWER_DEFAULT_WIDTH,
+      height: this.props?.json_viewer?.height ?? JSON_VIEWER_DEFAULT_HEIGHT,
+      padding: this.props?.json_viewer?.padding ?? JSON_VIEWER_DEFAULT_PADDING,
+    };
+    this.unformattedActiveLabel = this.props?.label ?? DEFAULT_LABEL;
+    this.ignoredTitles = [...(this.props?.ignored_windows?.by_class ?? [])];
     this.ignoredClasses = [
       ...IGNORED_CLASSES,
-      ...(this.props.ignored_windows?.by_title ?? []),
+      ...(this.props?.ignored_windows?.by_title ?? []),
     ];
     this.ignoredProcesses = [
       ...IGNORED_PROCESSES,
-      ...(this.props.ignored_windows?.by_process ?? []),
+      ...(this.props?.ignored_windows?.by_process ?? []),
     ];
   }
 
@@ -113,47 +113,18 @@ export class ActiveWindowWidgetComponent
     switch (callbackType) {
       case "toggle_label":
         return this.toggleActiveLabel.bind(this);
-      case "toggle_json_viewer":
+      case "json_viewer":
         return this.toggleJsonViewer.bind(this);
       default:
         return;
     }
   }
 
-  private async toggleJsonViewer(event: MouseEvent): Promise<void> {
-    if (!this.popupWebview && this.isJsonViewerCallbackConfigured) {
-      await this.createPopupWindow(
-        event,
-        "json-viewer",
-        this.jsonPopupWidth,
-        this.jsonPopupHeight,
-        this.jsonPopupPadding
-      );
-      const unlisten = await listen(
-        `${(this.popupWebview as any).label}_init`,
-        async () => {
-          await emit(`${this.popupWebview?.label}_data`, this.activeWindow);
-          unlisten();
-        }
-      );
-    } else if (await this.popupWebview?.isVisible()) {
-      await this.popupWebview?.hide();
-    } else if (this.popupWebview) {
-      await emit(`${this.popupWebview?.label}_data`, this.activeWindow);
-      await this.showPopupWindow(
-        event,
-        this.jsonPopupWidth,
-        this.jsonPopupHeight,
-        this.jsonPopupPadding
-      );
-    }
-  }
-
   public getClasses(): any {
     const classes: any = { error: this.isError, hidden: this.isHidden };
 
-    if (this.props.class) {
-      classes[this.props.class] = true;
+    if (this.props?.class) {
+      classes[this.props?.class] = true;
     }
 
     return classes;
@@ -175,10 +146,10 @@ export class ActiveWindowWidgetComponent
         )
       )
     ) {
-      this.activeWindow = event.payload;
+      this.activeWindow = this.jsonViewerData = event.payload;
       this.execData = this.activeWindow;
       if (await this.popupWebview?.isVisible()) {
-        await emit(`${this.popupWebview?.label}_data`, this.activeWindow);
+        await emit(`${this.popupWebview?.label}_data`, this.jsonViewerData);
       }
       this.hideOrUpdateContent();
     }
@@ -193,7 +164,7 @@ export class ActiveWindowWidgetComponent
       this.isHidden = true;
     } else {
       this.isHidden =
-        !!this.props.is_monitor_exclusive &&
+        !!this.props?.is_monitor_exclusive &&
         this.activeWindow?.monitor != this.currentMonitorName;
 
       if (
@@ -240,7 +211,7 @@ export class ActiveWindowWidgetComponent
   public async toggleActiveLabel(): Promise<void> {
     this.showAltLabel = !this.showAltLabel;
     this.unformattedActiveLabel =
-      (this.showAltLabel ? this.props.label_alt : this.props.label) ??
+      (this.showAltLabel ? this.props?.label_alt : this.props?.label) ??
       DEFAULT_LABEL;
     this.updateLabels();
   }

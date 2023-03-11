@@ -7,6 +7,11 @@ import {
 } from "../callback-widget.component";
 import { WidgetCallbacks } from "../../../../bindings/widget/base/WidgetCallbacks";
 import { DateTimeCallbackType } from "../../../../bindings/widget/datetime/DateTimeCallbackType";
+import {
+  CALENDAR_DEFAULT_HEIGHT,
+  CALENDAR_DEFAULT_PADDING,
+  CALENDAR_DEFAULT_WIDTH,
+} from "../../popups/calendar/calendar.component";
 
 @Component({
   selector: "date-time-widget",
@@ -22,16 +27,14 @@ export class DateTimeWidgetComponent
   public activeTimezone?: string;
   private activeFormatIndex = 0;
   private activeTimezoneIndex = 0;
-  private calendarW = 300;
-  private calendarH = 350;
-  private calendarPadding = 10;
-  private isCalendarCallbackConfigured = false;
 
   public constructor(@Inject(WIDGET_PROPS) public props?: DateTimeWidgetProps) {
     super(props?.callbacks as WidgetCallbacks<DateTimeCallbackType>);
-    this.isCalendarCallbackConfigured = Object.values(
-      this.props?.callbacks ?? {}
-    ).some((c) => c === "toggle_calendar");
+    this.popupWindowOptions = {
+      width: this.props?.calendar?.width ?? CALENDAR_DEFAULT_WIDTH,
+      height: this.props?.calendar?.height ?? CALENDAR_DEFAULT_HEIGHT,
+      padding: this.props?.calendar?.padding ?? CALENDAR_DEFAULT_PADDING,
+    };
     this.updateFormat();
     this.updateTimezone();
     this.updateCurrentDateTime();
@@ -45,23 +48,12 @@ export class DateTimeWidgetComponent
   }
 
   private async toggleCalendar(event: MouseEvent): Promise<void> {
-    if (!this.popupWebview && this.isCalendarCallbackConfigured) {
-      await this.createPopupWindow(
-        event,
-        "calendar",
-        this.calendarW,
-        this.calendarH,
-        this.calendarPadding
-      );
+    if (!this.popupWebview && this.isCallbackTypePresent("calendar")) {
+      await this.createPopupWindow(event, "calendar");
     } else if (await this.popupWebview?.isVisible()) {
       await this.popupWebview?.hide();
     } else {
-      await this.showPopupWindow(
-        event,
-        this.calendarW,
-        this.calendarH,
-        this.calendarPadding
-      );
+      await this.showPopupWindow(event);
     }
   }
 
@@ -77,7 +69,7 @@ export class DateTimeWidgetComponent
         return this.cycleNextTimezone.bind(this);
       case "prev_timezone":
         return this.cyclePrevTimezone.bind(this);
-      case "toggle_calendar":
+      case "calendar":
         return this.toggleCalendar.bind(this);
       default:
         return;

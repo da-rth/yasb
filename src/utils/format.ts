@@ -30,6 +30,7 @@ humanizer.languages.shortest = {
 };
 
 export const tryFormatEval = (str: string, data: any): string => {
+  // TODO find safer alternative to eval
   return eval("`" + str.replace(/`/g, "\\`") + "`");
 };
 

@@ -18,8 +18,12 @@ import {
 } from "@angular/material/datepicker";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import { appWindow } from "@tauri-apps/api/window";
-import { CalendarProps } from "../../../../bindings/widget/datetime/CalendarProps";
+import { CalendarPopupOptions } from "../../../../bindings/widget/base/CalendarPopupOptions";
 import { StylesWatcherComponent } from "../../styles-watcher.component";
+
+export const CALENDAR_DEFAULT_WIDTH = 500;
+export const CALENDAR_DEFAULT_HEIGHT = 260;
+export const CALENDAR_DEFAULT_PADDING = 10;
 
 @Component({
   standalone: true,
@@ -50,10 +54,10 @@ export class CalendarComponent
     this.calendarUnlistenFn = await listen(
       `${appWindow.label}_show`,
       async (event: any) => {
-        const props = event.payload as CalendarProps | undefined;
+        const props = event.payload as CalendarPopupOptions | undefined;
         this._locale = props?.locale ?? this._locale;
         this._adapter.setLocale(this._locale);
-        this.calendarClass = props?.popup?.class;
+        this.calendarClass = props?.class;
         await appWindow.show();
       }
     );

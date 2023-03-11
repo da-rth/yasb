@@ -1,4 +1,4 @@
-use super::base::{CallbackTypeExecOptions, WidgetCallbacks};
+use super::base::{ExecOptions, WidgetCallbacks};
 use serde::{Deserialize, Serialize};
 use std::os::windows::process::CommandExt;
 use std::{
@@ -16,8 +16,8 @@ const CREATE_NO_WINDOW: u32 = 0x08000000;
 #[ts(export, export_to = "../src/bindings/widget/custom/")]
 pub enum CustomCallbackType {
     ToggleLabel,
-    ToggleJsonViewer,
-    Exec(CallbackTypeExecOptions),
+    JsonViewer,
+    Exec(ExecOptions),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]

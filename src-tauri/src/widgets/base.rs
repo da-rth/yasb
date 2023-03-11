@@ -72,7 +72,7 @@ pub enum CallbackEvent {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/widget/base/")]
-pub struct CallbackTypeExecOptions {
+pub struct ExecOptions {
     cmd: String,
     args: Option<Vec<String>>,
 }
@@ -88,9 +88,23 @@ pub struct WidgetCallbacks<T> {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/widget/base/")]
-pub struct BasePopupProps {
+pub struct JsonViewerPopupOptions {
+    pub width: Option<u32>,
+    pub height: Option<u32>,
+    pub padding: Option< u32>,
+    pub class: Option<String>,
+    pub max_depth: Option<u32>,
+    pub expanded: Option<bool>,
+    pub from_child: Option<String>,
+    pub update_on_interval: Option<bool>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "../src/bindings/widget/base/")]
+pub struct CalendarPopupOptions {
     pub width: Option<u32>,
     pub height: Option<u32>,
     pub padding: Option<u32>,
     pub class: Option<String>,
+    pub locale: Option<String>,
 }

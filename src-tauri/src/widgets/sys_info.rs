@@ -1,4 +1,5 @@
-use super::base::CallbackTypeExecOptions;
+use super::base::ExecOptions;
+use super::base::JsonViewerPopupOptions;
 use super::base::WidgetCallbacks;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -22,8 +23,8 @@ use ts_rs::TS;
 #[ts(export, export_to = "../src/bindings/widget/sysinfo/")]
 pub enum SysInfoCallbackType {
     ToggleLabel,
-    ToggleJsonViewer,
-    Exec(CallbackTypeExecOptions),
+    JsonViewer,
+    Exec(ExecOptions),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
@@ -34,6 +35,7 @@ pub struct SysInfoWidgetProps {
     label_alt: Option<String>,
     label_tooltip: Option<String>,
     interval: Option<i32>,
+    json_viewer: Option<JsonViewerPopupOptions>,
     callbacks: Option<WidgetCallbacks<SysInfoCallbackType>>,
 }
 
@@ -45,6 +47,7 @@ impl Default for SysInfoWidgetProps {
             label_alt: None,
             label_tooltip: None,
             interval: None,
+            json_viewer: None,
             callbacks: None,
         }
     }
