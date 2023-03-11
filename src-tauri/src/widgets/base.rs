@@ -28,18 +28,14 @@ impl FromStr for ConfiguredWidget {
             "ActiveWindowWidget" => Ok(ConfiguredWidget::ActiveWindowWidget(
                 ActiveWindowWidgetProps::default(),
             )),
-            "CustomWidget" => Ok(ConfiguredWidget::CustomWidget(
-                CustomWidgetProps::default()
-            )),
+            "CustomWidget" => Ok(ConfiguredWidget::CustomWidget(CustomWidgetProps::default())),
             "DateTimeWidget" => Ok(ConfiguredWidget::DateTimeWidget(
                 DateTimeWidgetProps::default(),
             )),
             "SysInfoWidget" => Ok(ConfiguredWidget::SysInfoWidget(
                 SysInfoWidgetProps::default(),
             )),
-            "TextWidget" => Ok(ConfiguredWidget::TextWidget(
-                TextWidgetProps::default()
-            )),
+            "TextWidget" => Ok(ConfiguredWidget::TextWidget(TextWidgetProps::default())),
             _ => Err(()),
         }
     }
@@ -96,5 +92,5 @@ pub struct BasePopupProps {
     pub width: Option<u32>,
     pub height: Option<u32>,
     pub padding: Option<u32>,
-    pub class: Option<String>
+    pub class: Option<String>,
 }

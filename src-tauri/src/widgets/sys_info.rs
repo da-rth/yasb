@@ -1,7 +1,11 @@
+use super::base::CallbackTypeExecOptions;
+use super::base::WidgetCallbacks;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::sync::Mutex;
+use std::sync::MutexGuard;
+use std::time::Duration;
 use sysinfo::ComponentExt;
 use sysinfo::CpuExt;
 use sysinfo::DiskExt;
@@ -10,10 +14,8 @@ use sysinfo::NetworkExt;
 use sysinfo::System;
 use sysinfo::SystemExt;
 use tauri::State;
+use throttle_my_fn::throttle;
 use ts_rs::TS;
-
-use super::base::CallbackTypeExecOptions;
-use super::base::WidgetCallbacks;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[serde(rename_all = "snake_case")]
@@ -23,7 +25,6 @@ pub enum SysInfoCallbackType {
     ToggleJsonViewer,
     Exec(CallbackTypeExecOptions),
 }
-
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/widget/sysinfo/")]
@@ -53,7 +54,7 @@ pub struct SysInfoSystemState(pub Arc<Mutex<System>>);
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/widget/sysinfo/")]
-pub struct SystemInformation {
+pub struct SystemInformationPayload {
     sys: OperatingSystemInfo,
     mem: SystemMemoryInfo,
     cpus: Vec<SystemCpuInfo>,
@@ -61,107 +62,116 @@ pub struct SystemInformation {
     components: Vec<SystemComponentsInfo>,
 }
 
+#[throttle(1, Duration::from_millis(100))]
+fn try_refresh_sys(sys: &mut MutexGuard<System>) {
+    sys.refresh_all();
+}
+
 #[tauri::command]
 pub fn get_sys_info(
     _app_handle: tauri::AppHandle,
     sys_state: State<SysInfoSystemState>,
-) -> SystemInformation {
-    let mut sys = sys_state.0.lock().unwrap();
+) -> Option<SystemInformationPayload> {
+    let mut lock = sys_state.0.try_lock();
+    if let Ok(ref mut sys) = lock {
+        // Throttle system refresh to every 100ms
+        try_refresh_sys(sys);
 
-    sys.refresh_all();
+        let sys_cpu_info = sys.global_cpu_info();
+        let sys_load_avg = sys.load_average();
+        let mut disks: Vec<SystemDiskInfo> = Vec::new();
+        let mut cpus: Vec<SystemCpuInfo> = Vec::new();
+        let mut components: Vec<SystemComponentsInfo> = Vec::new();
+        let mut networks: HashMap<String, SystemNetowrkData> = HashMap::new();
 
-    let sys_cpu_info = sys.global_cpu_info();
-    let sys_load_avg = sys.load_average();
-    let mut disks: Vec<SystemDiskInfo> = Vec::new();
-    let mut cpus: Vec<SystemCpuInfo> = Vec::new();
-    let mut components: Vec<SystemComponentsInfo> = Vec::new();
-    let mut networks: HashMap<String, SystemNetowrkData> = HashMap::new();
+        for disk in sys.disks() {
+            disks.push(SystemDiskInfo {
+                kind: match disk.type_() {
+                    DiskType::HDD => "HDD".to_string(),
+                    DiskType::SSD => "SSD".to_string(),
+                    _ => "unknown".to_string(),
+                },
+                name: disk.name().to_str().unwrap_or("unknown").to_string(),
+                file_system: std::str::from_utf8(disk.file_system())
+                    .unwrap_or("unknown")
+                    .to_string(),
+                mount_point: disk
+                    .mount_point()
+                    .to_path_buf()
+                    .to_str()
+                    .unwrap_or("unknown")
+                    .to_string(),
+                total_space: disk.total_space(),
+                available_space: disk.available_space(),
+                is_removable: disk.is_removable(),
+            });
+        }
 
-    for disk in sys.disks() {
-        disks.push(SystemDiskInfo {
-            kind: match disk.type_() {
-                DiskType::HDD => "HDD".to_string(),
-                DiskType::SSD => "SSD".to_string(),
-                _ => "unknown".to_string(),
+        for (interface_name, data) in sys.networks() {
+            networks.insert(
+                interface_name.to_string(),
+                SystemNetowrkData {
+                    received: data.received(),
+                    transmitted: data.transmitted(),
+                    total_received: data.total_received(),
+                    total_transmitted: data.total_transmitted(),
+                },
+            );
+        }
+
+        for component in sys.components() {
+            components.push(SystemComponentsInfo {
+                temperature: component.temperature(),
+                max: component.max(),
+                critical: component.critical(),
+                label: component.label().to_string(),
+            });
+        }
+
+        for cpu in sys.cpus() {
+            cpus.push(SystemCpuInfo {
+                name: cpu.name().to_string(),
+                brand: cpu.brand().to_string(),
+                vendor_id: cpu.vendor_id().to_string(),
+                frequency: cpu.frequency(),
+                cpu_usage: cpu.cpu_usage(),
+            });
+        }
+
+        Some(SystemInformationPayload {
+            mem: SystemMemoryInfo {
+                mem_used: sys.used_memory(),
+                mem_total: sys.total_memory(),
+                swap_used: sys.used_swap(),
+                swap_total: sys.total_swap(),
             },
-            name: disk.name().to_str().unwrap_or("unknown").to_string(),
-            file_system: std::str::from_utf8(disk.file_system())
-                .unwrap_or("unknown")
-                .to_string(),
-            mount_point: disk
-                .mount_point()
-                .to_path_buf()
-                .to_str()
-                .unwrap_or("unknown")
-                .to_string(),
-            total_space: disk.total_space(),
-            available_space: disk.available_space(),
-            is_removable: disk.is_removable(),
-        });
-    }
-
-    for (interface_name, data) in sys.networks() {
-        networks.insert(
-            interface_name.to_string(),
-            SystemNetowrkData {
-                received: data.received(),
-                transmitted: data.transmitted(),
-                total_received: data.total_received(),
-                total_transmitted: data.total_transmitted(),
+            sys: OperatingSystemInfo {
+                name: sys.name(),
+                ver: sys.os_version(),
+                host: sys.host_name(),
+                boot_time: sys.boot_time(),
+                uptime: sys.uptime(),
+                num_cpus: cpus.len(),
+                num_cores: sys.physical_core_count(),
+                cpu_info: SystemCpuInfo {
+                    name: sys_cpu_info.name().to_string(),
+                    brand: sys_cpu_info.brand().to_string(),
+                    vendor_id: sys_cpu_info.vendor_id().to_string(),
+                    frequency: sys_cpu_info.frequency(),
+                    cpu_usage: sys_cpu_info.cpu_usage(),
+                },
+                load_avg: SystemLoadAverage {
+                    one: sys_load_avg.one,
+                    five: sys_load_avg.five,
+                    fifteen: sys_load_avg.fifteen,
+                },
             },
-        );
-    }
-
-    for component in sys.components() {
-        components.push(SystemComponentsInfo {
-            temperature: component.temperature(),
-            max: component.max(),
-            critical: component.critical(),
-            label: component.label().to_string(),
-        });
-    }
-
-    for cpu in sys.cpus() {
-        cpus.push(SystemCpuInfo {
-            name: cpu.name().to_string(),
-            brand: cpu.brand().to_string(),
-            vendor_id: cpu.vendor_id().to_string(),
-            frequency: cpu.frequency(),
-            cpu_usage: cpu.cpu_usage(),
-        });
-    }
-
-    SystemInformation {
-        mem: SystemMemoryInfo {
-            mem_used: sys.used_memory(),
-            mem_total: sys.total_memory(),
-            swap_used: sys.used_swap(),
-            swap_total: sys.total_swap(),
-        },
-        sys: OperatingSystemInfo {
-            name: sys.name(),
-            ver: sys.os_version(),
-            host: sys.host_name(),
-            boot_time: sys.boot_time(),
-            uptime: sys.uptime(),
-            num_cpus: cpus.len(),
-            num_cores: sys.physical_core_count(),
-            cpu_info: SystemCpuInfo {
-                name: sys_cpu_info.name().to_string(),
-                brand: sys_cpu_info.brand().to_string(),
-                vendor_id: sys_cpu_info.vendor_id().to_string(),
-                frequency: sys_cpu_info.frequency(),
-                cpu_usage: sys_cpu_info.cpu_usage(),
-            },
-            load_avg: SystemLoadAverage {
-                one: sys_load_avg.one,
-                five: sys_load_avg.five,
-                fifteen: sys_load_avg.fifteen,
-            },
-        },
-        cpus: cpus,
-        components: components,
-        networks: networks,
+            cpus: cpus,
+            components: components,
+            networks: networks,
+        })
+    } else {
+        None
     }
 }
 

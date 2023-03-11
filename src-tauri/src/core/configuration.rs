@@ -49,26 +49,36 @@ pub enum BarEdge {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/config/")]
 pub struct BarConfig {
-    #[serde(default="default_thickness")]
+    #[serde(default = "default_thickness")]
     pub thickness: u32,
-    #[serde(default="default_edge")]
+    #[serde(default = "default_edge")]
     pub edge: BarEdge,
-    #[serde(default="default_win_app_bar")]
+    #[serde(default = "default_win_app_bar")]
     pub win_app_bar: bool,
-    #[serde(default="default_always_on_top")]
+    #[serde(default = "default_always_on_top")]
     pub always_on_top: bool,
-    #[serde(default="default_transparency")]
+    #[serde(default = "default_transparency")]
     pub transparency: bool,
     pub blur_effect: Option<BlurEffect>,
     pub screens: Option<Vec<String>>,
     pub widgets: ColumnBarWidgets,
 }
 
-pub fn default_thickness() -> u32 { constants::DEFAULT_BAR_THICKNESS }
-pub fn default_edge() -> BarEdge { constants::DEFAULT_BAR_EDGE }
-pub fn default_win_app_bar() -> bool { constants::DEFAULT_BAR_WINAPPBAR }
-pub fn default_always_on_top() -> bool { constants::DEFAULT_BAR_ALWAYSONTOP }
-pub fn default_transparency() -> bool { constants::DEFAULT_BAR_TRANSPARENCY }
+pub fn default_thickness() -> u32 {
+    constants::DEFAULT_BAR_THICKNESS
+}
+pub fn default_edge() -> BarEdge {
+    constants::DEFAULT_BAR_EDGE
+}
+pub fn default_win_app_bar() -> bool {
+    constants::DEFAULT_BAR_WINAPPBAR
+}
+pub fn default_always_on_top() -> bool {
+    constants::DEFAULT_BAR_ALWAYSONTOP
+}
+pub fn default_transparency() -> bool {
+    constants::DEFAULT_BAR_TRANSPARENCY
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../src/bindings/config/")]

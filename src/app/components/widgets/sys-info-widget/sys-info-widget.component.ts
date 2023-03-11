@@ -1,11 +1,11 @@
-import { Component, Inject, ViewEncapsulation } from "@angular/core";
+import { Component, Inject, OnInit, ViewEncapsulation } from "@angular/core";
 import { invoke } from "@tauri-apps/api";
 import { emit, listen } from "@tauri-apps/api/event";
 import { WIDGET_PROPS } from "..";
 import { WidgetCallbacks } from "../../../../bindings/widget/base/WidgetCallbacks";
 import { SysInfoCallbackType } from "../../../../bindings/widget/sysinfo/SysInfoCallbackType";
 import { SysInfoWidgetProps } from "../../../../bindings/widget/sysinfo/SysInfoWidgetProps";
-import { SystemInformation } from "../../../../bindings/widget/sysinfo/SystemInformation";
+import { SystemInformationPayload } from "../../../../bindings/widget/sysinfo/SystemInformationPayload";
 import { tryFormatEval } from "../../../../utils/format";
 import { CallbackWidgetComponent } from "../callback-widget.component";
 
@@ -29,7 +29,7 @@ export class SysInfoWidgetComponent
 
   private label: string;
   private labelAlt?: string;
-  private sysInfo?: SystemInformation;
+  private sysInfo?: SystemInformationPayload;
   private showAltLabel = false;
   private activeLabel: string;
 
@@ -66,7 +66,7 @@ export class SysInfoWidgetComponent
 
   private async queryInfo(): Promise<void> {
     await invoke("get_sys_info").then(async (info) => {
-      this.sysInfo = info as SystemInformation;
+      this.sysInfo = info as SystemInformationPayload;
       //   if ((await this.popupWebview?.isVisible())) {
       //   await emit(`${this.popupWebview?.label}_data`, this.sysInfo);
       // }

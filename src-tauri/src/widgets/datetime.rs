@@ -1,4 +1,4 @@
-use super::base::{WidgetCallbacks, BasePopupProps};
+use super::base::{BasePopupProps, WidgetCallbacks};
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
