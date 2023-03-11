@@ -67,7 +67,7 @@ export class JsonViewerComponent
   private async onNewData(event: Event<any>): Promise<void> {
     const data = event.payload;
     // TODO find alternative for eval
-    this.data = this.fromChild ? eval(this.fromChild) : data;
+    this.data = this.fromChild ? eval(`${this.fromChild}`) : data;
     this.cdr.detectChanges();
   }
 

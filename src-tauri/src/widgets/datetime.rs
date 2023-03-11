@@ -1,4 +1,4 @@
-use super::base::{WidgetCallbacks, CalendarPopupOptions};
+use super::base::{CalendarPopupOptions, WidgetCallbacks};
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 

@@ -1,4 +1,4 @@
-use super::base::{ExecOptions, WidgetCallbacks, JsonViewerPopupOptions};
+use super::base::{ExecOptions, JsonViewerPopupOptions, WidgetCallbacks};
 use crate::win32::utils;
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager};

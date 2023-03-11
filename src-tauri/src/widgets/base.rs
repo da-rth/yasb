@@ -91,7 +91,7 @@ pub struct WidgetCallbacks<T> {
 pub struct JsonViewerPopupOptions {
     pub width: Option<u32>,
     pub height: Option<u32>,
-    pub padding: Option< u32>,
+    pub padding: Option<u32>,
     pub class: Option<String>,
     pub max_depth: Option<u32>,
     pub expanded: Option<bool>,

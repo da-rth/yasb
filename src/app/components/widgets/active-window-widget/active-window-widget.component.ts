@@ -200,6 +200,7 @@ export class ActiveWindowWidgetComponent
 
     if (
       this.props?.label_max_len &&
+      this.activeLabelFormatted &&
       this.activeLabelFormatted.length > this.props.label_max_len
     ) {
       this.activeLabelFormatted =
