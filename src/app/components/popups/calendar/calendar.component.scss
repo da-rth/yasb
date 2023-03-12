@@ -1,39 +1,39 @@
 html,
 body {
-  margin: 0;
-  height: 100%;
-  overflow: hidden;
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
 }
 
 .calendar-popup {
-  width: 95vw;
-  border-radius: 5px;
-  background: #e3e3e3;
-  border: 1px solid black;
-  margin: auto;
+    width: 95vw;
+    border-radius: 5px;
+    background: #e3e3e3;
+    border: 1px solid black;
+    margin: auto;
 
-  * {
-    color: #242424;
-  }
+    * {
+        color: #242424;
+    }
 
-  .mat-calendar-body-selected {
-    color: #e3e3e3;
-  }
+    .mat-calendar-body-selected {
+        color: #e3e3e3;
+    }
 
-  .cdk-program-focused
-    .mat-calendar-body-active
-    > .mat-calendar-body-cell-content:not(.mat-calendar-body-selected):not(
-      .mat-calendar-body-comparison-identical
-    ) {
-    background-color: transparent;
-    border: none;
-    font-weight: bold;
-  }
+    .cdk-program-focused
+        .mat-calendar-body-active
+        > .mat-calendar-body-cell-content:not(.mat-calendar-body-selected):not(
+            .mat-calendar-body-comparison-identical
+        ) {
+        background-color: transparent;
+        border: none;
+        font-weight: bold;
+    }
 
-  .mat-calendar-body-cell:hover
-    > .mat-calendar-body-cell-content:not(.mat-calendar-body-selected):not(
-      .mat-calendar-body-comparison-identical
-    ) {
-    font-weight: bold;
-  }
+    .mat-calendar-body-cell:hover
+        > .mat-calendar-body-cell-content:not(.mat-calendar-body-selected):not(
+            .mat-calendar-body-comparison-identical
+        ) {
+        font-weight: bold;
+    }
 }

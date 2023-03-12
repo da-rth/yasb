@@ -96,7 +96,7 @@ pub struct JsonViewerPopupOptions {
     pub max_depth: Option<u32>,
     pub expanded: Option<bool>,
     pub from_child: Option<String>,
-    pub update_on_interval: Option<bool>,
+    pub update_on_change: Option<bool>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]

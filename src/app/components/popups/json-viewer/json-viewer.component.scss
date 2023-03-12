@@ -1,23 +1,23 @@
 html,
 body {
-  margin: 0;
-  height: 100%;
-  overflow: hidden;
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
 }
 
 .json-viewer-popup {
-  padding: 10px;
-  border-radius: 5px;
-  background: #e3e3e3;
-  border: 1px solid black;
-  margin: auto;
-  width: calc(100% - 30px);
-  height: calc(100% - 30px);
-  overflow: hidden;
+    padding: 10px;
+    border-radius: 5px;
+    background: #e3e3e3;
+    border: 1px solid black;
+    margin: auto;
+    width: calc(100% - 30px);
+    height: calc(100% - 30px);
+    overflow: hidden;
 
-  section.ngx-json-viewer {
-    overflow-y: auto;
-    padding: 5px 0;
-    height: calc(100% - 10px);
-  }
+    section.ngx-json-viewer {
+        overflow-y: auto;
+        padding: 5px 0;
+        height: calc(100% - 10px);
+    }
 }

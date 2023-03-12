@@ -3,10 +3,10 @@ import { TextWidgetProps } from "../../../../bindings/widget/text/TextWidgetProp
 import { WIDGET_PROPS } from "..";
 
 @Component({
-  selector: "text-widget",
-  templateUrl: "./text-widget.component.html",
-  encapsulation: ViewEncapsulation.None,
+    selector: "text-widget",
+    templateUrl: "./text-widget.component.html",
+    encapsulation: ViewEncapsulation.None,
 })
 export class TextWidgetComponent {
-  public constructor(@Inject(WIDGET_PROPS) public props: TextWidgetProps) {}
+    public constructor(@Inject(WIDGET_PROPS) public props: TextWidgetProps) {}
 }

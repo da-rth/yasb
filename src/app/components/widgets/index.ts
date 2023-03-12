@@ -6,13 +6,13 @@ import { InjectionToken } from "@angular/core";
 import { ConfiguredWidget } from "../../../bindings/widget/ConfiguredWidget";
 import { SysInfoWidgetComponent } from "./sys-info-widget/sys-info-widget.component";
 
-export const WIDGET_PROPS = new InjectionToken<ConfiguredWidget>("widget");
+export const WIDGET_PROPS = new InjectionToken<ConfiguredWidget>("config.widget");
 
 export default {
-  ActiveWindowWidget: ActiveWindowWidgetComponent,
-  // CustomWidget,
-  DateTimeWidget: DateTimeWidgetComponent,
-  TextWidget: TextWidgetComponent,
-  SysInfoWidget: SysInfoWidgetComponent,
-  UnknownWidget: UnknownWidgetComponent,
+    ActiveWindowWidget: ActiveWindowWidgetComponent,
+    // CustomWidget,
+    DateTimeWidget: DateTimeWidgetComponent,
+    TextWidget: TextWidgetComponent,
+    SysInfoWidget: SysInfoWidgetComponent,
+    UnknownWidget: UnknownWidgetComponent,
 };

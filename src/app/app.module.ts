@@ -12,39 +12,40 @@ import { BarComponent } from "./components/bar/bar.component";
 import { CalendarComponent } from "./components/popups/calendar/calendar.component";
 import { ActiveWindowWidgetComponent } from "./components/widgets/active-window-widget/active-window-widget.component";
 import { JsonViewerComponent } from "./components/popups/json-viewer/json-viewer.component";
+import { WIDGET_PROPS } from "./components/widgets";
 // import { WIDGET_PROPS } from "./components/widgets";
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    BarComponent,
-    ActiveWindowWidgetComponent,
-    CustomWidgetComponent,
-    DateTimeWidgetComponent,
-    SysInfoWidgetComponent,
-    TextWidgetComponent,
-  ],
-  imports: [
-    BrowserModule,
-    CommonModule,
-    BrowserAnimationsModule,
-    RouterModule.forRoot([
-      {
-        path: "",
-        component: BarComponent,
-      },
-      {
-        path: "popup/calendar",
-        component: CalendarComponent,
-      },
-      {
-        path: "popup/json-viewer",
-        component: JsonViewerComponent,
-      },
-    ]),
-  ],
-  exports: [CommonModule],
-  // providers: [{ provide: WIDGET_PROPS, useValue: {} }],
-  bootstrap: [AppComponent],
+    declarations: [
+        AppComponent,
+        BarComponent,
+        ActiveWindowWidgetComponent,
+        CustomWidgetComponent,
+        DateTimeWidgetComponent,
+        SysInfoWidgetComponent,
+        TextWidgetComponent,
+    ],
+    imports: [
+        BrowserModule,
+        CommonModule,
+        BrowserAnimationsModule,
+        RouterModule.forRoot([
+            {
+                path: "",
+                component: BarComponent,
+            },
+            {
+                path: "popup/calendar",
+                component: CalendarComponent,
+            },
+            {
+                path: "popup/json_viewer",
+                component: JsonViewerComponent,
+            },
+        ]),
+    ],
+    exports: [CommonModule],
+    providers: [{ provide: WIDGET_PROPS, useValue: true }],
+    bootstrap: [AppComponent],
 })
 export class AppModule {}

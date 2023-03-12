@@ -3,13 +3,13 @@ import { WIDGET_PROPS } from "..";
 import { CustomWidgetProps } from "../../../../bindings/widget/custom/CustomWidgetProps";
 
 @Component({
-  selector: "custom-widget",
-  templateUrl: "./custom-widget.component.html",
-  encapsulation: ViewEncapsulation.None,
+    selector: "custom-widget",
+    templateUrl: "./custom-widget.component.html",
+    encapsulation: ViewEncapsulation.None,
 })
 export class CustomWidgetComponent {
-  public activeLabelFormatted = "todo";
-  public constructor(@Inject(WIDGET_PROPS) public props?: CustomWidgetProps) {}
+    public activeLabelFormatted = "todo";
+    public constructor(@Inject(WIDGET_PROPS) public props?: CustomWidgetProps) {}
 }
 
 /**

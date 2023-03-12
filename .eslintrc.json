@@ -9,7 +9,8 @@
     },
     "rules": {
         "linebreak-style": [2, "windows"],
-        "prettier/prettier": ["error", { "endOfLine": "crlf" }]
+        "prettier/prettier": ["error", { "endOfLine": "crlf" }],
+        "max-len": ["error", { "code": 120 }]
     },
     "extends": [
       "eslint:recommended",
@@ -37,7 +38,8 @@
         ],
         "rules": {
             "@typescript-eslint/no-explicit-any": "off",
-            "@typescript-eslint/no-empty-function": "off"
+            "@typescript-eslint/no-empty-function": "off",
+            "max-len": ["error", { "code": 128 }]
         }
       },
       {
