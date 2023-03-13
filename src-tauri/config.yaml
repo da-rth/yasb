@@ -13,7 +13,8 @@ bars:
       right: [
         cpu_usage_widget,
         uptime_widget,
-        hostname_widget
+        hostname_widget,
+        custom_weather_widget
       ]
 
 widgets:
@@ -49,6 +50,7 @@ widgets:
   cpu_usage_widget:
     kind: SysInfoWidget
     label: "cpu: ${parseFloat(data.sys.cpu_info.cpu_usage).toFixed(2)}"
+    label_alt: "test"
     interval: 1000
     json_viewer:
       expanded: true
@@ -56,6 +58,7 @@ widgets:
       from_child: "data.sys"
     callbacks:
       on_left: "json_viewer"
+      on_right: "toggle_label"
 
   active_window:
     kind: ActiveWindowWidget
@@ -85,13 +88,14 @@ widgets:
   #     on_right: { exec: { cmd: "cmd.exe", args: ["/c", "start", "https://maps.google.com/?q=${data.loc}"] } }
   #     on_hover: "toggle_label"
   
-  # custom_weather_widget:
-  #   kind: CustomWidget
-  #   label: "temp: ${data.current_weather.temperature}°c"
-  #   label_alt: "windspeed: ${data.current_weather.windspeed}"
-  #   command:
-  #     cmd: "curl.exe"
-  #     args: ["https://api.open-meteo.com/v1/forecast?current_weather=true&temperature_unit=celsius&latitude=55.87&longitude=-4.26"] # See https://open-meteo.com/en/docs
-  #     interval: 1800000 # Every 30 minutes
-  #   callbacks:
-  #     on_left: "toggle_label"
+  custom_weather_widget:
+    kind: CustomWidget
+    label: "temp: ${data.current_weather.temperature}°c"
+    label_alt: "windspeed: ${data.current_weather.windspeed}"
+    command:
+      cmd: "curl.exe"
+      args: ["https://api.open-meteo.com/v1/forecast?current_weather=true&temperature_unit=celsius&latitude=55.87&longitude=-4.26"] # See https://open-meteo.com/en/docs
+      interval: 1800000 # Every 30 minutes
+    callbacks:
+      on_left: "toggle_label"
+      on_right: "json_viewer"

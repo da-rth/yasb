@@ -5,14 +5,15 @@ import { ActiveWindowWidgetComponent } from "./active-window-widget/active-windo
 import { InjectionToken } from "@angular/core";
 import { ConfiguredWidget } from "../../../bindings/widget/ConfiguredWidget";
 import { SysInfoWidgetComponent } from "./sys-info-widget/sys-info-widget.component";
+import { CustomWidgetComponent } from "./custom-widget/custom-widget.component";
 
 export const WIDGET_PROPS = new InjectionToken<ConfiguredWidget>("config.widget");
 
 export default {
     ActiveWindowWidget: ActiveWindowWidgetComponent,
-    // CustomWidget,
+    CustomWidget: CustomWidgetComponent,
     DateTimeWidget: DateTimeWidgetComponent,
-    TextWidget: TextWidgetComponent,
     SysInfoWidget: SysInfoWidgetComponent,
+    TextWidget: TextWidgetComponent,
     UnknownWidget: UnknownWidgetComponent,
 };

@@ -2,7 +2,7 @@
     <div class="widgets-container bar-left">
         <ng-container *ngFor="let widget of barWidgets.left">
             <ng-template
-                [ngComponentOutlet]="getWidgetComponent(widget)"
+                [ngComponentOutlet]="$any(widget).component"
                 [ngComponentOutletInjector]="$any(widget).injector"
             ></ng-template>
         </ng-container>
@@ -11,7 +11,7 @@
     <div class="widgets-container bar-middle">
         <ng-container *ngFor="let widget of barWidgets.middle">
             <ng-template
-                [ngComponentOutlet]="getWidgetComponent(widget)"
+                [ngComponentOutlet]="$any(widget).component"
                 [ngComponentOutletInjector]="$any(widget).injector"
             ></ng-template>
         </ng-container>
@@ -20,7 +20,7 @@
     <div class="widgets-container bar-right">
         <ng-container *ngFor="let widget of barWidgets.right">
             <ng-template
-                [ngComponentOutlet]="getWidgetComponent(widget)"
+                [ngComponentOutlet]="$any(widget).component"
                 [ngComponentOutletInjector]="$any(widget).injector"
             ></ng-template>
         </ng-container>

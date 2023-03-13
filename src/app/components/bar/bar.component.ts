@@ -46,6 +46,7 @@ export class BarComponent extends StylesWatcherComponent implements OnInit, OnDe
         // Create props injector(s) for configured widgets
         for (const col of Object.keys(this.barWidgets) as Array<keyof typeof this.barWidgets>) {
             this.barWidgets[col] = this.barWidgets[col].map((widget: ConfiguredWidget) => ({
+                component: this.getWidgetComponent(widget),
                 injector: this.createPropsInjector(widget),
                 ...widget,
             })) as ConfiguredWidget[];
@@ -71,10 +72,6 @@ export class BarComponent extends StylesWatcherComponent implements OnInit, OnDe
 
     public getWidgetComponent(widget: ConfiguredWidget): any {
         return widget.kind in this.widgets ? (this.widgets as any)[widget.kind] : this.widgets.UnknownWidget;
-    }
-
-    public getInjector(widgetProps: ConfiguredWidget): Injector {
-        return (widgetProps as any).injector as Injector;
     }
 
     private async addEventListeners(): Promise<void> {

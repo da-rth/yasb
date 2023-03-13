@@ -34,7 +34,7 @@ export abstract class CallbackWidgetComponent {
     @HostListener("middleclick", ["$event"])
     protected async onMiddleClick(event: MouseEvent): Promise<void> {
         if (this.callbacks?.on_middle) {
-            await this.runCallback(event, this.callbacks.on_left);
+            await this.runCallback(event, this.callbacks.on_middle);
         }
     }
 
@@ -67,9 +67,8 @@ export abstract class CallbackWidgetComponent {
         if ((callbackType as ExecCallback)?.exec) {
             await this.onCallbackExec(callbackType as ExecCallback);
         } else {
-            const callbackFunc = this.mapCallback(this.callbacks?.on_left as string);
-
-            callbackFunc && (await callbackFunc(event, this.callbacks?.on_left));
+            const callbackFunc = this.mapCallback(callbackType as string);
+            callbackFunc && (await callbackFunc(event, callbackType as string));
         }
     }
 

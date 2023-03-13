@@ -1,4 +1,4 @@
-use super::base::{ExecOptions, WidgetCallbacks};
+use super::base::{ExecOptions, WidgetCallbacks, JsonViewerPopupOptions};
 use serde::{Deserialize, Serialize};
 use std::os::windows::process::CommandExt;
 use std::{
@@ -26,8 +26,9 @@ pub struct CustomWidgetProps {
     class: Option<String>,
     label: Option<String>,
     label_alt: Option<String>,
-    label_tooltip: Option<String>,
     command: Option<CustomCommandOptions>,
+    interval: Option<u32>,
+    json_viewer: Option<JsonViewerPopupOptions>,
     callbacks: Option<WidgetCallbacks<CustomCallbackType>>,
 }
 
@@ -37,8 +38,9 @@ impl Default for CustomWidgetProps {
             class: None,
             label: None,
             label_alt: None,
-            label_tooltip: None,
             command: None,
+            interval: None,
+            json_viewer: None,
             callbacks: None,
         }
     }

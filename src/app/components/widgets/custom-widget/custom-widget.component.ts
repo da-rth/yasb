@@ -1,113 +1,129 @@
-import { Component, Inject, ViewEncapsulation } from "@angular/core";
+import { Component, Inject, OnInit, ViewEncapsulation } from "@angular/core";
+import { invoke } from "@tauri-apps/api";
+import { emit, listen } from "@tauri-apps/api/event";
+import { WebviewWindow } from "@tauri-apps/api/window";
 import { WIDGET_PROPS } from "..";
+import { WidgetCallbacks } from "../../../../bindings/widget/base/WidgetCallbacks";
+import { CustomCallbackType } from "../../../../bindings/widget/custom/CustomCallbackType";
+import { CustomCommandResponse } from "../../../../bindings/widget/custom/CustomCommandResponse";
 import { CustomWidgetProps } from "../../../../bindings/widget/custom/CustomWidgetProps";
+import { tryFormatEval } from "../../../../utils/format";
+import { PopupOptions, PopupService } from "../../../services/popup.service";
+import {
+    JSON_VIEWER_DEFAULT_HEIGHT,
+    JSON_VIEWER_DEFAULT_PADDING,
+    JSON_VIEWER_DEFAULT_WIDTH,
+} from "../../popups/json-viewer/json-viewer.component";
+import { CallbackWidgetComponent } from "../callback-widget.component";
+
+const DEFAULT_LABEL = "CustomWidget";
 
 @Component({
     selector: "custom-widget",
     templateUrl: "./custom-widget.component.html",
     encapsulation: ViewEncapsulation.None,
 })
-export class CustomWidgetComponent {
-    public activeLabelFormatted = "todo";
-    public constructor(@Inject(WIDGET_PROPS) public props?: CustomWidgetProps) {}
+export class CustomWidgetComponent extends CallbackWidgetComponent implements OnInit {
+    public isHidden = true;
+    public isError = false;
+    public activeLabelFormatted?: string;
+    public errorTooltip?: string;
+
+    private label: string;
+    private labelAlt?: string;
+    private commandResult: CustomCommandResponse;
+    private commandResultData?: any;
+    private showAltLabel = false;
+    private activeLabel: string;
+    private webview: WebviewWindow;
+    private popupOptions: PopupOptions;
+
+    constructor(private popupService: PopupService, @Inject(WIDGET_PROPS) public props?: CustomWidgetProps) {
+        super(props?.callbacks as WidgetCallbacks<CustomCallbackType>);
+        this.label = this.props?.label ?? DEFAULT_LABEL;
+        this.labelAlt = this.props?.label_alt ?? undefined;
+        this.activeLabel = this.label;
+        this.popupOptions = {
+            width: this.props?.json_viewer?.width ?? JSON_VIEWER_DEFAULT_WIDTH,
+            height: this.props?.json_viewer?.height ?? JSON_VIEWER_DEFAULT_HEIGHT,
+            padding: this.props?.json_viewer?.padding ?? JSON_VIEWER_DEFAULT_PADDING,
+        };
+    }
+
+    public async ngOnInit(): Promise<void> {
+        await this.executeCustomCommand();
+        this.props?.interval && setInterval(this.executeCustomCommand.bind(this), this.props?.interval);
+    }
+
+    private async executeCustomCommand() {
+        if (this.props?.command) {
+            this.commandResult = await invoke("process_custom_command", {
+                command: this.props.command?.cmd,
+                args: this.props.command?.args ?? [],
+                timeout: Math.floor((this.props.command?.interval ?? 1000) / 2),
+            });
+        }
+
+        this.updateLabels();
+    }
+
+    private async toggleJsonViewer(event: MouseEvent): Promise<void> {
+        if (!this.webview && this.isCallbackTypePresent("json_viewer")) {
+            this.webview = await this.popupService.create(event, "json_viewer", this.popupOptions);
+            const initUnlisten = await listen(`${this.webview?.label}_ngOnInit`, async () => {
+                await emit(`${this.webview?.label}_data`, this.commandResultData);
+                initUnlisten();
+            });
+        } else {
+            this.popupService.toggleVisiblity(this.webview, event, this.popupOptions);
+        }
+    }
+
+    protected mapCallback(callbackType: string): ((event: MouseEvent, callbackType: string) => void) | undefined {
+        switch (callbackType) {
+            case "toggle_label":
+                return this.onCallbackLabelToggle.bind(this);
+            case "json_viewer":
+                return this.toggleJsonViewer.bind(this);
+            default:
+                return;
+        }
+    }
+
+    private updateLabels(): void {
+        if (this.commandResult.stdout) {
+            try {
+                this.commandResultData = JSON.parse(this.commandResult.stdout);
+            } catch {
+                this.commandResultData = this.commandResult.stdout.replace("\n", "\\n");
+            }
+            try {
+                this.activeLabelFormatted = tryFormatEval(this.activeLabel, this.commandResultData);
+                this.isError = false;
+            } catch (error) {
+                this.activeLabelFormatted = this.activeLabel;
+                this.errorTooltip = `Error formatting label:\n\n${(error as Error).message}`;
+                this.isError = true;
+            }
+        } else {
+            // If no stdout, format error tooltip
+            const cmd = this.props?.command?.cmd;
+            const args = ` - ${(this.props?.command?.args ?? []).join("\n")}`;
+            const status = this.commandResult.status ?? 1;
+            this.errorTooltip =
+                `The command '${cmd}' exited with code ${status}\n\n` +
+                (this.props?.command?.args ? `args:\n${args}` : "") +
+                `\n\nstderr: ${this.commandResult.stderr ?? "None"}`;
+            this.activeLabelFormatted = cmd ?? this.activeLabel;
+            this.isError = true;
+        }
+    }
+
+    private async onCallbackLabelToggle(): Promise<void> {
+        if (this.labelAlt) {
+            this.showAltLabel = !this.showAltLabel;
+            this.activeLabel = this.showAltLabel ? this.labelAlt : this.label;
+            this.updateLabels();
+        }
+    }
 }
-
-/**
-
-<!-- eslint-disable @typescript-eslint/no-non-null-assertion -->
-<script setup lang="ts">
-import type { CallbackTypeExecOptions } from "~/bindings/widget/base/CallbackTypeExecOptions";
-import type { CustomCommandResponse } from "~/bindings/widget/custom/CustomCommandResponse";
-import type { CustomWidgetProps } from "~/bindings/widget/custom/CustomWidgetProps";
-import { invoke } from "@tauri-apps/api/tauri";
-import { ref, onMounted } from "vue";
-import { tryFormatArgsEval, tryFormatEval } from "../../utils/format";
-import WidgetWrapper from "../WidgetWrapper.vue";
-import Log from "~/utils/log";
-
-const props = defineProps<CustomWidgetProps>();
-const defaultLabel = "CustomWidget";
-const activeLabelTooltip = ref<string | null>(null);
-const activeLabelError = ref<string | null>(null);
-const activeLabelFormatted = ref<string>(
-  props.label_alt ?? props.label ?? defaultLabel
-);
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-let commandResultData: any;
-let showAltLabel = false;
-const unformattedActiveTooltip = props.label_tooltip ?? "";
-let unformattedActiveLabel = props.label ?? defaultLabel;
-let commandResult: CustomCommandResponse;
-
-onMounted(async () => {
-  if (props.command) {
-    await executeCustomCommand();
-
-    if (props.command.interval ?? 0 > 0) {
-      setInterval(executeCustomCommand, props.command.interval ?? 1000);
-    }
-  }
-});
-
-const executeCustomCommand = async () => {
-  commandResult = await invoke("process_custom_command", {
-    command: props.command?.cmd,
-    args: props.command?.args ?? [],
-    timeout: Math.floor((props.command?.interval ?? 1000) / 2),
-  });
-
-  updateActiveLabel();
-};
-
-const updateActiveLabel = () => {
-  if (commandResult.stdout) {
-    try {
-      commandResultData = JSON.parse(commandResult.stdout);
-    } catch {
-      commandResultData = commandResult.stdout.replace("\n", "\\n");
-    }
-    try {
-      activeLabelTooltip.value = props.label_tooltip
-        ? tryFormatEval(unformattedActiveTooltip, commandResultData)
-        : null;
-      activeLabelFormatted.value = tryFormatEval(
-        unformattedActiveLabel,
-        commandResultData
-      );
-      activeLabelError.value = null;
-    } catch (error) {
-      activeLabelTooltip.value = unformattedActiveTooltip;
-      activeLabelFormatted.value = unformattedActiveLabel;
-      activeLabelError.value = `Error formatting label:\n\n${
-        (error as Error).message
-      }`;
-    }
-  } else {
-    // If no stdout, format error tooltip
-    const cmd = props.command?.cmd;
-    const args = ` ${(props.command?.args ?? []).join(" ")}`;
-    const status = commandResult.status ?? 1;
-
-    activeLabelError.value = `exited with code: ${status}\n\n${cmd}${args}\n\nstderr: ${
-      commandResult.stderr ?? "empty"
-    }`;
-    activeLabelFormatted.value = cmd ?? unformattedActiveLabel;
-  }
-};
-
-const toggleActiveLabel = async () => {
-  showAltLabel = !showAltLabel;
-  unformattedActiveLabel =
-    (showAltLabel ? props.label_alt : props.label) ?? defaultLabel;
-  updateActiveLabel();
-};
-
-const onCallbackExec = async (exec_options: CallbackTypeExecOptions) => {
-  const command = exec_options.cmd;
-  const args = tryFormatArgsEval(exec_options?.args ?? [], commandResultData);
-  await invoke("process_custom_command", { command, args, timeout: 1000 });
-  Log.info(`UnknownWidget: ${command} ${args}`);
-};
-
- */
