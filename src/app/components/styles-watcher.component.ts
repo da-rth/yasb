@@ -8,7 +8,7 @@ export abstract class StylesWatcherComponent implements OnInit, OnDestroy {
     private stylesChangedUnlistener?: UnlistenFn;
 
     public async ngOnInit(): Promise<void> {
-        this.addStylesToHead();
+        await this.addStylesToHead();
         this.stylesChangedUnlistener = await listen("StylesChangedEvent", this.onStylesChanged);
     }
 

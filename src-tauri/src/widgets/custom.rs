@@ -1,4 +1,4 @@
-use super::base::{ExecOptions, WidgetCallbacks, JsonViewerPopupOptions};
+use super::base::{ExecOptions, JsonViewerPopupOptions, WidgetCallbacks};
 use serde::{Deserialize, Serialize};
 use std::os::windows::process::CommandExt;
 use std::{
