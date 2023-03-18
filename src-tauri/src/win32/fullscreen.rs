@@ -1,8 +1,6 @@
 use tauri::{AppHandle, Manager};
 use windows::Win32::Foundation::{HWND, POINT, RECT};
-use windows::Win32::Graphics::Gdi::{
-    GetMonitorInfoW, MonitorFromWindow, HMONITOR, MONITORINFO, MONITOR_DEFAULTTONEAREST,
-};
+use windows::Win32::Graphics::Gdi::{GetMonitorInfoW, MonitorFromWindow, HMONITOR, MONITORINFO, MONITOR_DEFAULTTONEAREST};
 use windows::Win32::UI::Shell::{
     SHQueryUserNotificationState, QUNS_BUSY, QUNS_PRESENTATION_MODE, QUNS_RUNNING_D3D_FULL_SCREEN,
 };
@@ -54,17 +52,10 @@ pub fn hide_on_fullscreen(app_handle: AppHandle) -> () {
         for (label, window) in app_handle.windows() {
             let is_visible = window.is_visible().unwrap_or(true);
 
-            if !is_fullscreen_present()
-                || window.hwnd().is_err()
-                || window.current_monitor().is_err()
-            {
+            if !is_fullscreen_present() || window.hwnd().is_err() || window.current_monitor().is_err() {
                 if !is_visible {
                     app_handle
-                        .emit_to(
-                            label.as_str(),
-                            BarEvent::ShowWindowEvent.to_string().as_str(),
-                            true,
-                        )
+                        .emit_to(label.as_str(), BarEvent::ShowWindowEvent.to_string().as_str(), true)
                         .unwrap();
                 }
                 continue;
@@ -74,21 +65,13 @@ pub fn hide_on_fullscreen(app_handle: AppHandle) -> () {
                 if is_monitor_fullscreen(HWND(window.hwnd().unwrap().0.clone())) {
                     if is_visible {
                         app_handle
-                            .emit_to(
-                                label.as_str(),
-                                BarEvent::HideWindowEvent.to_string().as_str(),
-                                true,
-                            )
+                            .emit_to(label.as_str(), BarEvent::HideWindowEvent.to_string().as_str(), true)
                             .unwrap();
                     }
                 } else {
                     if !is_visible {
                         app_handle
-                            .emit_to(
-                                label.as_str(),
-                                BarEvent::ShowWindowEvent.to_string().as_str(),
-                                true,
-                            )
+                            .emit_to(label.as_str(), BarEvent::ShowWindowEvent.to_string().as_str(), true)
                             .unwrap();
                     }
                 }

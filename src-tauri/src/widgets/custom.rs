@@ -64,11 +64,7 @@ pub struct CustomCommandResponse {
 }
 
 #[tauri::command]
-pub fn process_custom_command(
-    command: String,
-    args: Vec<String>,
-    timeout: u64,
-) -> CustomCommandResponse {
+pub fn process_custom_command(command: String, args: Vec<String>, timeout: u64) -> CustomCommandResponse {
     let mut cmd = Command::new(command.clone());
     cmd.args(args.clone());
     cmd.stdout(Stdio::piped());
@@ -110,20 +106,11 @@ fn process_child(mut child: Child, timeout: u64) -> CustomCommandResponse {
         None => None,
     };
 
-    CustomCommandResponse {
-        stdout,
-        stderr,
-        status,
-    }
+    CustomCommandResponse { stdout, stderr, status }
 }
 
 fn process_error(cmd: String, args: Vec<String>, error: Error) -> CustomCommandResponse {
-    log::error!(
-        "Error processing CustomWidget command: {} {:?}: {}",
-        cmd,
-        args,
-        error
-    );
+    log::error!("Error processing CustomWidget command: {} {:?}: {}", cmd, args, error);
     CustomCommandResponse {
         stdout: None,
         stderr: Some(error.to_string()),

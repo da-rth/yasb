@@ -11,11 +11,7 @@ use tauri::api::notification::Notification;
 use tauri::State;
 use tauri::{AppHandle, Manager};
 
-fn send_event_payload<S: Serialize + Clone>(
-    app_handle: &AppHandle,
-    event: BarEvent,
-    payload: S,
-) -> () {
+fn send_event_payload<S: Serialize + Clone>(app_handle: &AppHandle, event: BarEvent, payload: S) -> () {
     let event_str = &event.to_string();
 
     match app_handle.emit_all(event_str, payload) {
@@ -48,16 +44,8 @@ fn notify_update_failure(identifier: String, path: String, error: Error) -> () {
 fn notify_update_success(identifier: String, path: String, filename: &str) -> () {
     let title = format!("Successfully updated bar(s) with {}", filename);
 
-    if let Err(e) = Notification::new(identifier)
-        .title(title)
-        .body(path.clone())
-        .show()
-    {
-        log::error!(
-            "Watcher: failed to show update success notification for {}: {}",
-            path,
-            e
-        );
+    if let Err(e) = Notification::new(identifier).title(title).body(path.clone()).show() {
+        log::error!("Watcher: failed to show update success notification for {}: {}", path, e);
     }
 }
 
@@ -104,11 +92,7 @@ fn handle_styles_changed(event: DebouncedEvent, app_handle: AppHandle) -> () {
     }
 }
 
-pub fn spawn_watchers(
-    app_handle: AppHandle,
-    config_path: PathBuf,
-    styles_path: PathBuf,
-) -> Result<Hotwatch, Error> {
+pub fn spawn_watchers(app_handle: AppHandle, config_path: PathBuf, styles_path: PathBuf) -> Result<Hotwatch, Error> {
     let mut hotwatch = Hotwatch::new()?;
 
     let _closure = {

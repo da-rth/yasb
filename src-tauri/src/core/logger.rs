@@ -1,7 +1,5 @@
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use simplelog::{
-    ColorChoice, CombinedLogger, Config, LevelFilter, TermLogger, TerminalMode, WriteLogger,
-};
+use simplelog::{ColorChoice, CombinedLogger, Config, LevelFilter, TermLogger, TerminalMode, WriteLogger};
 use std::{fs::File, path::PathBuf};
 
 use crate::core::constants::APP_LOG_FILENAME;
@@ -44,11 +42,7 @@ pub fn init_logger(verbose: bool) -> PathBuf {
                 ColorChoice::Auto
             },
         ),
-        WriteLogger::new(
-            LevelFilter::Info,
-            Config::default(),
-            File::create(log_path.clone()).unwrap(),
-        ),
+        WriteLogger::new(LevelFilter::Info, Config::default(), File::create(log_path.clone()).unwrap()),
     ])
     .expect("Failed to initialise logger");
 

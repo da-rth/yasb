@@ -1,7 +1,4 @@
-#![cfg_attr(
-    all(not(debug_assertions), target_os = "windows"),
-    windows_subsystem = "windows"
-)]
+#![cfg_attr(all(not(debug_assertions), target_os = "windows"), windows_subsystem = "windows")]
 
 mod core;
 mod widgets;
@@ -28,8 +25,9 @@ fn main() {
             commands::retrieve_config,
             commands::retrieve_styles,
             commands::webview_log,
-            // Background tasks
-            win32::wineventhook::init_win_event_hook,
+            // Run Once background tasks
+            win32::wineventhook::win32_init_event_hook,
+            widgets::komorebi::listener::komorebi_init_event_listener,
             // Widget Commands
             widgets::custom::process_custom_command,
             widgets::active_window::detect_foreground_window,

@@ -7,10 +7,7 @@ use std::str::FromStr;
 use tauri::State;
 
 #[tauri::command]
-pub fn retrieve_config(
-    bar_label: String,
-    config_state: State<configuration::Config>,
-) -> configuration::BarConfig {
+pub fn retrieve_config(bar_label: String, config_state: State<configuration::Config>) -> configuration::BarConfig {
     let bar_config = get_config_from_state(&config_state, &bar_label.as_str());
     bar_config
 }
@@ -21,10 +18,7 @@ pub fn retrieve_styles(styles_state: State<configuration::Styles>) -> String {
 }
 
 #[tauri::command]
-pub fn retrieve_widgets(
-    bar_label: String,
-    config_state: State<configuration::Config>,
-) -> ConfiguredWidgets {
+pub fn retrieve_widgets(bar_label: String, config_state: State<configuration::Config>) -> ConfiguredWidgets {
     let bar_config = get_config_from_state(&config_state, &bar_label.as_str());
     let configured_widgets = get_configured_widgets_from_state(&config_state);
 
@@ -63,17 +57,12 @@ pub fn retrieve_widgets(
     widgets_to_render
 }
 
-fn get_config_from_state(
-    config: &State<configuration::Config>,
-    bar_label: &str,
-) -> configuration::BarConfig {
+fn get_config_from_state(config: &State<configuration::Config>, bar_label: &str) -> configuration::BarConfig {
     let locked_config = config.0.lock().unwrap();
     locked_config.bars.get(bar_label).unwrap().clone()
 }
 
-fn get_configured_widgets_from_state(
-    config: &State<configuration::Config>,
-) -> HashMap<String, ConfiguredWidget> {
+fn get_configured_widgets_from_state(config: &State<configuration::Config>) -> HashMap<String, ConfiguredWidget> {
     let locked_config = config.0.lock().unwrap();
     locked_config.widgets.as_ref().unwrap().clone()
 }

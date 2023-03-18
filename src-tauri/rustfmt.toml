@@ -1,2 +1,4 @@
 edition = "2021"
 newline_style = "Windows"
+max_width=128
+single_line_if_else_max_width=50

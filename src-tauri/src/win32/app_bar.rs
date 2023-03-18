@@ -5,9 +5,7 @@ use std::collections::HashMap;
 use std::mem;
 use tauri::Window;
 use windows::Win32::Foundation::{HWND, RECT};
-use windows::Win32::UI::Shell::{
-    SHAppBarMessage, ABE_BOTTOM, ABE_LEFT, ABE_RIGHT, ABE_TOP, APPBARDATA,
-};
+use windows::Win32::UI::Shell::{SHAppBarMessage, ABE_BOTTOM, ABE_LEFT, ABE_RIGHT, ABE_TOP, APPBARDATA};
 use windows::Win32::UI::WindowsAndMessaging::WM_USER;
 
 pub fn abm_new(pabd: *mut APPBARDATA) -> () {

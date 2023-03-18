@@ -3,9 +3,8 @@ use std::str::FromStr;
 use ts_rs::TS;
 
 use super::{
-    active_window::ActiveWindowWidgetProps, custom::CustomWidgetProps,
-    datetime::DateTimeWidgetProps, sys_info::SysInfoWidgetProps, text::TextWidgetProps,
-    unknown::UnknownWidgetProps,
+    active_window::ActiveWindowWidgetProps, custom::CustomWidgetProps, datetime::DateTimeWidgetProps,
+    sys_info::SysInfoWidgetProps, text::TextWidgetProps, unknown::UnknownWidgetProps,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
@@ -25,16 +24,10 @@ impl FromStr for ConfiguredWidget {
 
     fn from_str(input: &str) -> Result<ConfiguredWidget, Self::Err> {
         match input {
-            "ActiveWindowWidget" => Ok(ConfiguredWidget::ActiveWindowWidget(
-                ActiveWindowWidgetProps::default(),
-            )),
+            "ActiveWindowWidget" => Ok(ConfiguredWidget::ActiveWindowWidget(ActiveWindowWidgetProps::default())),
             "CustomWidget" => Ok(ConfiguredWidget::CustomWidget(CustomWidgetProps::default())),
-            "DateTimeWidget" => Ok(ConfiguredWidget::DateTimeWidget(
-                DateTimeWidgetProps::default(),
-            )),
-            "SysInfoWidget" => Ok(ConfiguredWidget::SysInfoWidget(
-                SysInfoWidgetProps::default(),
-            )),
+            "DateTimeWidget" => Ok(ConfiguredWidget::DateTimeWidget(DateTimeWidgetProps::default())),
+            "SysInfoWidget" => Ok(ConfiguredWidget::SysInfoWidget(SysInfoWidgetProps::default())),
             "TextWidget" => Ok(ConfiguredWidget::TextWidget(TextWidgetProps::default())),
             _ => Err(()),
         }

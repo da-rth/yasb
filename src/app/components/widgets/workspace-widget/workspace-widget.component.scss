@@ -1,0 +1,14 @@
+.workspace-btn {
+    color: #c5c5c5;
+    background-color: transparent;
+    border: none;
+
+    &:hover {
+        color: #ffffff;
+        cursor: pointer;
+    }
+
+    &.active {
+        color: #ffffff;
+    }
+}

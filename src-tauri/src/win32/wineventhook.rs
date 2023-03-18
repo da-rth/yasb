@@ -1,5 +1,4 @@
 use std::sync::Once;
-
 use tauri::AppHandle;
 use tokio::sync::mpsc;
 use windows::Win32::Foundation::HWND;
@@ -36,18 +35,16 @@ fn handle_win_event(event: WindowEvent, app_handle: &AppHandle) {
 
     if event.object_type() == AccessibleObjectId::Window {
         match event_type {
-            SYSTEM_FOREGROUND | OBJECT_NAMECHANGE => {
-                widgets::active_window::handle_window_title_change(app_handle, hwnd)
-            }
+            SYSTEM_FOREGROUND | OBJECT_NAMECHANGE => widgets::active_window::handle_window_title_change(app_handle, hwnd),
             _ => {}
         };
     };
 }
 
 #[tauri::command]
-pub fn init_win_event_hook(app_handle: tauri::AppHandle) {
+pub fn win32_init_event_hook(app_handle: tauri::AppHandle) {
     INIT_WIN_EVENT_LISTENER.call_once(move || {
-        log::info!("Initialisng WinEventHook listener.");
+        log::info!("WinEventHook: Initialisng Event Listener.");
         tauri::async_runtime::spawn(async move {
             win_event_lister(app_handle).await.unwrap();
         });

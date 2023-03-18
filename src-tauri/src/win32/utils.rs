@@ -2,19 +2,16 @@ use anyhow::Result;
 use windows::core::{Result as WindowsCrateResult, PWSTR};
 use windows::Win32::Foundation::{HANDLE, HWND, RECT};
 use windows::Win32::Graphics::Gdi::{
-    GetMonitorInfoW, MonitorFromWindow, HMONITOR, MONITORINFO, MONITORINFOEXW,
-    MONITOR_DEFAULTTONEAREST,
+    GetMonitorInfoW, MonitorFromWindow, HMONITOR, MONITORINFO, MONITORINFOEXW, MONITOR_DEFAULTTONEAREST,
 };
 use windows::Win32::System::Console::{AttachConsole, ATTACH_PARENT_PROCESS};
 use windows::Win32::System::Threading::{
     OpenProcess, QueryFullProcessImageNameW, PROCESS_NAME_WIN32, PROCESS_QUERY_INFORMATION,
 };
-use windows::Win32::UI::HiDpi::{
-    SetProcessDpiAwarenessContext, DPI_AWARENESS_CONTEXT_SYSTEM_AWARE,
-};
+use windows::Win32::UI::HiDpi::{SetProcessDpiAwarenessContext, DPI_AWARENESS_CONTEXT_SYSTEM_AWARE};
 use windows::Win32::UI::WindowsAndMessaging::{
-    GetClassNameA, GetWindowLongW, GetWindowTextLengthW, GetWindowTextW, GetWindowThreadProcessId,
-    SetWindowLongW, GWL_EXSTYLE, WINDOW_EX_STYLE, WS_EX_NOACTIVATE,
+    GetClassNameA, GetWindowLongW, GetWindowTextLengthW, GetWindowTextW, GetWindowThreadProcessId, SetWindowLongW, GWL_EXSTYLE,
+    WINDOW_EX_STYLE, WS_EX_NOACTIVATE,
 };
 
 trait ProcessWindowsCrateResult<T> {
@@ -52,11 +49,7 @@ pub fn set_no_activate(hwnd: HWND) -> () {
     unsafe {
         let window_style = WINDOW_EX_STYLE(GetWindowLongW(hwnd.clone(), GWL_EXSTYLE) as u32);
 
-        SetWindowLongW(
-            hwnd.clone(),
-            GWL_EXSTYLE,
-            (window_style.0 | WS_EX_NOACTIVATE.0) as i32,
-        );
+        SetWindowLongW(hwnd.clone(), GWL_EXSTYLE, (window_style.0 | WS_EX_NOACTIVATE.0) as i32);
     }
 }
 
@@ -128,16 +121,9 @@ pub fn get_exe_path(handle: HANDLE) -> Option<String> {
     let mut path: Vec<u16> = vec![0; len as usize];
     let text_ptr = path.as_mut_ptr();
 
-    match unsafe {
-        QueryFullProcessImageNameW(
-            handle,
-            PROCESS_NAME_WIN32,
-            PWSTR(text_ptr),
-            std::ptr::addr_of_mut!(len),
-        )
-    }
-    .ok()
-    .process()
+    match unsafe { QueryFullProcessImageNameW(handle, PROCESS_NAME_WIN32, PWSTR(text_ptr), std::ptr::addr_of_mut!(len)) }
+        .ok()
+        .process()
     {
         Ok(_) => Some(String::from_utf16_lossy(&path[..len as usize])),
         Err(_) => None,

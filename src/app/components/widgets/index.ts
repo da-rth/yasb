@@ -6,6 +6,7 @@ import { InjectionToken } from "@angular/core";
 import { ConfiguredWidget } from "../../../bindings/widget/ConfiguredWidget";
 import { SysInfoWidgetComponent } from "./sys-info-widget/sys-info-widget.component";
 import { CustomWidgetComponent } from "./custom-widget/custom-widget.component";
+import { WorkspaceWidgetComponent } from "./workspace-widget/workspace-widget.component";
 
 export const WIDGET_PROPS = new InjectionToken<ConfiguredWidget>("config.widget");
 
@@ -16,4 +17,5 @@ export default {
     SysInfoWidget: SysInfoWidgetComponent,
     TextWidget: TextWidgetComponent,
     UnknownWidget: UnknownWidgetComponent,
+    WorkspaceWidget: WorkspaceWidgetComponent,
 };

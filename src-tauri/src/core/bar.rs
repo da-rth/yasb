@@ -31,11 +31,7 @@ pub fn create_bars_from_config(app_handle: &AppHandle, config: YasbConfig) -> ()
         label = validate_bar_label(&label.as_str());
 
         if let Err(e) = create_bars(app_handle, &label, &config) {
-            log::error!(
-                "Failed to create bar(s) for bar config '{}': {:#?}",
-                label,
-                e
-            );
+            log::error!("Failed to create bar(s) for bar config '{}': {:#?}", label, e);
             app_handle.exit(1);
         }
     }
@@ -47,17 +43,11 @@ pub fn create_bars_from_config(app_handle: &AppHandle, config: YasbConfig) -> ()
         .expect("Failed to enable tray 'hide all' menu item");
 }
 
-fn create_window(
-    app_handle: &AppHandle,
-    label: String,
-    url: &str,
-    transparency: bool,
-) -> Result<tauri::Window> {
-    let window_builder =
-        tauri::WindowBuilder::new(app_handle, label.clone(), tauri::WindowUrl::App(url.into()))
-            .min_inner_size(10.0, 10.0)
-            .visible(false)
-            .transparent(transparency);
+fn create_window(app_handle: &AppHandle, label: String, url: &str, transparency: bool) -> Result<tauri::Window> {
+    let window_builder = tauri::WindowBuilder::new(app_handle, label.clone(), tauri::WindowUrl::App(url.into()))
+        .min_inner_size(10.0, 10.0)
+        .visible(false)
+        .transparent(transparency);
 
     window_builder
         .build()
@@ -82,25 +72,35 @@ fn create_bar(
     window.set_decorations(false)?;
     window.set_resizable(false)?;
 
-    let monitor_name = monitor
-        .name()
-        .context(format!("Monitor for bar '{}' has NO NAME.", label));
+    let monitor_name = monitor.name().context(format!("Monitor for bar '{}' has NO NAME.", label));
 
     if let Some(blur_effect) = &bar_config.blur_effect {
         match blur_effect {
             BlurEffect::Blur => {
                 if let Err(e) = apply_blur(&window, None) {
-                    log::error!("Failed to apply window effect 'acrylic' on '{}': Acrylic is only supported on Windows 10 or above. {}", label, e);
+                    log::error!(
+                        "Failed to apply window effect 'acrylic' on '{}': Acrylic is only supported on Windows 10 or above. {}",
+                        label,
+                        e
+                    );
                 }
             }
             BlurEffect::Acrylic => {
                 if let Err(e) = apply_acrylic(&window, None) {
-                    log::error!("Failed to apply window effect 'acrylic' on '{}': Acrylic is only supported on Windows 10 or above. {}", label, e)
+                    log::error!(
+                        "Failed to apply window effect 'acrylic' on '{}': Acrylic is only supported on Windows 10 or above. {}",
+                        label,
+                        e
+                    )
                 }
             }
             BlurEffect::Mica => {
                 if let Err(e) = apply_mica(&window) {
-                    log::error!("Failed to apply window effect 'mica' on '{}': Mica is only supported on Windows 11. {}", label, e)
+                    log::error!(
+                        "Failed to apply window effect 'mica' on '{}': Mica is only supported on Windows 11. {}",
+                        label,
+                        e
+                    )
                 }
             }
         }
@@ -113,16 +113,14 @@ fn create_bar(
     // Change bar size and position based on edge provided in bar_config
     match bar_edge {
         BarEdge::Bottom => {
-            bar_position.y =
-                monitor.position().y + monitor.size().height as i32 - scaled_bar_thickness as i32;
+            bar_position.y = monitor.position().y + monitor.size().height as i32 - scaled_bar_thickness as i32;
         }
         BarEdge::Left => {
             bar_size.width = scaled_bar_thickness;
             bar_size.height = monitor.size().height;
         }
         BarEdge::Right => {
-            bar_position.x =
-                monitor.position().x + monitor.size().width as i32 - scaled_bar_thickness as i32;
+            bar_position.x = monitor.position().x + monitor.size().width as i32 - scaled_bar_thickness as i32;
             bar_size.width = scaled_bar_thickness;
             bar_size.height = monitor.size().height;
         }
@@ -132,31 +130,17 @@ fn create_bar(
     window.set_size(bar_size)?;
 
     if bar_appbar {
-        if let Err(e) = win32::app_bar::ab_register_and_position(
-            HWND(window.hwnd()?.0),
-            bar_edge.clone(),
-            scaled_bar_thickness.clone(),
-        ) {
-            log::error!(
-                "Failed to create Win32 App Bar for {}: {}",
-                label.clone(),
-                e
-            );
+        if let Err(e) =
+            win32::app_bar::ab_register_and_position(HWND(window.hwnd()?.0), bar_edge.clone(), scaled_bar_thickness.clone())
+        {
+            log::error!("Failed to create Win32 App Bar for {}: {}", label.clone(), e);
         }
     }
 
     win32::utils::set_no_activate(HWND(window.hwnd().unwrap().0.clone()));
     window.set_position(bar_position)?;
     window.set_skip_taskbar(true)?;
-    window.set_title(
-        app_handle
-            .config()
-            .package
-            .product_name
-            .as_ref()
-            .unwrap()
-            .as_str(),
-    )?;
+    window.set_title(app_handle.config().package.product_name.as_ref().unwrap().as_str())?;
 
     log::info!(
         "Created {} on \"{}\" [ Pos: {},{} | Edge: {} | AppBar: {} ]",
@@ -170,11 +154,7 @@ fn create_bar(
     Ok(window)
 }
 
-fn create_bars(
-    app_handle: &AppHandle,
-    bar_label: &String,
-    bar_config: &BarConfig,
-) -> Result<Vec<tauri::Window>> {
+fn create_bars(app_handle: &AppHandle, bar_label: &String, bar_config: &BarConfig) -> Result<Vec<tauri::Window>> {
     let mut bars: Vec<tauri::Window> = Vec::new();
     let setup_window = create_window(app_handle, "setup_window".to_string(), FRONTEND_SETUP, true)?;
 
