@@ -8,5 +8,5 @@ pytz==2022.1
 pywin32==304
 PyYAML==6.0
 tzlocal==4.2
-watchdog==2.1.9
+watchdog==3.0.0
 winsdk==1.0.0b6
