@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
@@ -13,6 +14,7 @@ import { TextWidgetComponent } from "./components/widgets/text-widget/text-widge
 import { CalendarComponent } from "./components/popups/calendar/calendar.component";
 import { JsonViewerComponent } from "./components/popups/json-viewer/json-viewer.component";
 import { WIDGET_PROPS } from "./components/widgets";
+import { KomorebiWorkspaceWidgetComponent } from "./components/widgets/komorebi-workspace-widget/komorebi-workspace-widget.component";
 
 @NgModule({
     declarations: [
@@ -23,6 +25,7 @@ import { WIDGET_PROPS } from "./components/widgets";
         DateTimeWidgetComponent,
         SysInfoWidgetComponent,
         TextWidgetComponent,
+        KomorebiWorkspaceWidgetComponent,
     ],
     imports: [
         BrowserModule,

@@ -10,9 +10,6 @@ pub struct TextWidgetProps {
 
 impl Default for TextWidgetProps {
     fn default() -> TextWidgetProps {
-        TextWidgetProps {
-            class: None,
-            text: None,
-        }
+        TextWidgetProps { class: None, text: None }
     }
 }

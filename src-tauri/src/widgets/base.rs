@@ -3,8 +3,8 @@ use std::str::FromStr;
 use ts_rs::TS;
 
 use super::{
-    active_window::ActiveWindowWidgetProps, custom::CustomWidgetProps,
-    datetime::DateTimeWidgetProps, sys_info::SysInfoWidgetProps, text::TextWidgetProps,
+    active_window::ActiveWindowWidgetProps, custom::CustomWidgetProps, datetime::DateTimeWidgetProps,
+    komorebi::workspaces::KomorebiWorkspaceProps, sys_info::SysInfoWidgetProps, text::TextWidgetProps,
     unknown::UnknownWidgetProps,
 };
 
@@ -18,6 +18,7 @@ pub enum ConfiguredWidget {
     TextWidget(TextWidgetProps),
     SysInfoWidget(SysInfoWidgetProps),
     UnknownWidget(UnknownWidgetProps),
+    KomorebiWorkspaceWidget(KomorebiWorkspaceProps),
 }
 
 impl FromStr for ConfiguredWidget {
@@ -25,17 +26,12 @@ impl FromStr for ConfiguredWidget {
 
     fn from_str(input: &str) -> Result<ConfiguredWidget, Self::Err> {
         match input {
-            "ActiveWindowWidget" => Ok(ConfiguredWidget::ActiveWindowWidget(
-                ActiveWindowWidgetProps::default(),
-            )),
+            "ActiveWindowWidget" => Ok(ConfiguredWidget::ActiveWindowWidget(ActiveWindowWidgetProps::default())),
             "CustomWidget" => Ok(ConfiguredWidget::CustomWidget(CustomWidgetProps::default())),
-            "DateTimeWidget" => Ok(ConfiguredWidget::DateTimeWidget(
-                DateTimeWidgetProps::default(),
-            )),
-            "SysInfoWidget" => Ok(ConfiguredWidget::SysInfoWidget(
-                SysInfoWidgetProps::default(),
-            )),
+            "DateTimeWidget" => Ok(ConfiguredWidget::DateTimeWidget(DateTimeWidgetProps::default())),
+            "SysInfoWidget" => Ok(ConfiguredWidget::SysInfoWidget(SysInfoWidgetProps::default())),
             "TextWidget" => Ok(ConfiguredWidget::TextWidget(TextWidgetProps::default())),
+            "KomorebiWorkspaceWidget" => Ok(ConfiguredWidget::KomorebiWorkspaceWidget(KomorebiWorkspaceProps::default())),
             _ => Err(()),
         }
     }

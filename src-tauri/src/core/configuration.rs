@@ -248,10 +248,7 @@ fn get_program_path() -> PathBuf {
             exe_path
         }
         Err(e) => {
-            log::error!(
-                "Failed loading default configuration files. Cannot find program path: {}.",
-                e
-            );
+            log::error!("Failed loading default configuration files. Cannot find program path: {}.", e);
             std::process::exit(1);
         }
     }

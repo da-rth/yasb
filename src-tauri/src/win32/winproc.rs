@@ -5,9 +5,9 @@ use windows::core::PCWSTR;
 use windows::Win32::Foundation::{HINSTANCE, HWND, LPARAM, LRESULT, WPARAM};
 use windows::Win32::Graphics::Gdi::HBRUSH;
 use windows::Win32::UI::WindowsAndMessaging::{
-    CreateWindowExW, DefWindowProcW, DispatchMessageA, PeekMessageA, PostQuitMessage,
-    RegisterClassW, TranslateMessage, HCURSOR, HICON, HMENU, MSG, PM_REMOVE, WM_DESTROY,
-    WM_DISPLAYCHANGE, WM_QUIT, WNDCLASSW, WS_MINIMIZEBOX, WS_OVERLAPPED, WS_SYSMENU,
+    CreateWindowExW, DefWindowProcW, DispatchMessageA, PeekMessageA, PostQuitMessage, RegisterClassW, TranslateMessage,
+    HCURSOR, HICON, HMENU, MSG, PM_REMOVE, WM_DESTROY, WM_DISPLAYCHANGE, WM_QUIT, WNDCLASSW, WS_MINIMIZEBOX, WS_OVERLAPPED,
+    WS_SYSMENU,
 };
 
 use crate::core::{bar, configuration};
@@ -17,12 +17,7 @@ use crate::core::{bar, configuration};
 
 static mut APP_HANDLE: Option<AppHandle> = None;
 
-unsafe extern "system" fn window_proc(
-    hwnd: HWND,
-    msg: u32,
-    w_param: WPARAM,
-    l_param: LPARAM,
-) -> LRESULT {
+unsafe extern "system" fn window_proc(hwnd: HWND, msg: u32, w_param: WPARAM, l_param: LPARAM) -> LRESULT {
     let app_handle = APP_HANDLE.clone().unwrap();
     match msg {
         WM_DISPLAYCHANGE => {
@@ -47,8 +42,7 @@ pub fn listen(app_handle: AppHandle) -> () {
         unsafe {
             APP_HANDLE = Some(app_handle.clone());
 
-            let mut window_class_name: Vec<u16> =
-                OsStr::new("YasbWindowClass").encode_wide().collect();
+            let mut window_class_name: Vec<u16> = OsStr::new("YasbWindowClass").encode_wide().collect();
             window_class_name.push(0);
 
             let window_class = WNDCLASSW {

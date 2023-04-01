@@ -74,7 +74,7 @@ export class ActiveWindowWidgetComponent extends CallbackWidgetComponent impleme
     public async ngOnInit(): Promise<void> {
         this.currentMonitorName = (await currentMonitor())?.name;
         this.activeWindowUnlistener = await listen("ActiveWindowChanged", this.onActiveWindowChange.bind(this));
-        await invoke("init_win_event_hook");
+        await invoke("win32_init_event_hook");
         await invoke("detect_foreground_window");
         this.isHidden = false;
         this.activeLabelFormatted = this.unformattedActiveLabel;

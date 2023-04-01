@@ -8,7 +8,7 @@ bars:
     blur_effect: null         # Optional, default: None, options: blur|acrylic|mica. Mica works on Windows 11 only. Acrylic may have poor performance.
     transparency: true        # Optional, default: true, enables fully transparent windows. Disable to see a white fallback window background.
     widgets:                  # Provide a list of widgets for left, middle and right bar columns
-      left: [ left_widget, active_window ]
+      left: [ komorebi_workspaces, active_window ]
       middle: [ clock_widget ]
       right: [
         cpu_usage_widget,
@@ -33,6 +33,14 @@ widgets:
     callbacks:
       on_left: "calendar"
       on_right: "next_timezone"
+  
+  komorebi_workspaces:
+    kind: KomorebiWorkspaceWidget
+    label: "${ws.name ?? ws.index + 1}"
+    label_tooltip: "${JSON.stringify(ws, null, 2)}"
+    label_offline: "Komorebi Offline"
+    hide_empty: false
+    cycle_on_scroll: true
   
   uptime_widget:
     kind: SysInfoWidget

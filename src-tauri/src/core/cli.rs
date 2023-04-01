@@ -1,6 +1,4 @@
-use crate::core::constants::{
-    CLI_ARG_CONFIG, CLI_ARG_HELP, CLI_ARG_STYLES, CLI_ARG_VERBOSE, CLI_ARG_VERSION,
-};
+use crate::core::constants::{CLI_ARG_CONFIG, CLI_ARG_HELP, CLI_ARG_STYLES, CLI_ARG_VERBOSE, CLI_ARG_VERSION};
 use crate::win32;
 use std::path::PathBuf;
 use tauri::Manager;
@@ -19,13 +17,11 @@ pub fn parse_cmd_args(app: &mut tauri::App) -> (bool, Option<PathBuf>, Option<Pa
 
                 match arg.as_str() {
                     CLI_ARG_CONFIG => {
-                        let config_path_str: String =
-                            serde_json::from_value(arg_data.value).unwrap();
+                        let config_path_str: String = serde_json::from_value(arg_data.value).unwrap();
                         arg_config_path = Some(PathBuf::from(config_path_str));
                     }
                     CLI_ARG_STYLES => {
-                        let styles_path_str: String =
-                            serde_json::from_value(arg_data.value).unwrap();
+                        let styles_path_str: String = serde_json::from_value(arg_data.value).unwrap();
                         arg_styles_path = Some(PathBuf::from(styles_path_str));
                     }
                     CLI_ARG_VERBOSE => {
@@ -44,7 +40,10 @@ pub fn parse_cmd_args(app: &mut tauri::App) -> (bool, Option<PathBuf>, Option<Pa
                         app.app_handle().exit(0);
                     }
                     _ => {
-                        log::error!("Unknown CLI argument '{}'. Use argument `--help` to print help information.", arg);
+                        log::error!(
+                            "Unknown CLI argument '{}'. Use argument `--help` to print help information.",
+                            arg
+                        );
                     }
                 }
             }

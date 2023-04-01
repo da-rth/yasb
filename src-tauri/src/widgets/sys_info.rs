@@ -71,10 +71,7 @@ fn try_refresh_sys(sys: &mut MutexGuard<System>) {
 }
 
 #[tauri::command]
-pub fn get_sys_info(
-    _app_handle: tauri::AppHandle,
-    sys_state: State<SysInfoSystemState>,
-) -> Option<SystemInformationPayload> {
+pub fn get_sys_info(_app_handle: tauri::AppHandle, sys_state: State<SysInfoSystemState>) -> Option<SystemInformationPayload> {
     let mut lock = sys_state.0.try_lock();
     if let Ok(ref mut sys) = lock {
         // Throttle system refresh to every 100ms
@@ -95,15 +92,8 @@ pub fn get_sys_info(
                     _ => "unknown".to_string(),
                 },
                 name: disk.name().to_str().unwrap_or("unknown").to_string(),
-                file_system: std::str::from_utf8(disk.file_system())
-                    .unwrap_or("unknown")
-                    .to_string(),
-                mount_point: disk
-                    .mount_point()
-                    .to_path_buf()
-                    .to_str()
-                    .unwrap_or("unknown")
-                    .to_string(),
+                file_system: std::str::from_utf8(disk.file_system()).unwrap_or("unknown").to_string(),
+                mount_point: disk.mount_point().to_path_buf().to_str().unwrap_or("unknown").to_string(),
                 total_space: disk.total_space(),
                 available_space: disk.available_space(),
                 is_removable: disk.is_removable(),

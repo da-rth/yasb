@@ -1,0 +1,15 @@
+<div class="widget komorebi-workspaces">
+    <div *ngIf="komorebiState" #workspaceContainer>
+        <button
+            *ngFor="let ws of workspaces"
+            class="workspace-btn"
+            [style.display]="props.hide_empty && ws.isEmpty && !ws.isActive ? 'none' : 'inlne-block'"
+            [ngClass]="{ empty: ws.isEmpty, active: ws.isActive }"
+            [title]="ws.labelTooltip"
+            (click)="focusWorkspace(ws.index)"
+        >
+            {{ ws.label }}
+        </button>
+    </div>
+    <span *ngIf="!komorebiState" class="offline">{{ props.label_offline ?? "komorebi offline" }}</span>
+</div>

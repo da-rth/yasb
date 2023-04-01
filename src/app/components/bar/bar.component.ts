@@ -55,7 +55,7 @@ export class BarComponent extends StylesWatcherComponent implements OnInit, OnDe
         await this.addEventListeners();
         await appWindow.show();
         await appWindow.setAlwaysOnTop(this.barConfig?.always_on_top ?? false);
-        await log.info(`${appWindow.label} mounted.`);
+        await log.info(`${appWindow.label} has successfully mounted.`);
     }
 
     public async ngOnDestroy(): Promise<void> {

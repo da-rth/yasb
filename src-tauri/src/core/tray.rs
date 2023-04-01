@@ -1,9 +1,6 @@
 use crate::{core::events::BarEvent, win32};
 use anyhow::Result;
-use tauri::{
-    AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu,
-    SystemTrayMenuItem,
-};
+use tauri::{AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem};
 
 pub const TRAY_QUIT: &str = "quit";
 pub const TRAY_HIDE_ALL: &str = "hide_all";
@@ -32,11 +29,7 @@ pub fn tray_event_handler(app: &AppHandle, event: SystemTrayEvent) -> () {
             log::info!("Tray: handling click for menu item '{}'.", id.as_str());
 
             if let Err(error) = handle_menu_item_click(id.clone(), app) {
-                log::error!(
-                    "Tray: failed handling click for menu item '{}': {:?}",
-                    id.as_str(),
-                    error
-                );
+                log::error!("Tray: failed handling click for menu item '{}': {:?}", id.as_str(), error);
             }
         }
         _ => {}
