@@ -175,17 +175,17 @@ bars:
         # full: 100
           # ^ The max percentage at which the .status-full CSS class is applied. Accepts: integer from 0 to 100
       # status_icons:
-        # charging: "\uf0e7"
+        # icon_charging: "\uf0e7"
           # ^ The icon shown when the battery is charging. Accepts: string
-        # critical: "\uf244"
+        # icon_critical: "\uf244"
           # ^ The icon shown when critical battery status threshold is reached
-        # low: "\uf243"
+        # icon_low: "\uf243"
           # ^ The icon shown when low battery status threshold is reached
-        # medium: "\uf242"
+        # icon_medium: "\uf242"
           # ^ The icon shown when medium status threshold is reached
-        # high: "\uf241"
+        # icon_high: "\uf241"
           # ^ The icon shown when high status threshold is reached
-        # full: "\uf240"
+        # icon_full: "\uf240"
           # ^ The icon shown when full status threshold is reached
       # callbacks:
         # on_left: "toggle_label" - toggles between the clock and alternate clock labels
