@@ -26,13 +26,3 @@ pub fn unmanage_app_exe() -> ExitStatus {
         .unwrap();
     child.wait().unwrap()
 }
-
-pub fn query_state() -> ExitStatus {
-    let mut child = Command::new(KOMOREBI_CLI_EXE)
-        .arg("state")
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .spawn()
-        .unwrap();
-    child.wait().unwrap()
-}

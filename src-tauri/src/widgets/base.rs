@@ -4,7 +4,8 @@ use ts_rs::TS;
 
 use super::{
     active_window::ActiveWindowWidgetProps, custom::CustomWidgetProps, datetime::DateTimeWidgetProps,
-    sys_info::SysInfoWidgetProps, text::TextWidgetProps, unknown::UnknownWidgetProps,
+    komorebi::workspaces::KomorebiWorkspaceProps, sys_info::SysInfoWidgetProps, text::TextWidgetProps,
+    unknown::UnknownWidgetProps,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
@@ -17,6 +18,7 @@ pub enum ConfiguredWidget {
     TextWidget(TextWidgetProps),
     SysInfoWidget(SysInfoWidgetProps),
     UnknownWidget(UnknownWidgetProps),
+    KomorebiWorkspaceWidget(KomorebiWorkspaceProps),
 }
 
 impl FromStr for ConfiguredWidget {
@@ -29,6 +31,7 @@ impl FromStr for ConfiguredWidget {
             "DateTimeWidget" => Ok(ConfiguredWidget::DateTimeWidget(DateTimeWidgetProps::default())),
             "SysInfoWidget" => Ok(ConfiguredWidget::SysInfoWidget(SysInfoWidgetProps::default())),
             "TextWidget" => Ok(ConfiguredWidget::TextWidget(TextWidgetProps::default())),
+            "KomorebiWorkspaceWidget" => Ok(ConfiguredWidget::KomorebiWorkspaceWidget(KomorebiWorkspaceProps::default())),
             _ => Err(()),
         }
     }

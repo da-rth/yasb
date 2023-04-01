@@ -44,7 +44,7 @@ fn handle_win_event(event: WindowEvent, app_handle: &AppHandle) {
 #[tauri::command]
 pub fn win32_init_event_hook(app_handle: tauri::AppHandle) {
     INIT_WIN_EVENT_LISTENER.call_once(move || {
-        log::info!("WinEventHook: Initialisng Event Listener.");
+        log::info!("Win32EventHookListener: Initialisng.");
         tauri::async_runtime::spawn(async move {
             win_event_lister(app_handle).await.unwrap();
         });

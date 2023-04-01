@@ -70,5 +70,5 @@ fn get_configured_widgets_from_state(config: &State<configuration::Config>) -> H
 #[tauri::command]
 pub fn webview_log(level: WebviewLogLevel, message: String, location: Option<&str>) {
     let location = location.unwrap_or("webview");
-    log::log!(target: location, level.into(), "Webview: {}", message)
+    log::log!(target: location, level.into(), "Initialised Webview: {}", message)
 }
