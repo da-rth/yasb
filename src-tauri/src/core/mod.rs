@@ -8,3 +8,4 @@ pub mod logger;
 pub mod setup;
 pub mod tray;
 pub mod watcher;
+pub mod autostart;

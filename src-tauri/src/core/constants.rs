@@ -3,6 +3,7 @@ use super::configuration::BarEdge;
 pub const FRONTEND_SETUP: &str = "setup.html";
 pub const FRONTEND_INDEX: &str = "index.html";
 
+pub const APP_REG_NAME: &str = "Yasb";
 pub const APP_NAME: &str = "yasb";
 pub const APP_LOG_FILENAME: &str = "yasb.log";
 pub const CONFIG_DIR_NAME: &str = "yasb";
