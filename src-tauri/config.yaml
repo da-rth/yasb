@@ -48,8 +48,8 @@ widgets:
   uptime_widget:
     kind: SysInfoWidget
     # For humianizer formatting: https://github.com/EvanHahn/HumanizeDuration.js
-    label: "${icon('fa fa-clock-rotate-left p-right')} ${humanizer(data.sys.uptime * 1000, { language: 'shorter', delimiter: ' ', spacer: '', round: true, units: ['d', 'h', 'm'] })}" 
-    label_alt: "${icon('fa fa-clock-rotate-left p-right')} ${new Date(data.sys.boot_time * 1000).toLocaleString()}"
+    label: "${faIcon('fa-clock-rotate-left')} ${humanizer(data.sys.uptime * 1000, { language: 'shorter', delimiter: ' ', spacer: '', round: true, units: ['d', 'h', 'm'] })}" 
+    label_alt: "${faIcon('fa-clock-rotate-left')} ${new Date(data.sys.boot_time * 1000).toLocaleString()}"
     interval: 1000
     callbacks:
       on_left: "toggle_label"
@@ -60,7 +60,7 @@ widgets:
   
   cpu_usage_widget:
     kind: SysInfoWidget
-    label: "${icon('fa fa-microchip p-right')} ${parseFloat(data.sys.cpu_info.cpu_usage).toFixed(2)}%"
+    label: "${faIcon('fa-microchip')} ${percent(data.sys.cpu_info.cpu_usage, 100)}"
     interval: 1000
     json_viewer:
       expanded: true
@@ -72,13 +72,13 @@ widgets:
 
   mem_usage_widget:
     kind: SysInfoWidget
-    label: "${icon('fa fa-memory p-right')} ${parseFloat(data.mem.mem_used / data.mem.mem_total).toFixed(2) * 100}%"
+    label: "${faIcon('fa-memory')} ${percent(data.mem.mem_used, data.mem.mem_total)}"
     interval: 1000
 
   net_usage_widget:
     kind: SysInfoWidget
-    label: "${icon('fa fa-arrow-down-long p-right')} ${pb(data.networks['Wi-Fi'].received)}/s"
-    label_alt: "${icon('fa fa-arrow-up-long p-right')} ${pb(data.networks['Wi-Fi'].transmitted)}/s"
+    label: "${faIcon('fa-arrow-down-long')} ${pBytes(data.networks['Wi-Fi'].received)}/s"
+    label_alt: "${faIcon('fa-arrow-up-long')} ${pBytes(data.networks['Wi-Fi'].transmitted)}/s"
     interval: 1000
     callbacks:
       on_left: "toggle_label"
@@ -99,8 +99,8 @@ widgets:
 
   custom_weather_widget:
     kind: CustomWidget
-    label: "${icon('fa fa-temperature-quarter p-right')} ${data.current_weather.temperature}°c"
-    label_alt: "${icon('fa fa-wind p-right')} ${data.current_weather.windspeed}"
+    label: "${faIcon('fa-temperature-quarter right')} ${data.current_weather.temperature}°c"
+    label_alt: "${faIcon('fa-wind')} ${data.current_weather.windspeed}"
     command:
       cmd: "curl.exe"
       # See https://open-meteo.com/en/docs
@@ -114,8 +114,8 @@ widgets:
   custom_ipinfo_widget:
     kind: CustomWidget
     class: "ip_info"
-    label: "${icon('fa fa-location-dot p-right')} ${data.city}, ${data.country}"
-    label_alt: "${icon('fa fa-location-arrow p-right')} ${data.ip}"
+    label: "${faIcon('fa-location-dot')} ${data.city}, ${data.country}"
+    label_alt: "${faIcon('fa-location-arrow')} ${data.ip}"
     command:
       cmd: "curl.exe"
       args: ["https://ipinfo.io"]

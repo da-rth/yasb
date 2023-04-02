@@ -59,6 +59,11 @@ body {
   padding: 3px 7px;
   border-radius: 5px;
   background-color: $bar-widget-background-color;
+
+  i {
+    // Add left/right padding to widget icons
+    padding: 0 5px;
+  }
 }
 
 // You can style widgets based on their ID (widget type)
@@ -134,12 +139,14 @@ body {
   }
 }
 
-.p-left {
-  padding-left: 5px;
-  padding-top: 1px;
-}
-
-.p-right {
-  padding-right: 5px;
-  padding-top: 1px;
+i {
+  > .left {
+    padding-left: 5px;
+    padding-top: 1px;
+  }
+  
+  > .right {
+    padding-right: 5px;
+    padding-top: 1px;
+  }
 }

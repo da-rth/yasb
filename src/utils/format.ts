@@ -3,9 +3,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import humanizeDuration from "humanize-duration";
 import prettyBytes from "pretty-bytes";
+import { Options } from "pretty-bytes";
 
 const humanizer = humanizeDuration.humanizer();
-const pb = prettyBytes;
 
 humanizer.languages.shorter = {
     y: () => "y",
@@ -44,10 +44,14 @@ export const tryFormatArgsEval = (args: string[], data: any) => {
     });
 };
 
-export function percentage(partial: number, total: number) {
+export function percent(partial: number, total: number) {
     return `${Math.round((partial / total) * 100)}%`;
 }
 
-export function icon(cls: string): string {
-    return `<i class='${cls}'></i>`;
+export function faIcon(cls: string, type?: string): string {
+    return `<i class='${type ?? "fa"} ${cls} '></i>`;
+}
+
+export function pBytes(value: number, options?: Options): string {
+    return prettyBytes(value, options);
 }
