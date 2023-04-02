@@ -47,3 +47,7 @@ export const tryFormatArgsEval = (args: string[], data: any) => {
 export function percentage(partial: number, total: number) {
     return `${Math.round((partial / total) * 100)}%`;
 }
+
+export function icon(cls: string): string {
+    return `<i class='${cls}'></i>`;
+}

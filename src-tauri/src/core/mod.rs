@@ -1,3 +1,4 @@
+pub mod autostart;
 pub mod bar;
 pub mod cli;
 pub mod commands;
@@ -8,4 +9,3 @@ pub mod logger;
 pub mod setup;
 pub mod tray;
 pub mod watcher;
-pub mod autostart;

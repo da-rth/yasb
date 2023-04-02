@@ -58,6 +58,7 @@ export class JsonViewerComponent extends StylesWatcherComponent implements OnIni
     private async onNewData(event: Event<any>): Promise<void> {
         const data = event.payload;
         // TODO find alternative for eval
+        // TODO fix fromChild prop
         this.data = this.fromChild ? eval(`${this.fromChild}`) : data;
         this.cdr.detectChanges();
     }

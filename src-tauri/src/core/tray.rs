@@ -1,8 +1,11 @@
 use crate::{core::events::BarEvent, win32};
 use anyhow::Result;
-use tauri::{AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem, api::notification::Notification};
+use tauri::{
+    api::notification::Notification, AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu,
+    SystemTrayMenuItem,
+};
 
-use super::autostart::{autostart_key_exists, delete_autostart_key, add_autostart_key};
+use super::autostart::{add_autostart_key, autostart_key_exists, delete_autostart_key};
 
 pub const TRAY_QUIT: &str = "quit";
 pub const TRAY_HIDE_ALL: &str = "hide_all";
@@ -66,7 +69,7 @@ fn handle_menu_item_click(menu_id: String, app_handle: &AppHandle) -> Result<()>
             app_handle.emit_all(BarEvent::ShowAllWindowsEvent.to_string().as_str(), false)?;
             tray_handle.get_item(TRAY_SHOW_ALL).set_enabled(false)?;
             tray_handle.get_item(TRAY_HIDE_ALL).set_enabled(true)?;
-        },
+        }
         TRAY_AUTOSTART => {
             let hide_autostart = tray_handle.get_item(TRAY_AUTOSTART);
 

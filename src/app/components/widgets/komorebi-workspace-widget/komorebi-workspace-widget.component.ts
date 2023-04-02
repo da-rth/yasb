@@ -13,8 +13,7 @@ import { KomorebiWorkspaceProps } from "../../../../bindings/widget/komorebi/Kom
     styleUrls: ["./komorebi-workspace-widget.component.scss"],
 })
 export class KomorebiWorkspaceWidgetComponent implements OnInit, OnDestroy {
-    @ViewChild("workspaceContainer")
-    public workspaceContainer: ElementRef;
+    @ViewChild("workspaceContainer") public workspaceContainer: ElementRef;
     public workspaces?: any[];
     public komorebiState: any;
 
@@ -52,7 +51,7 @@ export class KomorebiWorkspaceWidgetComponent implements OnInit, OnDestroy {
             await listen("KomorebiWorkspaceName", this.onKomorebiUpdate.bind(this))
         );
 
-        this.wheelEvent$ = fromEvent(this.workspaceContainer.nativeElement, "wheel")
+        this.wheelEvent$ = fromEvent(this.workspaceContainer.nativeElement, "wheel", { passive: true })
             .pipe(throttleTime(250))
             .subscribe((e) => {
                 if (!this.props.cycle_on_scroll) return;

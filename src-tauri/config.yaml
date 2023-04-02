@@ -11,10 +11,13 @@ bars:
       left: [ komorebi_workspaces, active_window ]
       middle: [ clock_widget ]
       right: [
+        net_usage_widget,
+        mem_usage_widget,
         cpu_usage_widget,
         uptime_widget,
+        custom_weather_widget,
         hostname_widget,
-        custom_weather_widget
+        # custom_ipinfo_widget
       ]
 
 widgets:
@@ -45,8 +48,8 @@ widgets:
   uptime_widget:
     kind: SysInfoWidget
     # For humianizer formatting: https://github.com/EvanHahn/HumanizeDuration.js
-    label: "uptime: ${humanizer(data.sys.uptime * 1000, { language: 'shorter', delimiter: ' ', spacer: '', round: true, units: ['d', 'h', 'm'] })}" 
-    label_alt: "startup: ${new Date(data.sys.boot_time * 1000).toLocaleString()}"
+    label: "${icon('fa fa-clock-rotate-left p-right')} ${humanizer(data.sys.uptime * 1000, { language: 'shorter', delimiter: ' ', spacer: '', round: true, units: ['d', 'h', 'm'] })}" 
+    label_alt: "${icon('fa fa-clock-rotate-left p-right')} ${new Date(data.sys.boot_time * 1000).toLocaleString()}"
     interval: 1000
     callbacks:
       on_left: "toggle_label"
@@ -57,17 +60,29 @@ widgets:
   
   cpu_usage_widget:
     kind: SysInfoWidget
-    label: "cpu: ${parseFloat(data.sys.cpu_info.cpu_usage).toFixed(2)}"
-    label_alt: "test"
+    label: "${icon('fa fa-microchip p-right')} ${parseFloat(data.sys.cpu_info.cpu_usage).toFixed(2)}%"
     interval: 1000
     json_viewer:
       expanded: true
       max_depth: 1
-      from_child: "data.sys"
+      from_child: "data.cpu"
     callbacks:
       on_left: "json_viewer"
       on_right: "toggle_label"
 
+  mem_usage_widget:
+    kind: SysInfoWidget
+    label: "${icon('fa fa-memory p-right')} ${parseFloat(data.mem.mem_used / data.mem.mem_total).toFixed(2) * 100}%"
+    interval: 1000
+
+  net_usage_widget:
+    kind: SysInfoWidget
+    label: "${icon('fa fa-arrow-down-long p-right')} ${pb(data.networks['Wi-Fi'].received)}/s"
+    label_alt: "${icon('fa fa-arrow-up-long p-right')} ${pb(data.networks['Wi-Fi'].transmitted)}/s"
+    interval: 1000
+    callbacks:
+      on_left: "toggle_label"
+  
   active_window:
     kind: ActiveWindowWidget
     label: "${data.title}"
@@ -82,28 +97,30 @@ widgets:
       on_left: "json_viewer"
       on_right: { exec: { cmd: "cmd.exe", args: ["/c", "start", "https://google.com/?q=${data.exe_name}"] } }
 
-  # custom_ipinfo_widget:
-  #   kind: CustomWidget
-  #   class: "ip_info"
-  #   label: "${data.city}, ${data.country}"
-  #   label_alt: "IP: ${data.ip}"
-  #   command:
-  #     cmd: "curl.exe"
-  #     args: ["https://ipinfo.io"]
-  #     interval: 600000
-  #   callbacks:
-  #     on_left: { exec: { cmd: "cmd.exe", args: ["/c", "start", "https://ipinfo.io/${data.ip}"] } }
-  #     on_right: { exec: { cmd: "cmd.exe", args: ["/c", "start", "https://maps.google.com/?q=${data.loc}"] } }
-  #     on_hover: "toggle_label"
-  
   custom_weather_widget:
     kind: CustomWidget
-    label: "temp: ${data.current_weather.temperature}°c"
-    label_alt: "windspeed: ${data.current_weather.windspeed}"
+    label: "${icon('fa fa-temperature-quarter p-right')} ${data.current_weather.temperature}°c"
+    label_alt: "${icon('fa fa-wind p-right')} ${data.current_weather.windspeed}"
     command:
       cmd: "curl.exe"
-      args: ["https://api.open-meteo.com/v1/forecast?current_weather=true&temperature_unit=celsius&latitude=55.87&longitude=-4.26"] # See https://open-meteo.com/en/docs
-      interval: 1800000 # Every 30 minutes
+      # See https://open-meteo.com/en/docs
+      args: ["https://api.open-meteo.com/v1/forecast?current_weather=true&temperature_unit=celsius&latitude=55.87&longitude=-4.26"]
+      # Poll every 30 minutes
+      interval: 1800000
     callbacks:
       on_left: "toggle_label"
       on_right: "json_viewer"
+
+  custom_ipinfo_widget:
+    kind: CustomWidget
+    class: "ip_info"
+    label: "${icon('fa fa-location-dot p-right')} ${data.city}, ${data.country}"
+    label_alt: "${icon('fa fa-location-arrow p-right')} ${data.ip}"
+    command:
+      cmd: "curl.exe"
+      args: ["https://ipinfo.io"]
+      # Poll every 10 minutes
+      interval: 600000
+    callbacks:
+      on_left: { exec: { cmd: "cmd.exe", args: ["/c", "start", "https://ipinfo.io/${data.ip}"] } }
+      on_hover: "toggle_label"
