@@ -39,7 +39,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.github.yasb",
+      "identifier": "com.denBot.yasb",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
