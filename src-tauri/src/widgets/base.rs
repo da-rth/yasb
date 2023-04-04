@@ -4,8 +4,7 @@ use ts_rs::TS;
 
 use super::{
     active_window::ActiveWindowWidgetProps, custom::CustomWidgetProps, datetime::DateTimeWidgetProps,
-    komorebi::workspaces::KomorebiWorkspaceProps, sys_info::SysInfoWidgetProps,
-    unknown::UnknownWidgetProps,
+    komorebi::workspaces::KomorebiWorkspaceProps, sys_info::SysInfoWidgetProps, unknown::UnknownWidgetProps,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]

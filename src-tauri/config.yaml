@@ -21,6 +21,9 @@ bars:
       ]
 
 widgets:
+  # Formattable labels have access to several utility functions.
+  # See: src/utils/format.ts for a list of available utility functions.
+
   clock_widget:
     kind: DateTimeWidget
     formats: ['mediumTime', 'mediumDate']
@@ -68,7 +71,7 @@ widgets:
 
   mem_usage_widget:
     kind: SysInfoWidget
-    label: "${matIcon('memory')} ${percent(sys_info.mem.mem_used, sys_info.mem.mem_total)}"
+    label: "${matIcon('storage')} ${percent(sys_info.mem.mem_used, sys_info.mem.mem_total)}"
     interval: 1000
 
   net_usage_widget:
@@ -81,7 +84,7 @@ widgets:
   
   active_window:
     kind: ActiveWindowWidget
-    label: "${win.title}"
+    label: "${matIcon('grain')} ${win.title}"
     label_alt: "class=${win.wm_class} exe=${win.exe_name}"
     label_max_len: 64
     is_monitor_exclusive: true
