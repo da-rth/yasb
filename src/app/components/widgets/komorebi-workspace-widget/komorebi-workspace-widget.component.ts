@@ -6,6 +6,7 @@ import { fromEvent, Subscription, throttleTime } from "rxjs";
 import { WIDGET_PROPS } from "..";
 import { KomorebiService } from "../../../services/komorebi.service";
 import { KomorebiWorkspaceProps } from "../../../../bindings/widget/komorebi/KomorebiWorkspaceProps";
+import { scopedEval } from "../../../../utils/eval";
 
 @Component({
     selector: "komorebi-workspace-widget",
@@ -127,7 +128,7 @@ export class KomorebiWorkspaceWidgetComponent implements OnInit, OnDestroy {
     private formatWorkspaceLabel(label: string, ws: any): string {
         try {
             // TODO find safer alternative to eval
-            return eval("`" + label.replace(/`/g, "\\`") + "`");
+            return scopedEval("`" + label.replace(/`/g, "\\`") + "`", { workspace: ws });
         } catch {
             return label;
         }

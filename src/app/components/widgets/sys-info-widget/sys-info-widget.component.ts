@@ -7,7 +7,7 @@ import { WidgetCallbacks } from "../../../../bindings/widget/base/WidgetCallback
 import { SysInfoCallbackType } from "../../../../bindings/widget/sysinfo/SysInfoCallbackType";
 import { SysInfoWidgetProps } from "../../../../bindings/widget/sysinfo/SysInfoWidgetProps";
 import { SystemInformationPayload } from "../../../../bindings/widget/sysinfo/SystemInformationPayload";
-import { tryFormatEval } from "../../../../utils/format";
+import { tryFormatEval } from "../../../../utils/eval";
 import { PopupOptions, PopupService } from "../../../services/popup.service";
 import {
     JSON_VIEWER_DEFAULT_HEIGHT,
@@ -58,7 +58,7 @@ export class SysInfoWidgetComponent extends CallbackWidgetComponent implements O
         if (!this.webview && this.isCallbackTypePresent("json_viewer")) {
             this.webview = await this.popupService.create(event, "json_viewer", this.popupOptions);
             const initUnlisten = await listen(`${this.webview?.label}_ngOnInit`, async () => {
-                await emit(`${this.webview?.label}_data`, this.sysInfo);
+                await emit(`${this.webview?.label}_data`, { sys_info: this.sysInfo });
                 initUnlisten();
             });
         } else {
@@ -90,7 +90,7 @@ export class SysInfoWidgetComponent extends CallbackWidgetComponent implements O
 
     private updateLabels(): void {
         try {
-            this.activeLabelFormatted = tryFormatEval(this.activeLabel, this.sysInfo);
+            this.activeLabelFormatted = tryFormatEval(this.activeLabel, { sys_info: this.sysInfo });
             this.isError = false;
             this.errorTooltip = undefined;
         } catch (error) {

@@ -2,7 +2,7 @@ import { Component, HostListener, Inject } from "@angular/core";
 import { invoke } from "@tauri-apps/api";
 import { ExecOptions } from "../../../bindings/widget/base/ExecOptions";
 import { WidgetCallbacks } from "../../../bindings/widget/base/WidgetCallbacks";
-import { tryFormatArgsEval } from "../../../utils/format";
+import { tryFormatArgsEval } from "../../../utils/eval";
 
 export interface ExecCallback {
     exec: ExecOptions;

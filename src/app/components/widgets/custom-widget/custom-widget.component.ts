@@ -7,7 +7,7 @@ import { WidgetCallbacks } from "../../../../bindings/widget/base/WidgetCallback
 import { CustomCallbackType } from "../../../../bindings/widget/custom/CustomCallbackType";
 import { CustomCommandResponse } from "../../../../bindings/widget/custom/CustomCommandResponse";
 import { CustomWidgetProps } from "../../../../bindings/widget/custom/CustomWidgetProps";
-import { tryFormatEval } from "../../../../utils/format";
+import { tryFormatEval } from "../../../../utils/eval";
 import { PopupOptions, PopupService } from "../../../services/popup.service";
 import {
     JSON_VIEWER_DEFAULT_HEIGHT,
@@ -31,7 +31,7 @@ export class CustomWidgetComponent extends CallbackWidgetComponent implements On
 
     private label: string;
     private labelAlt?: string;
-    private commandResult: CustomCommandResponse;
+    private commandResult?: CustomCommandResponse;
     private commandResultData?: any;
     private showAltLabel = false;
     private activeLabel: string;
@@ -71,7 +71,7 @@ export class CustomWidgetComponent extends CallbackWidgetComponent implements On
         if (!this.webview && this.isCallbackTypePresent("json_viewer")) {
             this.webview = await this.popupService.create(event, "json_viewer", this.popupOptions);
             const initUnlisten = await listen(`${this.webview?.label}_ngOnInit`, async () => {
-                await emit(`${this.webview?.label}_data`, this.commandResultData);
+                await emit(`${this.webview?.label}_data`, { res: this.commandResultData });
                 initUnlisten();
             });
         } else {
@@ -90,32 +90,44 @@ export class CustomWidgetComponent extends CallbackWidgetComponent implements On
         }
     }
 
+    private tryFormatActiveLabel(labelToFormat: string, withCommandContext = false): void {
+        try {
+            this.activeLabelFormatted = tryFormatEval(
+                labelToFormat,
+                withCommandContext ? { res: this.commandResultData } : {}
+            );
+            this.isError = false;
+        } catch (error) {
+            this.activeLabelFormatted = labelToFormat;
+            this.errorTooltip = `Error formatting label:\n\n${(error as Error).message}`;
+            this.isError = true;
+        }
+    }
+
     private updateLabels(): void {
-        if (this.commandResult.stdout) {
+        if (this.commandResult?.stdout) {
             try {
                 this.commandResultData = JSON.parse(this.commandResult.stdout);
             } catch {
                 this.commandResultData = this.commandResult.stdout.replace("\n", "\\n");
             }
-            try {
-                this.activeLabelFormatted = tryFormatEval(this.activeLabel, this.commandResultData);
-                this.isError = false;
-            } catch (error) {
-                this.activeLabelFormatted = this.activeLabel;
-                this.errorTooltip = `Error formatting label:\n\n${(error as Error).message}`;
-                this.isError = true;
-            }
+            this.tryFormatActiveLabel(this.activeLabel, true);
         } else {
-            // If no stdout, format error tooltip
             const cmd = this.props?.command?.cmd;
-            const args = ` - ${(this.props?.command?.args ?? []).join("\n")}`;
-            const status = this.commandResult.status ?? 1;
-            this.errorTooltip =
-                `The command '${cmd}' exited with code ${status}\n\n` +
-                (this.props?.command?.args ? `args:\n${args}` : "") +
-                `\n\nstderr: ${this.commandResult.stderr ?? "None"}`;
-            this.activeLabelFormatted = cmd ?? this.activeLabel;
-            this.isError = true;
+
+            if (cmd) {
+                // If no stdout, format error tooltip
+                const args = ` - ${(this.props?.command?.args ?? []).join("\n")}`;
+                const status = this.commandResult?.status ?? 1;
+                this.errorTooltip =
+                    `The command '${cmd}' exited with code ${status}\n\n` +
+                    (this.props?.command?.args ? `args:\n${args}` : "") +
+                    `\n\nstderr: ${this.commandResult?.stderr ?? "None"}`;
+                this.tryFormatActiveLabel(cmd, false);
+                this.isError = true;
+            } else {
+                this.tryFormatActiveLabel(this.activeLabel, false);
+            }
         }
     }
 

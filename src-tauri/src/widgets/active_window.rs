@@ -65,7 +65,7 @@ pub struct ActiveWindowPayload {
     pid: u32,
     tid: u32,
     title: Option<String>,
-    class: Option<String>,
+    wm_class: Option<String>,
     exe_path: Option<String>,
     exe_name: Option<String>,
     monitor: Option<String>,
@@ -97,14 +97,14 @@ pub fn handle_window_title_change(app_handle: &AppHandle, hwnd: HWND) {
         pid: process_id,
         tid: thread_id,
         title: utils::get_win_title(hwnd.clone()),
-        class: utils::get_win_class(hwnd.clone()),
+        wm_class: utils::get_win_class(hwnd.clone()),
         exe_path: proc_path,
         exe_name: proc_name,
         monitor: monitor_name,
     };
 
     let p = payload.clone();
-    if (p.title.is_none() && p.class.unwrap_or("".to_string()) != "WorkerW")
+    if (p.title.is_none() && p.wm_class.unwrap_or("".to_string()) != "WorkerW")
         || (p.title.unwrap_or("".to_string()) == "yasb")
         || (p.exe_name.unwrap_or("".to_string()) == "yasb.exe")
     {

@@ -4,6 +4,7 @@ import { emit, Event, listen, UnlistenFn } from "@tauri-apps/api/event";
 import { appWindow } from "@tauri-apps/api/window";
 import { NgxJsonViewerModule } from "ngx-json-viewer";
 import { StylesWatcherComponent } from "../../styles-watcher.component";
+import { scopedEval } from "../../../../utils/eval";
 
 export const JSON_VIEWER_DEFAULT_WIDTH = 500;
 export const JSON_VIEWER_DEFAULT_HEIGHT = 260;
@@ -57,9 +58,8 @@ export class JsonViewerComponent extends StylesWatcherComponent implements OnIni
 
     private async onNewData(event: Event<any>): Promise<void> {
         const data = event.payload;
-        // TODO find alternative for eval
         // TODO fix fromChild prop
-        this.data = this.fromChild ? eval(`${this.fromChild}`) : data;
+        this.data = this.fromChild ? scopedEval(this.fromChild, data, false) : data;
         this.cdr.detectChanges();
     }
 

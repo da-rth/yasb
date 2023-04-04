@@ -1,5 +1,4 @@
 import { DateTimeWidgetComponent } from "./date-time-widget/date-time-widget.component";
-import { TextWidgetComponent } from "./text-widget/text-widget.component";
 import { UnknownWidgetComponent } from "./unknown-widget/unknown-widget.component";
 import { ActiveWindowWidgetComponent } from "./active-window-widget/active-window-widget.component";
 import { InjectionToken } from "@angular/core";
@@ -15,7 +14,6 @@ export default {
     CustomWidget: CustomWidgetComponent,
     DateTimeWidget: DateTimeWidgetComponent,
     SysInfoWidget: SysInfoWidgetComponent,
-    TextWidget: TextWidgetComponent,
     UnknownWidget: UnknownWidgetComponent,
     KomorebiWorkspaceWidget: KomorebiWorkspaceWidgetComponent,
 };

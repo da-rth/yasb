@@ -63,6 +63,10 @@ body {
   i {
     // Add left/right padding to widget icons
     padding: 0 5px;
+
+    &.matIcon {
+      font-size: 16px;
+    }
   }
 }
 
@@ -139,14 +143,3 @@ body {
   }
 }
 
-i {
-  > .left {
-    padding-left: 5px;
-    padding-top: 1px;
-  }
-  
-  > .right {
-    padding-right: 5px;
-    padding-top: 1px;
-  }
-}

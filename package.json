@@ -34,6 +34,7 @@
     "@fortawesome/fontawesome-free": "^6.4.0",
     "@tauri-apps/api": "1.2.0",
     "humanize-duration": "^3.27.2",
+    "material-icons": "^1.13.4",
     "ngx-json-viewer": "^3.2.1",
     "pretty-bytes": "^6.0.0",
     "rxjs": "7.8.0",

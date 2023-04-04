@@ -3,7 +3,7 @@ import { ActiveWindowWidgetProps } from "../../../../bindings/widget/active_wind
 import { Event as TauriEvent, UnlistenFn, listen, emit } from "@tauri-apps/api/event";
 import { currentMonitor, WebviewWindow } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api/tauri";
-import { tryFormatEval } from "../../../../utils/format";
+import { tryFormatEval } from "../../../../utils/eval";
 import { ActiveWindowPayload } from "../../../../bindings/widget/active_window/ActiveWindowPayload";
 import { WIDGET_PROPS } from "..";
 import { CallbackWidgetComponent } from "../callback-widget.component";
@@ -31,7 +31,7 @@ const IGNORED_CLASSES = [
     "XamlExplorerHostIslandWindow",
     "Windows.UI.Core.CoreWindow",
 ];
-const DEFAULT_LABEL = "${win.title} ${win.class} ${win.process}";
+const DEFAULT_LABEL = "${title}";
 
 @Component({
     selector: "active-window-widget",
@@ -102,7 +102,7 @@ export class ActiveWindowWidgetComponent extends CallbackWidgetComponent impleme
         if (!this.webview && this.isCallbackTypePresent("json_viewer")) {
             this.webview = await this.popupService.create(event, "json_viewer", this.popupOptions);
             const initUnlisten = await listen(`${this.webview?.label}_ngOnInit`, async () => {
-                await emit(`${this.webview?.label}_data`, this.activeWindow);
+                await emit(`${this.webview?.label}_data`, { win: this.activeWindow });
                 initUnlisten();
             });
         } else {
@@ -142,14 +142,14 @@ export class ActiveWindowWidgetComponent extends CallbackWidgetComponent impleme
     private async hideOrUpdateContent(): Promise<void> {
         if (
             this.ignoredProcesses?.includes(this.activeWindow?.exe_name ?? "") ||
-            this.ignoredClasses?.includes(this.activeWindow?.class ?? "") ||
+            this.ignoredClasses?.includes(this.activeWindow?.wm_class ?? "") ||
             this.ignoredTitles?.includes(this.activeWindow?.title ?? "")
         ) {
             this.isHidden = true;
         } else {
             this.isHidden = !!this.props?.is_monitor_exclusive && this.activeWindow?.monitor != this.currentMonitorName;
 
-            if (!this.isHidden && NAVIGATION_CLASSES.includes(this.activeWindow?.class ?? "")) {
+            if (!this.isHidden && NAVIGATION_CLASSES.includes(this.activeWindow?.wm_class ?? "")) {
                 return await invoke("detect_foreground_window");
             }
 
@@ -164,7 +164,7 @@ export class ActiveWindowWidgetComponent extends CallbackWidgetComponent impleme
         }
 
         try {
-            this.activeLabelFormatted = tryFormatEval(this.unformattedActiveLabel, this.activeWindow);
+            this.activeLabelFormatted = tryFormatEval(this.unformattedActiveLabel, { win: this.activeWindow });
             this.isError = false;
         } catch (error) {
             this.activeLabelFormatted = this.unformattedActiveLabel;

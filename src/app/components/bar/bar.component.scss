@@ -68,6 +68,8 @@ body {
         }
 
         .widget {
+            align-items: center;
+
             &.error {
                 color: #f00;
             }

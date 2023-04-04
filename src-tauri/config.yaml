@@ -11,20 +11,16 @@ bars:
       left: [ komorebi_workspaces, active_window ]
       middle: [ clock_widget ]
       right: [
+        # hostname_widget,
+        # uptime_widget,
         net_usage_widget,
         mem_usage_widget,
         cpu_usage_widget,
-        uptime_widget,
         custom_weather_widget,
-        hostname_widget,
         # custom_ipinfo_widget
       ]
 
 widgets:
-  left_widget:
-    kind: TextWidget
-    text: "yasb"
-  
   clock_widget:
     kind: DateTimeWidget
     formats: ['mediumTime', 'mediumDate']
@@ -39,8 +35,8 @@ widgets:
   
   komorebi_workspaces:
     kind: KomorebiWorkspaceWidget
-    label: "${ws.name ?? ws.index + 1}"
-    label_tooltip: "${JSON.stringify(ws, null, 2)}"
+    label: "${workspace.name ?? workspace.index + 1}"
+    label_tooltip: "${JSON.stringify(workspace, null, 2)}"
     label_offline: "Komorebi Offline"
     hide_empty: false
     cycle_on_scroll: true
@@ -48,45 +44,45 @@ widgets:
   uptime_widget:
     kind: SysInfoWidget
     # For humianizer formatting: https://github.com/EvanHahn/HumanizeDuration.js
-    label: "${faIcon('fa-clock-rotate-left')} ${humanizer(data.sys.uptime * 1000, { language: 'shorter', delimiter: ' ', spacer: '', round: true, units: ['d', 'h', 'm'] })}" 
-    label_alt: "${faIcon('fa-clock-rotate-left')} ${new Date(data.sys.boot_time * 1000).toLocaleString()}"
+    label: "${matIcon('restore')} ${humanize(sys_info.sys.uptime * 1000, { round: true, units: ['h', 'm'] })}" 
+    label_alt: "${matIcon('restore')} ${new Date(sys_info.sys.boot_time * 1000).toLocaleString()}"
     interval: 1000
     callbacks:
       on_left: "toggle_label"
   
   hostname_widget:
     kind: SysInfoWidget
-    label: "${data.sys.host}"
+    label: "${sys_info.sys.host}"
   
   cpu_usage_widget:
     kind: SysInfoWidget
-    label: "${faIcon('fa-microchip')} ${percent(data.sys.cpu_info.cpu_usage, 100)}"
+    label: "${matIcon('bar_chart')} ${percent(sys_info.sys.cpu_info.cpu_usage, 100)}"
     interval: 1000
     json_viewer:
       expanded: true
       max_depth: 1
-      from_child: "data.cpu"
+      from_child: "sys_info.cpu"
     callbacks:
       on_left: "json_viewer"
       on_right: "toggle_label"
 
   mem_usage_widget:
     kind: SysInfoWidget
-    label: "${faIcon('fa-memory')} ${percent(data.mem.mem_used, data.mem.mem_total)}"
+    label: "${matIcon('memory')} ${percent(sys_info.mem.mem_used, sys_info.mem.mem_total)}"
     interval: 1000
 
   net_usage_widget:
     kind: SysInfoWidget
-    label: "${faIcon('fa-arrow-down-long')} ${pBytes(data.networks['Wi-Fi'].received)}/s"
-    label_alt: "${faIcon('fa-arrow-up-long')} ${pBytes(data.networks['Wi-Fi'].transmitted)}/s"
+    label: "${matIcon('download')} ${pBytes(sys_info.networks['Wi-Fi'].received)}/s"
+    label_alt: "${matIcon('upload')} ${pBytes(sys_info.networks['Wi-Fi'].transmitted)}/s"
     interval: 1000
     callbacks:
       on_left: "toggle_label"
   
   active_window:
     kind: ActiveWindowWidget
-    label: "${data.title}"
-    label_alt: "class=${data.class} exe=${data.exe_name}"
+    label: "${win.title}"
+    label_alt: "class=${win.wm_class} exe=${win.exe_name}"
     label_max_len: 64
     is_monitor_exclusive: true
     json_viewer:
@@ -95,12 +91,12 @@ widgets:
       expanded: false
     callbacks:
       on_left: "json_viewer"
-      on_right: { exec: { cmd: "cmd.exe", args: ["/c", "start", "https://google.com/?q=${data.exe_name}"] } }
+      on_right: { exec: { cmd: "cmd.exe", args: ["/c", "start", "https://google.com/?q=${win.exe_name}"] } }
 
   custom_weather_widget:
     kind: CustomWidget
-    label: "${faIcon('fa-temperature-quarter right')} ${data.current_weather.temperature}°c"
-    label_alt: "${faIcon('fa-wind')} ${data.current_weather.windspeed}"
+    label: "${matIcon('thermostat')} ${res.current_weather.temperature}°c"
+    label_alt: "${matIcon('air')} ${res.current_weather.windspeed}"
     command:
       cmd: "curl.exe"
       # See https://open-meteo.com/en/docs
@@ -114,13 +110,13 @@ widgets:
   custom_ipinfo_widget:
     kind: CustomWidget
     class: "ip_info"
-    label: "${faIcon('fa-location-dot')} ${data.city}, ${data.country}"
-    label_alt: "${faIcon('fa-location-arrow')} ${data.ip}"
+    label: "${matIcon('location_on')} ${res.city}, ${res.country}"
+    label_alt: "${matIcon('public')} ${res.ip}"
     command:
       cmd: "curl.exe"
       args: ["https://ipinfo.io"]
       # Poll every 10 minutes
       interval: 600000
     callbacks:
-      on_left: { exec: { cmd: "cmd.exe", args: ["/c", "start", "https://ipinfo.io/${data.ip}"] } }
+      on_left: { exec: { cmd: "cmd.exe", args: ["/c", "start", "https://ipinfo.io/${res.ip}"] } }
       on_hover: "toggle_label"

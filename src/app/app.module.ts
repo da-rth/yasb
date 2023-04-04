@@ -10,11 +10,12 @@ import { ActiveWindowWidgetComponent } from "./components/widgets/active-window-
 import { CustomWidgetComponent } from "./components/widgets/custom-widget/custom-widget.component";
 import { DateTimeWidgetComponent } from "./components/widgets/date-time-widget/date-time-widget.component";
 import { SysInfoWidgetComponent } from "./components/widgets/sys-info-widget/sys-info-widget.component";
-import { TextWidgetComponent } from "./components/widgets/text-widget/text-widget.component";
 import { CalendarComponent } from "./components/popups/calendar/calendar.component";
 import { JsonViewerComponent } from "./components/popups/json-viewer/json-viewer.component";
-import { WIDGET_PROPS } from "./components/widgets";
 import { KomorebiWorkspaceWidgetComponent } from "./components/widgets/komorebi-workspace-widget/komorebi-workspace-widget.component";
+import { MatIconModule } from "@angular/material/icon";
+import { SafeHtmlPipe } from "./pipes/safe-html.pipe";
+import { WIDGET_PROPS } from "./components/widgets";
 
 @NgModule({
     declarations: [
@@ -24,8 +25,8 @@ import { KomorebiWorkspaceWidgetComponent } from "./components/widgets/komorebi-
         CustomWidgetComponent,
         DateTimeWidgetComponent,
         SysInfoWidgetComponent,
-        TextWidgetComponent,
         KomorebiWorkspaceWidgetComponent,
+        SafeHtmlPipe,
     ],
     imports: [
         BrowserModule,
@@ -45,6 +46,7 @@ import { KomorebiWorkspaceWidgetComponent } from "./components/widgets/komorebi-
                 component: JsonViewerComponent,
             },
         ]),
+        MatIconModule,
     ],
     exports: [CommonModule],
     providers: [{ provide: WIDGET_PROPS, useValue: true }],

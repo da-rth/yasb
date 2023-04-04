@@ -4,5 +4,5 @@
     [id]="$any(props).kind"
     [ngClass]="props?.class"
     [title]="errorTooltip ?? ''"
-    [innerHTML]="activeLabelFormatted"
+    [innerHTML]="activeLabelFormatted | safeHtml"
 ></span>
