@@ -9,4 +9,4 @@ pywin32==304
 PyYAML==6.0
 tzlocal==4.2
 watchdog==2.1.9
-winsdk==1.0.0b6
+winsdk==1.0.0b9
