@@ -77,8 +77,8 @@ class WorkspaceWidget(BaseWidget):
         self._hide_empty_workspaces = hide_empty_workspaces
 
         self._workspace_focus_events = [
-            KomorebiEvent.CycleFocusWorkspace,
-            KomorebiEvent.CycleFocusMonitor,
+            KomorebiEvent.CycleFocusWorkspace.value,
+            KomorebiEvent.CycleFocusMonitor.value,
             KomorebiEvent.FocusMonitorWorkspaceNumber.value,
             KomorebiEvent.FocusMonitorNumber.value,
             KomorebiEvent.FocusWorkspaceNumber.value
