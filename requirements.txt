@@ -7,6 +7,6 @@ PyQt6==6.3.1
 pytz==2022.1
 pywin32==304
 PyYAML==6.0
-tzlocal==4.2
+tzlocal==5.0
 watchdog==2.1.9
 winsdk==1.0.0b6
