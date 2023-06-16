@@ -1,6 +1,10 @@
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "yasb"
+version = "0.0.1"
 dependencies = [
 	"BlurWindow==1.2.1",
 	"Cerberus==1.3.4",
