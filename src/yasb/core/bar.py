@@ -1,14 +1,14 @@
 import logging
-from settings import APP_BAR_TITLE
+from yasb.settings import APP_BAR_TITLE
 from PyQt6.QtWidgets import QApplication, QWidget, QHBoxLayout, QGridLayout, QFrame
 from PyQt6.QtGui import QScreen
 from PyQt6.QtCore import Qt, QRect
-from core.utils.utilities import is_valid_percentage_str, percent_to_float
-from core.validation.bar import BAR_DEFAULTS
+from yasb.core.utils.utilities import is_valid_percentage_str, percent_to_float
+from yasb.core.validation.bar import BAR_DEFAULTS
 from BlurWindow.blurWindow import GlobalBlur
 
 try:
-    from core.utils.win32 import app_bar
+    from yasb.core.utils.win32 import app_bar
     IMPORT_APP_BAR_MANAGER_SUCCESSFUL = True
 except ImportError:
     IMPORT_APP_BAR_MANAGER_SUCCESSFUL = False

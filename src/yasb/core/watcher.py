@@ -1,10 +1,10 @@
 import logging
 from os.path import basename
-from core.config import get_config_dir
-from settings import DEFAULT_STYLES_FILENAME, DEFAULT_CONFIG_FILENAME
+from yasb.core.config import get_config_dir
+from yasb.settings import DEFAULT_STYLES_FILENAME, DEFAULT_CONFIG_FILENAME
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler, FileModifiedEvent
-from core.bar_manager import BarManager
+from yasb.core.bar_manager import BarManager
 
 
 class FileModifiedEventHandler(PatternMatchingEventHandler):

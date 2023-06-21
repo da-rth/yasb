@@ -1,5 +1,5 @@
 import ctypes.wintypes
-from core.event_enums import Event
+from yasb.core.event_enums import Event
 
 user32 = ctypes.windll.user32
 user32.SetWinEventHook.restype = ctypes.wintypes.HANDLE

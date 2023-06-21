@@ -1,4 +1,4 @@
-from core.validation.bar import BAR_SCHEMA, BAR_DEFAULTS
+from yasb.core.validation.bar import BAR_SCHEMA, BAR_DEFAULTS
 
 CONFIG_SCHEMA = {
     'watch_config': {

@@ -1,12 +1,12 @@
 import logging
-from settings import APP_BAR_TITLE
-from core.utils.win32.windows import WinEvent
-from core.widgets.base import BaseWidget
-from core.event_service import EventService
+from yasb.settings import APP_BAR_TITLE
+from yasb.core.utils.win32.windows import WinEvent
+from yasb.core.widgets.base import BaseWidget
+from yasb.core.event_service import EventService
 from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtWidgets import QLabel
-from core.validation.widgets.yasb.active_window import VALIDATION_SCHEMA
-from core.utils.win32.utilities import get_hwnd_info
+from yasb.core.validation.widgets.yasb.active_window import VALIDATION_SCHEMA
+from yasb.core.utils.win32.utilities import get_hwnd_info
 
 IGNORED_TITLES = ['', ' ']
 IGNORED_CLASSES = ['WorkerW']
@@ -20,7 +20,7 @@ IGNORED_YASB_CLASSES = [
 ]
 
 try:
-    from core.utils.win32.event_listener import SystemEventListener
+    from yasb.core.utils.win32.event_listener import SystemEventListener
 except ImportError:
     SystemEventListener = None
     logging.warning("Failed to load Win32 System Event Listener")

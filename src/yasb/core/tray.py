@@ -3,8 +3,8 @@ import webbrowser
 from PyQt6.QtWidgets import QSystemTrayIcon, QMenu
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import QCoreApplication, QSize
-from core.bar_manager import BarManager
-from settings import GITHUB_URL, FAVICON_PATH, APP_NAME, APP_NAME_FULL
+from yasb.core.bar_manager import BarManager
+from yasb.settings import GITHUB_URL, FAVICON_PATH, APP_NAME, APP_NAME_FULL
 
 
 class TrayIcon(QSystemTrayIcon):

@@ -1,10 +1,10 @@
 from sys import argv, exit
 from PyQt6.QtWidgets import QApplication
-from core.bar_manager import BarManager
-from core.config import get_config_and_stylesheet
-from core.log import init_logger
-from core.tray import TrayIcon
-from core.watcher import create_observer
+from yasb.core.bar_manager import BarManager
+from yasb.core.config import get_config_and_stylesheet
+from yasb.core.log import init_logger
+from yasb.core.tray import TrayIcon
+from yasb.core.watcher import create_observer
 
 
 def main():
