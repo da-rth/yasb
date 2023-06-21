@@ -19,3 +19,5 @@ dependencies = [
 	"watchdog==2.1.9",
 	"winsdk==1.0.0b6",
 ]
+[project.scripts]
+yasb = "yasb:main"
