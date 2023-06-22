@@ -4,11 +4,11 @@ from contextlib import suppress
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtGui import QScreen
 from PyQt6.QtCore import QObject, pyqtSignal, pyqtSlot
-from yasb.core.bar import Bar
-from yasb.core.utils.widget_builder import WidgetBuilder
-from yasb.core.utils.utilities import get_screen_by_name
-from yasb.core.event_service import EventService
-from yasb.core.config import get_stylesheet, get_config
+from core.bar import Bar
+from core.utils.widget_builder import WidgetBuilder
+from core.utils.utilities import get_screen_by_name
+from core.event_service import EventService
+from core.config import get_stylesheet, get_config
 from copy import deepcopy
 
 

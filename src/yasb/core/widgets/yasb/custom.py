@@ -1,8 +1,8 @@
 import subprocess
 import json
 from PyQt6.QtWidgets import QLabel
-from yasb.core.widgets.base import BaseWidget
-from yasb.core.validation.widgets.yasb.custom import VALIDATION_SCHEMA
+from core.widgets.base import BaseWidget
+from core.validation.widgets.yasb.custom import VALIDATION_SCHEMA
 
 
 class CustomWidget(BaseWidget):

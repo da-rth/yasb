@@ -2,15 +2,15 @@ import logging
 from collections import deque
 from PyQt6.QtWidgets import QWidget, QLabel
 from PyQt6.QtCore import pyqtSignal
-from yasb.core.utils.win32.utilities import get_monitor_hwnd
-from yasb.core.event_service import EventService
-from yasb.core.event_enums import KomorebiEvent
-from yasb.core.widgets.base import BaseWidget
-from yasb.core.utils.komorebi.client import KomorebiClient
-from yasb.core.validation.widgets.komorebi.active_layout import VALIDATION_SCHEMA
+from core.utils.win32.utilities import get_monitor_hwnd
+from core.event_service import EventService
+from core.event_enums import KomorebiEvent
+from core.widgets.base import BaseWidget
+from core.utils.komorebi.client import KomorebiClient
+from core.validation.widgets.komorebi.active_layout import VALIDATION_SCHEMA
 
 try:
-    from yasb.core.utils.komorebi.event_listener import KomorebiEventListener
+    from core.utils.komorebi.event_listener import KomorebiEventListener
 except ImportError:
     KomorebiEventListener = None
     logging.warning("Failed to load Komorebi Event Listener")

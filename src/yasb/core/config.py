@@ -1,11 +1,11 @@
 import logging
-from yasb import settings
+import settings
 from os import path
 from sys import argv, exit
 from pathlib import Path
 from typing import Union
-from yasb.core.validation.config import CONFIG_SCHEMA
-from yasb.core.utils.alert_dialog import raise_info_alert
+from core.validation.config import CONFIG_SCHEMA
+from core.utils.alert_dialog import raise_info_alert
 from cssutils import CSSParser
 from cerberus import Validator, schema
 from yaml.parser import ParserError

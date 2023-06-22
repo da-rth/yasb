@@ -5,8 +5,8 @@ from PyQt6.QtCore import QObject
 from typing import Optional
 from cerberus import Validator
 from importlib import import_module
-from yasb.core.utils.alert_dialog import raise_info_alert
-from yasb.settings import DEFAULT_CONFIG_FILENAME
+from core.utils.alert_dialog import raise_info_alert
+from settings import DEFAULT_CONFIG_FILENAME
 
 
 class WidgetBuilder(QObject):
