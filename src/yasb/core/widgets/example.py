@@ -1,5 +1,5 @@
-from core.widgets.base import BaseWidget
-from core.validation.widgets.example import EXAMPLE_VALIDATION_SCHEMA
+from .base import BaseWidget
+from ..validation.widgets.example import EXAMPLE_VALIDATION_SCHEMA
 from PyQt6.QtWidgets import QLabel
 
 

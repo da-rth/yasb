@@ -1,10 +1,10 @@
 import logging
 from PyQt6.QtWidgets import QWidget, QFrame
 from PyQt6.QtCore import pyqtSignal, Qt
-from core.event_service import EventService
-from core.utils.win32.windows import WinEvent
-from core.bar import BAR_WM_TITLE
-from core.utils.win32.utilities import get_hwnd_info, get_window_extended_frame_bounds, is_window_maximised
+from ...event_service import EventService
+from .windows import WinEvent
+from ...bar import BAR_WM_TITLE
+from .utilities import get_hwnd_info, get_window_extended_frame_bounds, is_window_maximised
 
 IGNORED_CLASSES = [
     'WorkerW',

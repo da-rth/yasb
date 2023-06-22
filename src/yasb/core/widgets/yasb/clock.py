@@ -1,7 +1,7 @@
 import re
 import pytz
-from core.widgets.base import BaseWidget
-from core.validation.widgets.yasb.clock import VALIDATION_SCHEMA
+from ..base import BaseWidget
+from ...validation.widgets.yasb.clock import VALIDATION_SCHEMA
 from PyQt6.QtWidgets import QLabel
 from datetime import datetime
 from tzlocal import get_localzone_name

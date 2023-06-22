@@ -1,8 +1,8 @@
 import logging
 import psutil
 from humanize import naturalsize
-from core.widgets.base import BaseWidget
-from core.validation.widgets.yasb.memory import VALIDATION_SCHEMA
+from ..base import BaseWidget
+from ...validation.widgets.yasb.memory import VALIDATION_SCHEMA
 from PyQt6.QtWidgets import QLabel
 
 

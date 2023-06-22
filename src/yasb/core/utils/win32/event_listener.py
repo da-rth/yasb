@@ -3,8 +3,8 @@ import time
 import logging
 from PyQt6.QtCore import QThread
 from win32gui import GetForegroundWindow
-from core.utils.win32.windows import WinEventProcType, WinEvent, user32, ole32, msg
-from core.event_service import EventService
+from .windows import WinEventProcType, WinEvent, user32, ole32, msg
+from ...event_service import EventService
 
 
 class SystemEventListener(QThread):

@@ -1,7 +1,7 @@
 import logging
 from os.path import join
-from settings import DEFAULT_LOG_FILENAME, APP_NAME, APP_NAME_FULL
-from core.config import get_config_dir
+from ..settings import DEFAULT_LOG_FILENAME, APP_NAME, APP_NAME_FULL
+from .config import get_config_dir
 
 LOG_PATH = join(get_config_dir(), DEFAULT_LOG_FILENAME)
 LOG_FORMAT = "%(asctime)s %(levelname)s %(filename)s: %(message)s"

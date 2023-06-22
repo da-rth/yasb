@@ -3,15 +3,15 @@ from PyQt6.QtWidgets import QPushButton, QWidget, QHBoxLayout, QLabel
 from PyQt6.QtCore import pyqtSignal
 from typing import Literal
 from contextlib import suppress
-from core.utils.win32.utilities import get_monitor_hwnd
-from core.event_service import EventService
-from core.event_enums import KomorebiEvent
-from core.widgets.base import BaseWidget
-from core.utils.komorebi.client import KomorebiClient
-from core.validation.widgets.komorebi.workspaces import VALIDATION_SCHEMA
+from ...utils.win32.utilities import get_monitor_hwnd
+from ...event_service import EventService
+from ...event_enums import KomorebiEvent
+from ..base import BaseWidget
+from ...utils.komorebi.client import KomorebiClient
+from ...validation.widgets.komorebi.workspaces import VALIDATION_SCHEMA
 
 try:
-    from core.utils.komorebi.event_listener import KomorebiEventListener
+    from ...utils.komorebi.event_listener import KomorebiEventListener
 except ImportError:
     KomorebiEventListener = None
     logging.warning("Failed to load Komorebi Event Listener")
