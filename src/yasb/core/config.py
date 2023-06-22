@@ -1,11 +1,11 @@
 import logging
-import settings
+from .. import settings
 from os import path
 from sys import argv, exit
 from pathlib import Path
 from typing import Union
-from core.validation.config import CONFIG_SCHEMA
-from core.utils.alert_dialog import raise_info_alert
+from .validation.config import CONFIG_SCHEMA
+from .utils.alert_dialog import raise_info_alert
 from cssutils import CSSParser
 from cerberus import Validator, schema
 from yaml.parser import ParserError

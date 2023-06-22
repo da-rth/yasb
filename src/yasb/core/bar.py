@@ -1,10 +1,10 @@
 import logging
-from settings import APP_BAR_TITLE
+from ..settings import APP_BAR_TITLE
 from PyQt6.QtWidgets import QApplication, QWidget, QHBoxLayout, QGridLayout, QFrame
 from PyQt6.QtGui import QScreen
 from PyQt6.QtCore import Qt, QRect
-from core.utils.utilities import is_valid_percentage_str, percent_to_float
-from core.validation.bar import BAR_DEFAULTS
+from .utils.utilities import is_valid_percentage_str, percent_to_float
+from .validation.bar import BAR_DEFAULTS
 from BlurWindow.blurWindow import GlobalBlur
 
 try:

@@ -1,7 +1,7 @@
 import psutil
 from collections import deque
-from core.widgets.base import BaseWidget
-from core.validation.widgets.yasb.cpu import VALIDATION_SCHEMA
+from ..base import BaseWidget
+from ...validation.widgets.yasb.cpu import VALIDATION_SCHEMA
 from PyQt6.QtWidgets import QLabel
 
 
