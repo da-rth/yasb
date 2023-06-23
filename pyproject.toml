@@ -20,4 +20,4 @@ dependencies = [
 	"winsdk==1.0.0b6",
 ]
 [project.scripts]
-yasb = "yasb:main"
+yasb = "yasb:main.main"
