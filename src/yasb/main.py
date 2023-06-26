@@ -7,7 +7,9 @@ from .core.tray import TrayIcon
 from .core.watcher import create_observer
 
 
-def main():
+def main(log=True):
+    if log:
+        init_logger()
     config, stylesheet = get_config_and_stylesheet()
 
     app = QApplication(argv)
@@ -39,5 +41,4 @@ def main():
 
 
 if __name__ == "__main__":
-    init_logger()
-    main()
+    main(log=True)
