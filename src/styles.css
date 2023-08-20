@@ -73,11 +73,16 @@
 }
 
 .cpu-widget .label,
+.wifi-widget .label,
 .memory-widget .label,
 .battery-widget .label {
   padding: 2px 5px;
   font-size: 14px;
   border-radius: 5px;
+}
+
+.wifi-widget .label {
+  background: #b8bb26;
 }
 
 .cpu-widget .label {
