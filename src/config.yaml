@@ -456,7 +456,7 @@ widgets:
           - "\udb82\udd28"  # 76-100% strength. Alternate theming: \uf1eb
         callbacks:
           on_middle: "do_nothing"
-          on_right: "exec explorer.exe shell:Appsfolder\\Microsoft.WindowsAlarms_8wekyb3d8bbwe!App"
+          on_right: "exec cmd.exe /c start ms-settings:network"
 
 
   # Some custom widgets
