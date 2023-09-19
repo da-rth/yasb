@@ -1,6 +1,6 @@
 # Configuration for Yasb (Yet Another Status Bar)
 # Author: @denBot
-# Last updated: 08/11/2021
+# Last updated: 21/08/2023
 
 # General Bar Configuration Notes:
 #   - All bars must be defined in within the `bars` section
@@ -96,7 +96,7 @@ bars:
     widgets:
       left:   ["komorebi_workspaces", "komorebi_active_layout", "active_window"]
       center: ["clock"]
-      right:  ["explorer_button", "ip_info", "cpu", "memory", "battery"]
+      right:  ["explorer_button", "wifi", "cpu", "memory", "battery"]
 
 # widgets:
   # my-clock-widget:
@@ -332,9 +332,9 @@ bars:
         # ^ The format label for the custom widget. Accepts: string containing {data} format options. Required field.
         # If the command executed returns a JSON structure,
         # the JSON object can be used within the format label using the python dictionary string formatting syntax.
-          # - data = "curl.exe api.openweathermap.org/..."
-          # - data = {"current": {"temp":287.03, "humidity":92}, ...}
-      # label_alt: "Temperature: {data[current][humidity]}%"
+          # - data = "curl.exe  wttr.in/..."
+          # - data = {"current_condition": [{"temp_C":16, "humidity":71}], ...}
+      # label_alt: "Temperature: {data[current_condition][0][temp_C]}%"
         # ^ The alternate format label for the clock. Accepts: string containing {data} format options. Required field.
       # label_max_length: None
         # ^ The maximum length of the label. Accepts: positive integer
@@ -442,6 +442,23 @@ widgets:
         on_middle: 'toggle_monocle'
         on_right: 'prev_layout'
 
+  wifi:
+    type: "yasb.wifi.WifiWidget"
+    options:
+        label: "{wifi_icon}"
+        label_alt: "{wifi_icon} {wifi_name}"
+        update_interval: 5000
+        wifi_icons:
+          - "\udb82\udd2e"  # 0% strength (no wifi)
+          - "\udb82\udd1f"  # 1-25% strength
+          - "\udb82\udd22"  # 26-50% strength
+          - "\udb82\udd25"  # 51-75% strength
+          - "\udb82\udd28"  # 76-100% strength. Alternate theming: \uf1eb
+        callbacks:
+          on_middle: "do_nothing"
+          on_right: "exec cmd.exe /c start ms-settings:network"
+
+
   # Some custom widgets
 
   explorer_button:
@@ -474,11 +491,12 @@ widgets:
   weather:
     type: "yasb.custom.CustomWidget"
     options:
-      label: "\uf0c2 {data[main][temp]}\u00b0c"
-      label_alt: "\uf0c2 {data[weather][0][description]}"
+      label: "\uf0c2 {data[current_condition][0][temp_C]}\u00b0c"
+      label_alt: "\uf0c2 {data[current_condition][0][weatherDesc][0][value]}"
       class_name: "weather-widget"
       exec_options:
-        run_cmd: "curl.exe api.openweathermap.org/data/2.5/weather?q=Glasgow&units=metric&appid={YOUR_API_KEY_HERE}"
+        run_cmd: "curl.exe  wttr.in/Vancouver?format=j1"
         # run every hour
         run_interval: 3600000
         return_format: "json"
+
