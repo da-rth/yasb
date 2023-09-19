@@ -82,7 +82,14 @@ fn poll_named_pipe(named_pipe: HANDLE, app_handle: &AppHandle) -> () {
                     };
 
                     let komorebi_event = format!("Komorebi{}", event_type);
-                    let payload: KomorebiNotification = serde_json::from_value(payload_value.clone()).unwrap();
+                    let payload: KomorebiNotification = match serde_json::from_value(payload_value.clone()) {
+                        Ok(v) => v,
+                        Err(e) => {
+                            log::error!("Event[{}]: {}", event_type, e.to_string());
+                            continue;
+                        }
+                    };
+
                     let _ = app_handle.emit_all(komorebi_event.as_str(), payload.state);
                 }
             }
@@ -119,27 +126,30 @@ fn wait_until_subscribed(pipe_name: &str) -> () {
 }
 
 fn komorebi_event_listener(app_handle: &AppHandle) -> () {
-    if let Ok(named_pipe) = create_named_pipe(KOMOREBI_NAMED_PIPE) {
-        let (_, pipe_name) = KOMOREBI_NAMED_PIPE.rsplit_once('\\').unwrap();
+    match create_named_pipe(KOMOREBI_NAMED_PIPE) {
+        Ok(named_pipe) => {
+            let (_, pipe_name) = KOMOREBI_NAMED_PIPE.rsplit_once('\\').unwrap();
 
-        while named_pipe != INVALID_HANDLE_VALUE {
-            let _app_handle = app_handle.clone();
-            let pipe_thread = thread::spawn(move || {
-                if connect_named_pipe(named_pipe) {
-                    log::info!("KomorebiEventListener: pipe connected. Listening for komorebi events.");
-                    poll_named_pipe(named_pipe, &_app_handle);
-                } else {
-                    log::warn!("KomorebiEventListener: failed to connect named pipe. Disconnecting and trying again.");
-                    disconnect_named_pipe(named_pipe);
-                    let _ = _app_handle.emit_all("KomorebiOffline", ());
-                }
-            });
+            while named_pipe != INVALID_HANDLE_VALUE {
+                let _app_handle = app_handle.clone();
+                let pipe_thread: thread::JoinHandle<()> = thread::spawn(move || {
+                    if connect_named_pipe(named_pipe) {
+                        log::info!("KomorebiEventListener: pipe connected. Listening for komorebi events.");
+                        poll_named_pipe(named_pipe, &_app_handle);
+                    } else {
+                        log::warn!("KomorebiEventListener: failed to connect named pipe. Disconnecting and trying again.");
+                        disconnect_named_pipe(named_pipe);
+                        let _ = _app_handle.emit_all("KomorebiOffline", ());
+                    }
+                });
 
-            thread::sleep(Duration::from_millis(500));
-            wait_until_subscribed(pipe_name);
-            let _ = app_handle.emit_all("KomorebiOnline", ());
-            pipe_thread.join().unwrap();
+                thread::sleep(Duration::from_millis(500));
+                wait_until_subscribed(pipe_name);
+                let _ = app_handle.emit_all("KomorebiOnline", ());
+                pipe_thread.join().unwrap();
+            }
         }
+        Err(e) => log::error!("{}", e.to_string()),
     }
 }
 
