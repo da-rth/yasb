@@ -75,10 +75,15 @@
 .cpu-widget .label,
 .wifi-widget .label,
 .memory-widget .label,
+.traffic-widget .label,
 .battery-widget .label {
   padding: 2px 5px;
   font-size: 14px;
   border-radius: 5px;
+}
+
+.traffic-widget .label {
+    background: #B3D3D9;
 }
 
 .wifi-widget .label {
