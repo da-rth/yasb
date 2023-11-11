@@ -144,7 +144,8 @@ class ActiveLayoutWidget(BaseWidget):
                 self._active_layout_text.setText(
                     self._label.replace("{icon}", layout_icon).replace("{layout_name}", layout_name)
                 )
-
+                self._active_layout_text.setProperty("class", f"label {layout_name}")
+                self._active_layout_text.setStyleSheet('')
                 if self._active_layout_text.isHidden():
                     self._active_layout_text.show()
         except Exception:
