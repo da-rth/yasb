@@ -1,6 +1,4 @@
 DEFAULTS = {
-    # 'label': '\uf017 {%H:%M:%S}',
-    # 'label_alt': '\uf017 {%d-%m-%y %H:%M:%S}',
     'label': "{wifi_icon}",
     'label_alt': "{wifi_icon} {wifi_name}",
     'update_interval': 1000,
