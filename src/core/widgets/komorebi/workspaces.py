@@ -81,13 +81,15 @@ class WorkspaceWidget(BaseWidget):
             KomorebiEvent.CycleFocusMonitor.value,
             KomorebiEvent.FocusMonitorWorkspaceNumber.value,
             KomorebiEvent.FocusMonitorNumber.value,
-            KomorebiEvent.FocusWorkspaceNumber.value
+            KomorebiEvent.FocusWorkspaceNumber.value,
+            KomorebiEvent.FocusNamedWorkspace.value
         ]
 
         self._update_buttons_event_watchlist = [
             KomorebiEvent.EnsureWorkspaces.value,
             KomorebiEvent.Manage.value,
             KomorebiEvent.MoveContainerToWorkspaceNumber.value,
+            KomorebiEvent.MoveContainerToNamedWorkspace.value,
             KomorebiEvent.NewWorkspace.value,
             KomorebiEvent.ReloadConfiguration.value,
             KomorebiEvent.SendContainerToMonitorNumber.value,
