@@ -14,12 +14,13 @@ class KomorebiClient:
     def __init__(
             self,
             komorebic_path: str = "komorebic.exe",
-            timeout_secs: int = 0.5
+            timeout_secs: float = 0.5
     ):
         super().__init__()
         self._timeout_secs = timeout_secs
         self._komorebic_path = komorebic_path
         self._previous_poll_offline = False
+        self._previous_mouse_follows_focus = False
 
     def query_state(self) -> Optional[dict]:
         with suppress(json.JSONDecodeError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
@@ -81,8 +82,31 @@ class KomorebiClient:
                     if managed_window['hwnd'] == window_hwnd:
                         return add_index(workspace, i)
 
-    def activate_workspace(self, ws_idx: int) -> None:
-        subprocess.Popen([self._komorebic_path, "focus-workspace", str(ws_idx)], shell=True)
+    def get_mouse_follows_focus(self, state: dict) -> bool:
+        return state['mouse_follows_focus']
+
+    def activate_workspace(self, ws_idx: int, wait: bool = False) -> None:
+        p = subprocess.Popen([self._komorebic_path, "focus-workspace", str(ws_idx)], shell=True)
+
+        if wait:
+            p.wait()
+
+    def hide_preview(self, ws_idx: int, stay_on_workspace: bool = False) -> None:
+        if self._previous_mouse_follows_focus:
+            self._previous_mouse_follows_focus = False
+            self.toggle("mouse-follows-focus", True)
+
+        if not stay_on_workspace:
+            self.activate_workspace(ws_idx, True)
+
+    def preview_workspace(self, ws_idx: int, state: dict) -> None:
+        is_mff_active = self.get_mouse_follows_focus(state)
+
+        if is_mff_active and not self._previous_mouse_follows_focus:
+            self._previous_mouse_follows_focus = True
+            self.toggle("mouse-follows-focus", True)
+
+        self.activate_workspace(ws_idx, True)
 
     def next_workspace(self) -> None:
         try:
@@ -119,9 +143,12 @@ class KomorebiClient:
         except subprocess.SubprocessError:
             pass
 
-    def toggle(self, toggle_type: str):
+    def toggle(self, toggle_type: str, wait: bool = False) -> None:
         try:
-            subprocess.Popen([self._komorebic_path, f"toggle-{toggle_type}"], shell=True)
+            p = subprocess.Popen([self._komorebic_path, f"toggle-{toggle_type}"], shell=True)
+
+            if wait:
+                p.wait()
         except subprocess.SubprocessError:
             logging.exception(f"Failed to toggle {toggle_type} for currently active workspace")
 
