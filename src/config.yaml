@@ -292,6 +292,9 @@ bars:
         # ^ Specifies if the workspace and monitor index values should be zero-indexed. Accepts: boolean
       # hide_empty_workspaces: False
         # ^ Specifies if empty workspaces should be shown in the list of komorebi workspaces. Accepts: boolean
+      # preview_workspace: False
+        # ^ Specifies mouse over behavior on komorebi workspaces. If true, you can see workspace by mouse over and get back by leaving the button area. Accepts: boolean
+      
 
   # komorebi_active_layout:
     # type: "komorebi.active_layout.ActiveLayoutWidget"
@@ -420,6 +423,7 @@ widgets:
         label_default_name: "{index}"
         label_zero_index: false
         hide_empty_workspaces: false
+        preview_workspace: false
 
   komorebi_active_layout:
     type: "komorebi.active_layout.ActiveLayoutWidget"
