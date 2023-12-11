@@ -46,7 +46,8 @@ export class KomorebiWorkspaceWidgetComponent implements OnInit, OnDestroy {
             await listen("KomorebiFocusMonitorWorkspaceNumber", this.onKomorebiUpdate.bind(this)),
             await listen("KomorebiMoveWorkspaceToMonitorNumber", this.onKomorebiUpdate.bind(this)),
             await listen("KomorebiFocusNamedWorkspace", this.onKomorebiUpdate.bind(this)),
-            await listen("KomorebiFocusNamedWorkspace", this.onKomorebiUpdate.bind(this)),
+            await listen("KomorebiMoveContainerToWorkspaceNumber", this.onKomorebiUpdate.bind(this)),
+            await listen("KomorebiMoveContainerToNamedWorkspace", this.onKomorebiUpdate.bind(this)),
             await listen("KomorebiCycleFocusWorkspace", this.onKomorebiUpdate.bind(this)),
             await listen("KomorebiNewWorkspace", this.onKomorebiUpdate.bind(this)),
             await listen("KomorebiWorkspaceName", this.onKomorebiUpdate.bind(this))

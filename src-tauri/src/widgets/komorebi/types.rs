@@ -101,10 +101,18 @@ pub struct KomorebiState {
     pub focus_follows_mouse: Option<FocusFollowsMouseImplementation>,
     pub mouse_follows_focus: bool,
     pub has_pending_raise_op: bool,
-    pub float_identifiers: Vec<String>,
-    pub manage_identifiers: Vec<String>,
-    pub layered_whitelist: Vec<String>,
-    pub tray_and_multi_window_identifiers: Vec<String>,
-    pub border_overflow_identifiers: Vec<String>,
-    pub name_change_on_launch_identifiers: Vec<String>,
+    pub float_identifiers: Vec<KomorebiIdentifier>,
+    pub manage_identifiers: Vec<KomorebiIdentifier>,
+    pub layered_whitelist: Vec<KomorebiIdentifier>,
+    pub tray_and_multi_window_identifiers: Vec<KomorebiIdentifier>,
+    pub border_overflow_identifiers: Vec<KomorebiIdentifier>,
+    pub name_change_on_launch_identifiers: Vec<KomorebiIdentifier>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct KomorebiIdentifier {
+    id: String,
+    // These below should probably be enums but this is working for now
+    kind: String,
+    matching_strategy: String
 }
