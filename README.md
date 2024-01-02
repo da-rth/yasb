@@ -96,7 +96,7 @@ If you would like to use a different icon font, simply change the wildcard font-
 The Komorebi Workspace widget bundled with Yasb requires that you are running [komorebi v0.18.0](https://github.com/LGUG2Z/komorebi/releases/tag/v0.1.8) or above. This is because previous komorebi versions do not support socket-based communication with external applications via Windows Named Pipes.
 If you are running an older version of komorebi, yasb will not be able to query komorebi for workspace information.
 
-**Note**: Yasb executes komorebic.exe commands directly via the [subprocess](https://docs.python.org/3/library/subprocess.html) module. For this to work, you MUST have `komoreb.exe` and `komorebic.exe` [added to your system PATH](https://medium.com/@kevinmarkvi/how-to-add-executables-to-your-path-in-windows-5ffa4ce61a53). 
+**Note**: Yasb executes komorebic.exe commands directly via the [subprocess](https://docs.python.org/3/library/subprocess.html) module. For this to work, you MUST have `komorebi.exe` and `komorebic.exe` [added to your system PATH](https://medium.com/@kevinmarkvi/how-to-add-executables-to-your-path-in-windows-5ffa4ce61a53). 
 
 
 ## Contributions
