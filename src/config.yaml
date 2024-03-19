@@ -445,22 +445,22 @@ widgets:
   wifi:
     type: "yasb.wifi.WifiWidget"
     options:
-        label: "{wifi_icon}"
-        label_alt: "{wifi_icon} {wifi_name}"
-        update_interval: 5000
-        wifi_icons:
-          - "\udb82\udd2e"  # 0% strength (no wifi)
-          - "\udb82\udd1f"  # 1-25% strength
-          - "\udb82\udd22"  # 26-50% strength
-          - "\udb82\udd25"  # 51-75% strength
-          - "\udb82\udd28"  # 76-100% strength. Alternate theming: \uf1eb
-        callbacks:
-          on_middle: "do_nothing"
-          on_right: "exec cmd.exe /c start ms-settings:network"
+      label: "{wifi_icon}"
+      label_alt: "{wifi_icon} {wifi_name}"
+      update_interval: 5000
+      wifi_icons:
+        - "\udb82\udd2e"  # 0% strength (no wifi)
+        - "\udb82\udd1f"  # 1-25% strength
+        - "\udb82\udd22"  # 26-50% strength
+        - "\udb82\udd25"  # 51-75% strength
+        - "\udb82\udd28"  # 76-100% strength. Alternate theming: \uf1eb
+      callbacks:
+        on_middle: "do_nothing"
+        on_right: "exec cmd.exe /c start ms-settings:network"
 
   traffic:
-  type: "yasb.traffic.TrafficWidget"
-  options:
+    type: "yasb.traffic.TrafficWidget"
+    options:
       label: "\ueb01 \ueab4 {download_speed} | \ueab7 {upload_speed}"
       label_alt: "\ueb01 \ueab4 {upload_speed} | \ueab7 {download_speed}"
       update_interval: 1000 # Update interval should be a multiple of 1000
