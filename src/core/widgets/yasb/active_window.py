@@ -96,8 +96,11 @@ class ActiveWindowWidget(BaseWidget):
             return
 
         monitor_xpos = win_info['monitor_info'].get('rect', None).get('x', None)
+        monitor_ypos = win_info['monitor_info'].get('rect', None).get('y', None)
 
-        if self._monitor_exclusive and self.screen().geometry().x() != monitor_xpos:
+        if (self._monitor_exclusive and 
+           (self.screen().geometry().x() != monitor_xpos or
+            self.screen().geometry().y() != monitor_ypos)):
             self._window_title_text.hide()
         else:
             self._update_window_title(hwnd, win_info, event)
