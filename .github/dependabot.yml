@@ -4,3 +4,10 @@
 #     directory: "/"
 #     schedule:
 #       interval: "daily"
+
+# version: 2
+# updates:
+#   - package-ecosystem: "pip"
+#     directory: "/"
+#     schedule:
+#       interval: "daily"
