@@ -1,145 +1,86 @@
+/* General styles */
 * {
-    /* Bar measurement icons: https://github.com/and3rson/graph-bars-font */
-    /* Icon set: https://fontawesome.com/v5.15/how-to-use/on-the-desktop/setup/getting-started */
-    font-family: 'Courier New', 'Bars', 'Font Awesome 5 Free';
-    font-size: 14px;
-    color: #f2e5bc;
+  font-family: 'JetBrainsMonoNL Nerd Font';
+  font-size: 16px;
 }
 
 .bar {
-    background: rgba(29, 32, 33, 0.3);
-    border: 1px solid #504945;
-    padding: 0 5px;
+  padding-right: 5px;
 }
-
-.container-right .widget {
-  margin: 2px;
+.bar .widget{
+  background: #bdae93;
   border-radius: 5px;
+  margin-left: 5px;
+  margin-top: 1px;
 }
-
-.container-right .widget * {
+.bar .widget .label{
   color: #242424;
+  font-weight: bold;
 }
-.komorebi-workspaces {
-  margin-left: 0;
-}
-.ws-btn {
-    padding: 5px;
-    background: rgba(60, 56, 54, 0.4);
-    border: 1px solid rgba(168, 153, 132, 0.4);
-    margin: 2px 1px;
-    font-size: 12px;
-    border-radius: 3px;
-}
-
-.ws-btn:hover {
-    color: #fbf1c7;
-    font-weight: bold;
-}
-
-.ws-btn.populated {
-    border-color: rgba(168, 153, 132, 1.0);
-    color: #ebdbb2;
-}
-
-.ws-btn.active {
-    background: rgba(251, 241, 199, 0.85);
-    color: #121212;
-}
-
-.custom-widget {
-    padding: 2px 6px;
-    font-size: 14px;
-    background: #bdae93;
-}
-.custom-widget .icon {
-  font-size: 13px;
-}
-.custom-widget:hover {
+.bar .widget:hover{
   background: #fbf1c7;
 }
-.custom-widget .icon.icon-left {
-    margin-right: 5px;
-}
-.custom-widget .icon.icon-right {
-    margin-left: 5px;
-}
-.custom-widget.hostname-widget {
-    background: #83a598;
-}
 
-.custom-widget.terminal-widget {
-    font-size: 14px;
-}
-
-.cpu-widget .label,
-.wifi-widget .label,
-.memory-widget .label,
-.traffic-widget .label,
-.battery-widget .label {
+.label{
   padding: 2px 5px;
-  font-size: 14px;
   border-radius: 5px;
 }
 
-.traffic-widget .label {
-    background: #B3D3D9;
+
+
+
+
+
+.ws-btn:hover {
+  background: #fbf1c7;
+}
+.ws-btn {
+  padding: 5px 10px;
+  background: #bdae93;
+  margin: 2px;
+  border-radius: 5px;
+  color: #242424;
+  font-weight: bold;
+}
+.ws-btn.populated{
+  background: #fbf1c7;
+}
+.ws-btn.active {
+  background: #fbf1c7;
+  height: 32px;
+  border-bottom: 1px solid #242424;
 }
 
-.wifi-widget .label {
-  background: #b8bb26;
+
+
+.active-window-widget .label {
+  padding: -5px 7px 0 7px !important;
 }
 
-.cpu-widget .label {
-  background: #d3869b;
-}
 
+.battery-widget .label.status-full,
+.battery-widget .label.status-charging {
+  color: #5f924d;
+}
 .battery-widget .label.status-critical {
-  background: #fb4934;
+  color: #d15142;
 }
 .battery-widget .label.status-low {
-  background: #fe8019;
+  color: #df8a45;
 }
 .battery-widget .label.status-medium {
-  background: #fabd2f;
+  color: #e2b345;
 }
 .battery-widget .label.status-high {
-  background: #b8bb26;
-}
-.battery-widget .label.status-full {
-  background: #8ec07c;
-}
-.battery-widget .label.status-charging {
-  background: #8ec07c;
-}
-.battery-widget,
-.memory-widget {
-  margin: 0;
+  color: #b7b85a;
 }
 
 .memory-widget .label.status-low {
-  background: #689d6a;
+  color: #5f924d;
 }
 .memory-widget .label.status-medium {
-  background: #fe8019;
+  color: #df8a45;
 }
 .memory-widget .label.status-high {
-  background: #cc241d;
-}
-.active-window-widget {
-  margin-left: 5px;
-}
-.active-window-widget .label {
-  padding: -5px 7px 0 7px;
-  color: #242424;
-  background: #83a598;
-  margin-bottom: -1px;
-  border-radius: 3px;
-  margin: 2px;
-}
-
-.komorebi-active-layout .label {
-  color: #fbf1c7;
-  margin: -4px 2px 2px 8px;
-  font-family: Hack;
+  color: #d15142;
 }
