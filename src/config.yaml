@@ -53,7 +53,7 @@ bars:
     widgets:
       left:   ["open_startmenu", "komorebi_workspaces", "komorebi_active_layout", "ip_info"]
       center: ["clock", "weather"]
-      right:  [ "terminal_button", "explorer_button", "cpu", "memory", "wifi", "battery"]
+      right:  [ "dropdown_menu", "terminal_button", "explorer_button",  "volume", "cpu", "memory", "wifi", "battery"]
 
   monitor-bar:
     enabled: true
@@ -80,7 +80,7 @@ bars:
     widgets:
       left:   ["komorebi_workspaces", "komorebi_active_layout", "active_window"]
       center: ["clock", "weather"]
-      right:  ["disk", "volume", "explorer_button", "ip_info", "wifi", "cpu", "memory", "battery"]
+      right:  ["terminal_button", "explorer_button", "ip_info", "volume", "disk", "cpu", "memory", "wifi", "battery"]
 
 widgets:
   active_window:
@@ -133,9 +133,8 @@ widgets:
       label: "\ue266 CPU:{info[percent][total]}%"
       label_alt: "CPU:{info[histograms][cpu_percent]}"
       update_interval: 1000
-            #^ The interval at which the CPU widget will update. Accepts: positive integer
       histogram_icons:
-        - '\u2581 ' # 0%
+        - '\u2581' # 0%
         - '\u2582' # 10%
         - '\u2583' # 20%
         - '\u2584' # 30%
@@ -149,9 +148,9 @@ widgets:
   memory:
     type: "yasb.memory.MemoryWidget"
     options:
-        label: "\ue266 RAM:{virtual_mem_free}"
-        label_alt: "\ue266 RAM:{virtual_mem_percent}%"
-        update_interval: 5000
+        label: "\ue266 RAM:{virtual_mem_percent}%"
+        label_alt: "\ue266 RAM:{virtual_mem_free}"
+        update_interval: 2000
         callbacks:
           on_right: "exec cmd /c Taskmgr"
 
@@ -162,7 +161,7 @@ widgets:
         label_workspace_btn: "{index}"
         label_default_name: "{index}"
         label_zero_index: false
-        hide_empty_workspaces: false
+        hide_empty_workspaces: true
 
   komorebi_active_layout:
     type: "komorebi.active_layout.ActiveLayoutWidget"
@@ -192,11 +191,11 @@ widgets:
         label_alt: "{wifi_icon} {wifi_name}"
         update_interval: 5000
         wifi_icons:
-          - "\udb82\udd2e"  # 0% strength (no wifi)
-          - "\udb82\udd1f"  # 1-25% strength
-          - "\udb82\udd22"  # 26-50% strength
-          - "\udb82\udd25"  # 51-75% strength
-          - "\udb82\udd28"  # 76-100% strength. Alternate theming: \uf1eb
+          - "<span style=\"color: #d15142\">\udb82\udd2e</span>"  # 0% strength (no wifi)
+          - "<span style=\"color: #df8a45\">\udb82\udd1f</span>"  # 1-25% strength
+          - "<span style=\"color: #e2b345\">\udb82\udd22</span>"  # 26-50% strength
+          - "<span style=\"color: #b7b85a\">\udb82\udd25</span>"  # 51-75% strength
+          - "<span style=\"color: #5f924d\">\udb82\udd28</span>"  # 76-100% strength. Alternate theming: \uf1eb
         callbacks:
           on_middle: "do_nothing"
           on_right: "exec cmd.exe /c start ms-settings:network"
@@ -287,10 +286,23 @@ widgets:
   disk:
     type: "yasb.disk.DiskWidget"
     options:
-        label: "{volume_label}{space[used][percent]:.1f}%"
-        label_alt: "{volume_label}{space[used][gb]:.1f}GB / {space[total][gb]:.1f}GB"
+        label: "\udb80\udeca {volume_label}{space[used][percent]:.1f}%"
+        label_alt: "\udb80\udeca {volume_label}{space[used][gb]:.1f}GB / {space[total][gb]:.1f}GB"
         volume_label: "C:"
         update_interval: 60000
         callbacks:
           on_middle: "do_nothing"
           on_right: "exec cmd.exe /c start ms-settings:network"
+
+  dropdown_menu:
+    type: "yasb.dropdown.DropdownWidget"
+    options:
+      items:
+        "CPU Monitor": "cpu"
+        "Memory Monitor": "memory"
+        "Volume Control": "volume"
+      update_interval: 5000
+      callbacks:
+        on_left: "do_nothing"
+        on_middle: "do_nothing"
+        on_right: "do_nothing"
