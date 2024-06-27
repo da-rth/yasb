@@ -24,7 +24,9 @@ class ExampleWidget(BaseWidget):
         self._label_alt.setProperty("class", "label alt")
         self.widget_layout.addWidget(self._label)
         self.widget_layout.addWidget(self._label_alt)
+
         self.register_callback("toggle_label", self._toggle_label)
+        self.register_callback("update_label", self._update_label)
 
         self.callback_left = callbacks['on_left']
         self.callback_right = callbacks['on_right']
