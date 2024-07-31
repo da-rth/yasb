@@ -461,8 +461,8 @@ widgets:
           on_right: "exec cmd.exe /c start ms-settings:network"
 
   traffic:
-  type: "yasb.traffic.TrafficWidget"
-  options:
+    type: "yasb.traffic.TrafficWidget"
+    options:
       label: "\ueb01 \ueab4 {download_speed} | \ueab7 {upload_speed}"
       label_alt: "\ueb01 \ueab4 {upload_speed} | \ueab7 {download_speed}"
       update_interval: 1000 # Update interval should be a multiple of 1000
@@ -509,4 +509,3 @@ widgets:
         # run every hour
         run_interval: 3600000
         return_format: "json"
-
