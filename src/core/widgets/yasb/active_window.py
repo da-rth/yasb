@@ -103,7 +103,7 @@ class ActiveWindowWidget(BaseWidget):
              self.screen().geometry().y() != monitor_ypos)):
             self._window_title_text.hide()
         else:
-            win_info['class_title_noexe'] = str(win_info['class_name']).replace('.exe', '')
+            win_info['process_name_noexe'] = str(win_info['process']['name']).replace('.exe', '')
             self._update_window_title(hwnd, win_info, event)
 
     def _update_window_title(self, hwnd: int, win_info: dict, event: WinEvent) -> None:
