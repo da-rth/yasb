@@ -120,9 +120,12 @@ class BatteryWidget(BaseWidget):
 
         self._battery_state = psutil.sensors_battery()
 
-        threshold = self._get_battery_threshold()
+        is_charging_str = "yes"
+        threshold = "full"
+        if not self._battery_state.power_plugged:
+            is_charging_str = "no"
+            threshold = self._get_battery_threshold()
         time_remaining = self._get_time_remaining()
-        is_charging_str = "yes" if self._battery_state.power_plugged else "no"
         charging_icon = self._get_charging_icon(threshold)
         battery_status = active_label_content\
             .replace("{percent}", str(self._battery_state.percent)) \
