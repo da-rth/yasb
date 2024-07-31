@@ -66,6 +66,7 @@ class MemoryWidget(BaseWidget):
 
             threshold = self._get_virtual_memory_threshold(virtual_mem.percent)
             label_options = [
+                ("{virtual_mem_used}", naturalsize(virtual_mem.used)),
                 ("{virtual_mem_free}", naturalsize(virtual_mem.free)),
                 ("{virtual_mem_percent}", virtual_mem.percent),
                 ("{virtual_mem_total}", naturalsize(virtual_mem.total)),
