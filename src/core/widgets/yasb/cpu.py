@@ -86,6 +86,18 @@ class CpuWidget(BaseWidget):
         self._cpu_freq_history.append(current_freq)
         self._cpu_perc_history.append(current_perc)
 
+        # Convert the frequency to GHz
+        current_freq_ghz = cpu_freq / 1000
+        # Convert to string, removing trailing .00 if the number is a whole number
+        if current_freq_ghz.is_integer():
+            freq_str = f"{int(current_freq_ghz)}"
+        else:
+            freq_str = f"{current_freq_ghz:.2f}"
+        if cpu_freq.is_integer():
+            freq_str = f"{int(cpu_freq)}"
+        else:
+            freq_str = f"{cpu_freq:.2f}"
+
         return {
             'cores': {
                 'physical': psutil.cpu_count(logical=False),
@@ -94,7 +106,8 @@ class CpuWidget(BaseWidget):
             'freq': {
                 'min': min_freq,
                 'max': max_freq,
-                'current': current_freq
+                'current': current_freq,
+                'current_ghz': current_freq_ghz
             },
             'percent': {
                 'core': cores_perc,
