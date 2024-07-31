@@ -95,11 +95,15 @@ class ActiveWindowWidget(BaseWidget):
                 win_info['class_name'] in IGNORED_YASB_CLASSES):
             return
 
-        monitor_name = win_info['monitor_info'].get('device', None)
+        monitor_xpos = win_info['monitor_info'].get('rect', None).get('x', None)
+        monitor_ypos = win_info['monitor_info'].get('rect', None).get('y', None)
 
-        if self._monitor_exclusive and self.screen().name() != monitor_name:
+        if (self._monitor_exclusive and
+            (self.screen().geometry().x() != monitor_xpos or
+             self.screen().geometry().y() != monitor_ypos)):
             self._window_title_text.hide()
         else:
+            win_info['process_name_noexe'] = str(win_info['process']['name']).replace('.exe', '')
             self._update_window_title(hwnd, win_info, event)
 
     def _update_window_title(self, hwnd: int, win_info: dict, event: WinEvent) -> None:

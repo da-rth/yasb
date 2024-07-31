@@ -8,6 +8,7 @@ DEFAULTS = {
         "vertical_stack": "[V]=",
         "horizontal_stack": "[H]=",
         "ultrawide_vertical_stack": "||=",
+        "grid": "[#]",
         "monocle": "[M]",
         "maximised": "[X]",
         "floating": "><>",
@@ -66,6 +67,10 @@ VALIDATION_SCHEMA = {
             "ultrawide_vertical_stack": {
                 'type': 'string',
                 'default': DEFAULTS['layout_icons']['ultrawide_vertical_stack']
+            },
+            "grid": {
+                'type': 'string',
+                'default': DEFAULTS['layout_icons']['grid']
             },
             "monocle": {
                 'type': 'string',
