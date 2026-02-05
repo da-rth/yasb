@@ -8,6 +8,10 @@
   <a href="https://github.com/denBot/yasb/issues"><img src="https://img.shields.io/github/issues/denBot/yasb"></a>
 </p>
 
+> NOTE: This project is now archived.
+> 
+> A popular and highly maintained fork of yasb is available at: https://github.com/amnweb/yasb
+
 ### What is it?
 **Yasb** (Yet Another Status Bar) is a highly configurable status bar written in Python using the Qt6 GUI Framework. The current goal of yasb is to bring a [polybar](https://github.com/polybar/polybar)/[waybar](https://github.com/Alexays/Waybar)-style status bar to the Windows platform. However, as yasb is written in Python + Qt6, it is cross-platform capable. With some minor adjustments and OS-specific widgets, yasb can also be configured to run on both Linux and Mac OSX.
 
